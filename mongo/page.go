@@ -9,7 +9,7 @@ import (
 type PageInput struct {
 	Page     int64
 	PageSize int64
-	DocRef   []struct{}
+	Ref      []struct{}
 	Sort     any
 }
 

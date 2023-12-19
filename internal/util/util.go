@@ -131,6 +131,10 @@ func SetInsertedIdOnDocument(insertedId, a any) {
 	rInsertedId := reflect.ValueOf(insertedId)
 	v := reflect.ValueOf(a)
 	t := reflect.TypeOf(a)
+	if v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface {
+		v = v.Elem()
+		t = t.Elem()
+	}
 	for i := 0; i < v.NumField(); i++ {
 		fieldValue := v.Field(i)
 		fieldStruct := t.Field(i)

@@ -72,3 +72,11 @@ func ParseReturnDocument(c ReturnDocument) *options.ReturnDocument {
 	result := options.ReturnDocument(c)
 	return &result
 }
+
+func ParseFullDocument(c FullDocument) *options.FullDocument {
+	if !c.IsEnumValid() {
+		return nil
+	}
+	result := options.FullDocument(c)
+	return &result
+}
