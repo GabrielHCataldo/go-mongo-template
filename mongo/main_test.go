@@ -11,11 +11,22 @@ import (
 	"time"
 )
 
+type testNewTemplate struct {
+	name            string
+	options         *options.ClientOptions
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
 type testInsertOne struct {
-	name    string
-	value   any
-	option  option.InsertOne
-	wantErr bool
+	name                     string
+	value                    any
+	option                   option.InsertOne
+	durationTimeout          time.Duration
+	beforeStartSession       bool
+	beforeCloseMongoClient   bool
+	forceErrCloseMongoClient bool
+	wantErr                  bool
 }
 
 var mongoTemplate Template
@@ -35,13 +46,21 @@ type testInvalidStruct struct {
 	Balance   float64            `json:"balance,omitempty" bson:"balance,omitempty"`
 }
 
+type testInvalidCollectionStruct struct {
+	Id        primitive.ObjectID `json:"id,omitempty" bson:"id,omitempty" database:"test"`
+	Name      string             `json:"name,omitempty" bson:"name,omitempty"`
+	BirthDate primitive.DateTime `json:"birthDate,omitempty" bson:"birthDate,omitempty"`
+	Emails    []string           `json:"emails,omitempty" bson:"emails,omitempty"`
+	Balance   float64            `json:"balance,omitempty" bson:"balance,omitempty"`
+}
+
 type testEmptyStruct struct {
 }
 
 func TestMain(t *testing.M) {
 	initMongoTemplate()
-	defer mongoTemplate.Disconnect()
 	t.Run()
+	disconnectMongoTemplate()
 }
 
 func initTestStruct() *testStruct {
@@ -55,6 +74,15 @@ func initTestStruct() *testStruct {
 
 func initTestInvalidStruct() *testInvalidStruct {
 	return &testInvalidStruct{
+		Name:      "Test Full Name",
+		BirthDate: primitive.NewDateTimeFromTime(time.Date(1999, 1, 21, 0, 0, 0, 0, time.Local)),
+		Emails:    []string{"testemail@gmail.com", "fullname@gmail.com", "test@gmail.com"},
+		Balance:   100.32,
+	}
+}
+
+func initTestInvalidCollectionStruct() *testInvalidCollectionStruct {
+	return &testInvalidCollectionStruct{
 		Name:      "Test Full Name",
 		BirthDate: primitive.NewDateTimeFromTime(time.Date(1999, 1, 21, 0, 0, 0, 0, time.Local)),
 		Emails:    []string{"testemail@gmail.com", "fullname@gmail.com", "test@gmail.com"},
@@ -83,38 +111,110 @@ func initMongoTemplate() {
 	mongoTemplate = nMongoTemplate
 }
 
+func initListTestNewTemplate() []testNewTemplate {
+	return []testNewTemplate{
+		{
+			name:            "success",
+			options:         options.Client().ApplyURI(os.Getenv("MONGODB_URL")),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed client",
+			options:         options.Client().ApplyURI("https://google.com/"),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed timeout",
+			options:         options.Client().ApplyURI(os.Getenv("MONGODB_URL")),
+			durationTimeout: 1 * time.Millisecond,
+			wantErr:         true,
+		},
+	}
+}
+
 func initListTestInsertOne() []testInsertOne {
 	return []testInsertOne{
 		{
-			name:   "success",
-			value:  initTestStruct(),
-			option: initOptionInsertOne(),
+			name:            "success",
+			value:           initTestStruct(),
+			option:          initOptionInsertOne(),
+			durationTimeout: 5 * time.Second,
 		},
 		{
-			name:    "failed type value",
-			value:   "string value",
-			option:  initOptionInsertOne().SetDisableAutoCloseTransaction(true),
-			wantErr: true,
+			name:                     "success with error commit transaction",
+			value:                    initTestStruct(),
+			option:                   initOptionInsertOne().SetDisableAutoCloseTransaction(true),
+			forceErrCloseMongoClient: true,
+			durationTimeout:          5 * time.Second,
 		},
 		{
-			name:    "failed empty value",
-			value:   initTestEmptyStruct(),
-			option:  initOptionInsertOne().SetDisableAutoCloseTransaction(true),
-			wantErr: true,
+			name:            "failed type value",
+			value:           "string value",
+			option:          initOptionInsertOne(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
 		},
 		{
-			name:    "failed non struct value",
-			value:   initTestString(),
-			option:  initOptionInsertOne().SetDisableAutoCloseTransaction(true),
-			wantErr: true,
+			name:            "failed empty value",
+			value:           initTestEmptyStruct(),
+			option:          initOptionInsertOne(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed invalid database struct config",
+			value:           initTestInvalidStruct(),
+			option:          initOptionInsertOne(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed invalid collection struct config",
+			value:           initTestInvalidCollectionStruct(),
+			option:          initOptionInsertOne(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed non struct value",
+			value:           initTestString(),
+			option:          initOptionInsertOne(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:                     "failed timeout",
+			value:                    initTestStruct(),
+			option:                   initOptionInsertOne().SetDisableAutoCloseTransaction(true),
+			durationTimeout:          1 * time.Millisecond,
+			forceErrCloseMongoClient: true,
+			wantErr:                  true,
+		},
+		{
+			name:                   "failed start session",
+			value:                  initTestStruct(),
+			option:                 initOptionInsertOne().SetForceRecreateSession(false),
+			durationTimeout:        5 * time.Second,
+			beforeCloseMongoClient: true,
+			beforeStartSession:     true,
+			wantErr:                true,
 		},
 	}
 }
 
 func initOptionInsertOne() option.InsertOne {
-	return option.InsertOne{
-		BypassDocumentValidation:    true,
-		Comment:                     "comment insert golang unit test",
-		DisableAutoCloseTransaction: false,
+	return option.NewInsertOne().
+		SetBypassDocumentValidation(true).
+		SetForceRecreateSession(true).
+		SetComment("comment insert golang unit test").
+		SetDisableAutoCloseTransaction(false)
+}
+
+func disconnectMongoTemplate() {
+	if mongoTemplate == nil {
+		return
 	}
+	mongoTemplate.Disconnect()
+	mongoTemplate = nil
 }

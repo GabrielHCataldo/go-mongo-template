@@ -31,8 +31,8 @@ type Update struct {
 	// servers will report an error for using this option. This must be a document mapping parameter names to values.
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
-	Let                         any
-	DisableAutoCloseTransaction bool
+	Let                     any
+	DisableAutoCloseSession bool
 }
 
 func NewUpdate() Update {
@@ -70,7 +70,7 @@ func (u Update) SetLet(a any) Update {
 }
 
 func (u Update) SetDisableAutoCloseTransaction(b bool) Update {
-	u.DisableAutoCloseTransaction = b
+	u.DisableAutoCloseSession = b
 	return u
 }
 
@@ -92,8 +92,8 @@ func GetUpdateOptionByParams(opts []Update) Update {
 		if opt.Let != nil {
 			result.Let = opt.Let
 		}
-		if opt.DisableAutoCloseTransaction {
-			result.DisableAutoCloseTransaction = opt.DisableAutoCloseTransaction
+		if opt.DisableAutoCloseSession {
+			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
 	}
 	return result

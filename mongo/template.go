@@ -59,7 +59,8 @@ type Template interface {
 	ListIndexes(ctx context.Context, ref struct{}, opts ...option.ListIndexes) ([]IndexOutput, error)
 	ListIndexSpecifications(ctx context.Context, ref struct{}, opts ...option.ListIndexes) ([]*mongo.IndexSpecification,
 		error)
-	CloseTransaction(context.Context, error)
+	StartSession(forceSession bool)
+	CloseSession(ctx context.Context, err error)
 	Disconnect()
 }
 
@@ -78,36 +79,21 @@ func NewTemplate(ctx context.Context, opts ...*options.ClientOptions) (Template,
 }
 
 func (t *template) InsertOne(ctx context.Context, document any, opts ...option.InsertOne) error {
-	err := t.startTransaction()
-	if err != nil {
-		return err
-	}
 	opt := option.GetInsertOneOptionByParams(opts)
+	t.StartSession(opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
+		err := t.insertOne(sc, document, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
 		}
-		err = t.insertOne(sc, document, opt)
 		return err
 	})
 }
 
 func (t *template) InsertMany(ctx context.Context, documents []any, opts ...option.InsertMany) error {
-	err := t.startTransaction()
-	if err != nil {
-		return err
-	}
 	opt := option.GetInsertManyOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer func() {
-				errClose := err
-				if !opt.DisableAutoRollback {
-					errClose = nil
-				}
-				t.CloseTransaction(sc, errClose)
-			}()
-		}
+		var err error
 		errs := t.insertMany(sc, documents, opt)
 		if len(errs) != 0 {
 			var b strings.Builder
@@ -119,23 +105,27 @@ func (t *template) InsertMany(ctx context.Context, documents []any, opts ...opti
 			}
 			err = errors.New(b.String())
 		}
+		if !opt.DisableAutoCloseSession {
+			errClose := err
+			if !opt.DisableAutoSessionRollback {
+				errClose = nil
+			}
+			t.CloseSession(sc, errClose)
+		}
 		return err
 	})
 }
 
 func (t *template) DeleteOne(ctx context.Context, filter any, ref struct{}, opts ...option.Delete) (
 	*mongo.DeleteResult, error) {
-	err := t.startTransaction()
-	if err != nil {
-		return nil, err
-	}
 	var result *mongo.DeleteResult
+	var err error
 	opt := option.GetDeleteOptionByParams(opts)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
-		}
 		result, err = t.deleteOne(sc, filter, ref, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
+		}
 		return err
 	})
 	return result, nil
@@ -143,17 +133,14 @@ func (t *template) DeleteOne(ctx context.Context, filter any, ref struct{}, opts
 
 func (t *template) DeleteMany(ctx context.Context, filter any, ref struct{}, opts ...option.Delete) (
 	*mongo.DeleteResult, error) {
-	err := t.startTransaction()
-	if err != nil {
-		return nil, err
-	}
 	var result *mongo.DeleteResult
+	var err error
 	opt := option.GetDeleteOptionByParams(opts)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
-		}
 		result, err = t.deleteMany(sc, filter, ref, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
+		}
 		return err
 	})
 	return result, nil
@@ -161,17 +148,14 @@ func (t *template) DeleteMany(ctx context.Context, filter any, ref struct{}, opt
 
 func (t *template) UpdateOneById(ctx context.Context, id, update any, ref struct{}, opts ...option.Update) (
 	*mongo.UpdateResult, error) {
-	err := t.startTransaction()
-	if err != nil {
-		return nil, err
-	}
 	var result *mongo.UpdateResult
+	var err error
 	opt := option.GetUpdateOptionByParams(opts)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
-		}
 		result, err = t.updateOne(sc, bson.M{"_id": id}, update, ref, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
+		}
 		return err
 	})
 	return result, nil
@@ -179,17 +163,14 @@ func (t *template) UpdateOneById(ctx context.Context, id, update any, ref struct
 
 func (t *template) UpdateOne(ctx context.Context, filter any, update any, ref struct{}, opts ...option.Update) (
 	*mongo.UpdateResult, error) {
-	err := t.startTransaction()
-	if err != nil {
-		return nil, err
-	}
 	var result *mongo.UpdateResult
+	var err error
 	opt := option.GetUpdateOptionByParams(opts)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
-		}
 		result, err = t.updateOne(sc, filter, update, ref, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
+		}
 		return err
 	})
 	return result, nil
@@ -197,17 +178,14 @@ func (t *template) UpdateOne(ctx context.Context, filter any, update any, ref st
 
 func (t *template) UpdateMany(ctx context.Context, filter any, update any, ref struct{}, opts ...option.Update) (
 	*mongo.UpdateResult, error) {
-	err := t.startTransaction()
-	if err != nil {
-		return nil, err
-	}
 	var result *mongo.UpdateResult
+	var err error
 	opt := option.GetUpdateOptionByParams(opts)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
-		}
 		result, err = t.updateMany(sc, filter, update, ref, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
+		}
 		return err
 	})
 	return result, nil
@@ -215,17 +193,14 @@ func (t *template) UpdateMany(ctx context.Context, filter any, update any, ref s
 
 func (t *template) ReplaceOne(ctx context.Context, filter any, update any, ref struct{}, opts ...option.Replace) (
 	*mongo.UpdateResult, error) {
-	err := t.startTransaction()
-	if err != nil {
-		return nil, err
-	}
 	var result *mongo.UpdateResult
+	var err error
 	opt := option.GetReplaceOptionByParams(opts)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
-		}
 		result, err = t.replaceOne(sc, filter, update, ref, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
+		}
 		return err
 	})
 	return result, nil
@@ -270,16 +245,13 @@ func (t *template) FindOneAndDelete(ctx context.Context, filter, dest any, opts 
 	} else if util.IsNotStruct(dest) {
 		return ErrDestIsNotStruct
 	}
-	err := t.startTransaction()
-	if err != nil {
-		return err
-	}
 	opt := option.GetFindOneAndDeleteOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
+		err := t.findOneAndDelete(sc, filter, dest, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
 		}
-		return t.findOneAndDelete(sc, filter, dest, opt)
+		return err
 	})
 }
 
@@ -289,16 +261,13 @@ func (t *template) FindOneAndReplace(ctx context.Context, filter, replacement, d
 	} else if util.IsNotStruct(dest) {
 		return ErrDestIsNotStruct
 	}
-	err := t.startTransaction()
-	if err != nil {
-		return err
-	}
 	opt := option.GetFindOneAndReplaceOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
+		err := t.findOneAndReplace(sc, filter, replacement, dest, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
 		}
-		return t.findOneAndReplace(sc, filter, replacement, dest, opt)
+		return err
 	})
 }
 
@@ -308,16 +277,13 @@ func (t *template) FindOneAndUpdate(ctx context.Context, filter, update, dest an
 	} else if util.IsNotStruct(dest) {
 		return ErrDestIsNotStruct
 	}
-	err := t.startTransaction()
-	if err != nil {
-		return err
-	}
 	opt := option.GetFindOneAndUpdateOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
+		err := t.findOneAndUpdate(sc, filter, update, dest, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
 		}
-		return t.findOneAndUpdate(sc, filter, update, dest, opt)
+		return err
 	})
 }
 
@@ -547,31 +513,23 @@ func (t *template) WatchHandler(ctx context.Context, pipeline any, handler Handl
 }
 
 func (t *template) DropCollection(ctx context.Context, ref struct{}, opts ...option.Drop) error {
-	err := t.startTransaction()
-	if err != nil {
-		return err
-	}
 	opt := option.GetDropOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(ctx, err)
+		err := t.dropCollection(sc, ref)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
 		}
-		err = t.dropCollection(sc, ref)
 		return err
 	})
 }
 
 func (t *template) DropDatabase(ctx context.Context, ref struct{}, opts ...option.Drop) error {
-	err := t.startTransaction()
-	if err != nil {
-		return err
-	}
 	opt := option.GetDropOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(ctx, err)
+		err := t.dropDatabase(sc, ref)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
 		}
-		err = t.dropDatabase(sc, ref)
 		return err
 	})
 }
@@ -597,31 +555,23 @@ func (t *template) CreateManyIndex(ctx context.Context, inputs []IndexInput, ref
 }
 
 func (t *template) DropOneIndex(ctx context.Context, name string, ref struct{}, opts ...option.DropIndex) error {
-	err := t.startTransaction()
-	if err != nil {
-		return err
-	}
 	opt := option.GetDropIndexOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
+		err := t.dropOneIndex(sc, name, ref, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
 		}
-		err = t.dropOneIndex(sc, name, ref, opt)
 		return err
 	})
 }
 
 func (t *template) DropAllIndexes(ctx context.Context, ref struct{}, opts ...option.DropIndex) error {
-	err := t.startTransaction()
-	if err != nil {
-		return err
-	}
 	opt := option.GetDropIndexOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		if !opt.DisableAutoCloseTransaction {
-			defer t.CloseTransaction(sc, err)
+		err := t.dropAllIndex(sc, ref, opt)
+		if !opt.DisableAutoCloseSession {
+			t.CloseSession(sc, err)
 		}
-		err = t.dropAllIndex(sc, ref, opt)
 		return err
 	})
 }
@@ -664,31 +614,29 @@ func (t *template) ListIndexSpecifications(ctx context.Context, ref struct{}, op
 	})
 }
 
-func (t *template) CloseTransaction(ctx context.Context, err error) {
+func (t *template) CloseSession(ctx context.Context, err error) {
 	if t.session == nil {
 		return
 	}
 	if err != nil {
 		if err = t.session.AbortTransaction(ctx); err != nil {
 			logger.Error("error abort transaction")
+		} else {
+			logger.Info("transaction aborted successfully!")
 		}
-		logger.Info("transaction aborted successfully!")
 		return
 	}
 	if err = t.session.CommitTransaction(ctx); err != nil {
 		logger.Error("error commit transaction")
-		return
+	} else {
+		logger.Info("transaction commit successfully!")
 	}
-	logger.Info("transaction commit successfully!")
 	t.session.EndSession(ctx)
-	logger.Info("session finish successfully!")
 	t.session = nil
+	logger.Info("session finish successfully!")
 }
 
 func (t *template) Disconnect() {
-	if t.client == nil {
-		return
-	}
 	err := t.client.Disconnect(context.TODO())
 	if err != nil {
 		logger.Error("Error disconnect MongoDB:", err)
@@ -697,17 +645,13 @@ func (t *template) Disconnect() {
 	logger.Info("Connection to MongoDB closed.")
 }
 
-func (t *template) startTransaction() error {
-	session, err := t.client.StartSession()
-	if err != nil {
-		return err
+func (t *template) StartSession(forceSession bool) {
+	if t.session != nil && !forceSession {
+		return
 	}
-	err = session.StartTransaction()
-	if err != nil {
-		return err
-	}
+	session, _ := t.client.StartSession()
+	_ = session.StartTransaction()
 	t.session = session
-	return nil
 }
 
 func (t *template) insertOne(sc mongo.SessionContext, document any, opt option.InsertOne) error {

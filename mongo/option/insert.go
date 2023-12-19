@@ -8,8 +8,9 @@ type InsertOne struct {
 	BypassDocumentValidation bool
 	// A string or document that will be included in server logs, profiling logs, and currentOp queries to help trace
 	// the operation.  The default value is nil, which means that no comment will be included in the logs.
-	Comment                     any
-	DisableAutoCloseTransaction bool
+	Comment                 any
+	DisableAutoCloseSession bool
+	ForceRecreateSession    bool
 }
 
 type InsertMany struct {
@@ -20,9 +21,10 @@ type InsertMany struct {
 	BypassDocumentValidation bool
 	// A string or document that will be included in server logs, profiling logs, and currentOp queries to help trace
 	// the operation.  The default value is nil, which means that no comment will be included in the logs.
-	Comment                     any
-	DisableAutoRollback         bool
-	DisableAutoCloseTransaction bool
+	Comment                    any
+	DisableAutoSessionRollback bool
+	DisableAutoCloseSession    bool
+	ForceRecreateSession       bool
 }
 
 func NewInsertOne() InsertOne {
@@ -44,7 +46,12 @@ func (i InsertOne) SetComment(a any) InsertOne {
 }
 
 func (i InsertOne) SetDisableAutoCloseTransaction(b bool) InsertOne {
-	i.DisableAutoCloseTransaction = b
+	i.DisableAutoCloseSession = b
+	return i
+}
+
+func (i InsertOne) SetForceRecreateSession(b bool) InsertOne {
+	i.ForceRecreateSession = b
 	return i
 }
 
@@ -59,12 +66,17 @@ func (i InsertMany) SetComment(a any) InsertMany {
 }
 
 func (i InsertMany) SetDisableAutoRollback(b bool) InsertMany {
-	i.DisableAutoRollback = b
+	i.DisableAutoSessionRollback = b
 	return i
 }
 
 func (i InsertMany) SetDisableAutoCloseTransaction(b bool) InsertMany {
-	i.DisableAutoCloseTransaction = b
+	i.DisableAutoCloseSession = b
+	return i
+}
+
+func (i InsertMany) SetForceRecreateSession(b bool) InsertMany {
+	i.ForceRecreateSession = b
 	return i
 }
 
@@ -77,8 +89,11 @@ func GetInsertOneOptionByParams(opts []InsertOne) InsertOne {
 		if opt.Comment != nil {
 			result.Comment = opt.Comment
 		}
-		if opt.DisableAutoCloseTransaction {
-			result.DisableAutoCloseTransaction = opt.DisableAutoCloseTransaction
+		if opt.DisableAutoCloseSession {
+			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
+		}
+		if opt.ForceRecreateSession {
+			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
 	}
 	return result
@@ -87,17 +102,20 @@ func GetInsertOneOptionByParams(opts []InsertOne) InsertOne {
 func GetInsertManyOptionByParams(opts []InsertMany) InsertMany {
 	result := InsertMany{}
 	for _, opt := range opts {
+		if opt.ForceRecreateSession {
+			result.ForceRecreateSession = opt.ForceRecreateSession
+		}
 		if opt.BypassDocumentValidation {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
 		if opt.Comment != nil {
 			result.Comment = opt.Comment
 		}
-		if opt.DisableAutoRollback {
-			result.DisableAutoRollback = opt.DisableAutoRollback
+		if opt.DisableAutoSessionRollback {
+			result.DisableAutoSessionRollback = opt.DisableAutoSessionRollback
 		}
-		if opt.DisableAutoCloseTransaction {
-			result.DisableAutoCloseTransaction = opt.DisableAutoCloseTransaction
+		if opt.DisableAutoCloseSession {
+			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
 	}
 	return result

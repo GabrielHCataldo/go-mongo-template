@@ -44,6 +44,9 @@ func IsNilValueReflect(v reflect.Value) bool {
 
 func IsZero(a any) bool {
 	v := reflect.ValueOf(a)
+	if v.Kind() == reflect.Pointer && !IsNilValueReflect(v) {
+		v = v.Elem()
+	}
 	return v.Kind() == reflect.Invalid || v.IsZero() || IsNilValueReflect(v) || !v.CanInterface() ||
 		(v.Kind() == reflect.Map && len(v.MapKeys()) == 0) ||
 		(v.Kind() == reflect.Struct && v.NumField() == 0) ||

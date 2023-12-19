@@ -212,8 +212,8 @@ type FindOneAndDelete struct {
 	// servers will report an error for using this option. This must be a document mapping parameter names to values.
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
-	Let                         any
-	DisableAutoCloseTransaction bool
+	Let                     any
+	DisableAutoCloseSession bool
 }
 
 type FindOneAndReplace struct {
@@ -260,8 +260,8 @@ type FindOneAndReplace struct {
 	// servers will report an error for using this option. This must be a document mapping parameter names to values.
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
-	Let                         any
-	DisableAutoCloseTransaction bool
+	Let                     any
+	DisableAutoCloseSession bool
 }
 
 type FindOneAndUpdate struct {
@@ -312,8 +312,8 @@ type FindOneAndUpdate struct {
 	// servers will report an error for using this option. This must be a document mapping parameter names to values.
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
-	Let                         any
-	DisableAutoCloseTransaction bool
+	Let                     any
+	DisableAutoCloseSession bool
 }
 
 func NewFind() Find {
@@ -611,12 +611,12 @@ func (f FindOneAndDelete) SetLet(v any) FindOneAndDelete {
 }
 
 func (f FindOneAndDelete) SetDisableAutoCloseTransaction(b bool) FindOneAndDelete {
-	f.DisableAutoCloseTransaction = b
+	f.DisableAutoCloseSession = b
 	return f
 }
 
 func (f FindOneAndReplace) SetDisableAutoCloseTransaction(b bool) FindOneAndReplace {
-	f.DisableAutoCloseTransaction = b
+	f.DisableAutoCloseSession = b
 	return f
 }
 
@@ -671,7 +671,7 @@ func (f FindOneAndReplace) SetSort(i int64) FindOneAndReplace {
 }
 
 func (f FindOneAndUpdate) SetDisableAutoCloseTransaction(b bool) FindOneAndUpdate {
-	f.DisableAutoCloseTransaction = b
+	f.DisableAutoCloseSession = b
 	return f
 }
 
@@ -895,8 +895,8 @@ func GetFindOneOptionByParams(opts []FindOne) FindOne {
 func GetFindOneAndDeleteOptionByParams(opts []FindOneAndDelete) FindOneAndDelete {
 	result := FindOneAndDelete{}
 	for _, opt := range opts {
-		if opt.DisableAutoCloseTransaction {
-			result.DisableAutoCloseTransaction = opt.DisableAutoCloseTransaction
+		if opt.DisableAutoCloseSession {
+			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
@@ -929,8 +929,8 @@ func GetFindOneAndReplaceOptionByParams(opts []FindOneAndReplace) FindOneAndRepl
 		if opt.BypassDocumentValidation {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
-		if opt.DisableAutoCloseTransaction {
-			result.DisableAutoCloseTransaction = opt.DisableAutoCloseTransaction
+		if opt.DisableAutoCloseSession {
+			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
 		if opt.Upsert {
 			result.Upsert = opt.Upsert
@@ -969,8 +969,8 @@ func GetFindOneAndUpdateOptionByParams(opts []FindOneAndUpdate) FindOneAndUpdate
 		if opt.BypassDocumentValidation {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
-		if opt.DisableAutoCloseTransaction {
-			result.DisableAutoCloseTransaction = opt.DisableAutoCloseTransaction
+		if opt.DisableAutoCloseSession {
+			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
 		if opt.Upsert {
 			result.Upsert = opt.Upsert

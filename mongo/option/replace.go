@@ -27,8 +27,8 @@ type Replace struct {
 	// servers will report an error for using this option. This must be a document mapping parameter names to values.
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
-	Let                         any
-	DisableAutoCloseTransaction bool
+	Let                     any
+	DisableAutoCloseSession bool
 }
 
 func NewReplace() Replace {
@@ -61,7 +61,7 @@ func (r Replace) SetLet(a any) Replace {
 }
 
 func (r Replace) SetDisableAutoCloseTransaction(b bool) Replace {
-	r.DisableAutoCloseTransaction = b
+	r.DisableAutoCloseSession = b
 	return r
 }
 
@@ -80,8 +80,8 @@ func GetReplaceOptionByParams(opts []Replace) Replace {
 		if opt.Let != nil {
 			result.Let = opt.Let
 		}
-		if opt.DisableAutoCloseTransaction {
-			result.DisableAutoCloseTransaction = opt.DisableAutoCloseTransaction
+		if opt.DisableAutoCloseSession {
+			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
 	}
 	return result

@@ -73,8 +73,8 @@ type DropIndex struct {
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used
 	// in its place to control the amount of time that a single operation can run before returning an error. MaxTime
 	// is ignored if Timeout is set on the client.
-	MaxTime                     time.Duration
-	DisableAutoCloseTransaction bool
+	MaxTime                 time.Duration
+	DisableAutoCloseSession bool
 }
 
 type ListIndexes struct {
@@ -221,7 +221,7 @@ func (d DropIndex) SetMaxTime(duration time.Duration) DropIndex {
 }
 
 func (d DropIndex) SetDisableAutoCloseTransaction(b bool) DropIndex {
-	d.DisableAutoCloseTransaction = b
+	d.DisableAutoCloseSession = b
 	return d
 }
 
@@ -241,8 +241,8 @@ func GetDropIndexOptionByParams(opts []DropIndex) DropIndex {
 		if opt.MaxTime > 0 {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.DisableAutoCloseTransaction {
-			result.DisableAutoCloseTransaction = opt.DisableAutoCloseTransaction
+		if opt.DisableAutoCloseSession {
+			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
 	}
 	return result

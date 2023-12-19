@@ -19,8 +19,8 @@ type Delete struct {
 	// servers will report an error for using this option. This must be a document mapping parameter names to values.
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
-	Let                         any
-	DisableAutoCloseTransaction bool
+	Let                     any
+	DisableAutoCloseSession bool
 }
 
 func NewDelete() Delete {
@@ -48,7 +48,7 @@ func (d Delete) SetLet(a any) Delete {
 }
 
 func (d Delete) SetDisableAutoCloseTransaction(b bool) Delete {
-	d.DisableAutoCloseTransaction = b
+	d.DisableAutoCloseSession = b
 	return d
 }
 
@@ -67,8 +67,8 @@ func GetDeleteOptionByParams(opts []Delete) Delete {
 		if opt.Let != nil {
 			result.Let = opt.Let
 		}
-		if opt.DisableAutoCloseTransaction {
-			result.DisableAutoCloseTransaction = opt.DisableAutoCloseTransaction
+		if opt.DisableAutoCloseSession {
+			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
 	}
 	return result
