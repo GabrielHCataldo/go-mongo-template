@@ -4,12 +4,16 @@ import (
 	"context"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"go-mongo/mongo/option"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
 	"testing"
 	"time"
 )
+
+const MongoDBUrl = "MONGODB_URL"
+const MongoDBTestId = "MONGODB_TEST_ID"
 
 type testNewTemplate struct {
 	name            string
@@ -27,6 +31,53 @@ type testInsertOne struct {
 	beforeCloseMongoClient   bool
 	forceErrCloseMongoClient bool
 	wantErr                  bool
+}
+
+type testInsertMany struct {
+	name            string
+	value           []any
+	option          option.InsertMany
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testDelete struct {
+	name            string
+	filter          any
+	ref             any
+	option          option.Delete
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testUpdateOneById struct {
+	name            string
+	id              any
+	update          any
+	ref             any
+	option          option.Update
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testUpdate struct {
+	name            string
+	filter          any
+	update          any
+	ref             any
+	option          option.Update
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testReplace struct {
+	name            string
+	filter          any
+	replacement     any
+	ref             any
+	option          option.Replace
+	durationTimeout time.Duration
+	wantErr         bool
 }
 
 var mongoTemplate Template
@@ -61,6 +112,30 @@ func TestMain(t *testing.M) {
 	initMongoTemplate()
 	t.Run()
 	disconnectMongoTemplate()
+}
+
+func initMongoTemplate() {
+	if mongoTemplate != nil {
+		return
+	}
+	nMongoTemplate, err := NewTemplate(context.TODO(), options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+	if err != nil {
+		logger.Error("error new template:", err)
+		return
+	}
+	mongoTemplate = nMongoTemplate
+}
+
+func initDocument() {
+	initMongoTemplate()
+	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+	defer cancel()
+	test := initTestStruct()
+	err := mongoTemplate.InsertOne(ctx, test)
+	if err != nil {
+		logger.Error("error init document:", err)
+	}
+	_ = os.Setenv(MongoDBTestId, test.Id.String())
 }
 
 func initTestStruct() *testStruct {
@@ -99,23 +174,11 @@ func initTestString() *string {
 	return &s
 }
 
-func initMongoTemplate() {
-	if mongoTemplate != nil {
-		return
-	}
-	nMongoTemplate, err := NewTemplate(context.TODO(), options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error new template:", err)
-		return
-	}
-	mongoTemplate = nMongoTemplate
-}
-
 func initListTestNewTemplate() []testNewTemplate {
 	return []testNewTemplate{
 		{
 			name:            "success",
-			options:         options.Client().ApplyURI(os.Getenv("MONGODB_URL")),
+			options:         options.Client().ApplyURI(os.Getenv(MongoDBUrl)),
 			durationTimeout: 5 * time.Second,
 		},
 		{
@@ -126,7 +189,7 @@ func initListTestNewTemplate() []testNewTemplate {
 		},
 		{
 			name:            "failed timeout",
-			options:         options.Client().ApplyURI(os.Getenv("MONGODB_URL")),
+			options:         options.Client().ApplyURI(os.Getenv(MongoDBUrl)),
 			durationTimeout: 1 * time.Millisecond,
 			wantErr:         true,
 		},
@@ -203,6 +266,185 @@ func initListTestInsertOne() []testInsertOne {
 	}
 }
 
+func initListTestInsertMany() []testInsertMany {
+	return []testInsertMany{
+		{
+			name:            "success",
+			value:           []any{initTestStruct(), initTestStruct(), nil},
+			option:          initOptionInsertMany(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name: "success one",
+			value: []any{
+				initTestStruct(),
+				initTestInvalidStruct(),
+				initTestInvalidCollectionStruct(),
+				initTestEmptyStruct(),
+				initTestString(),
+				"test string normal",
+			},
+			option:          initOptionInsertMany().SetDisableAutoCloseTransaction(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed empty value",
+			value:           []any{},
+			option:          initOptionInsertMany(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestDelete() []testDelete {
+	return []testDelete{
+		{
+			name:            "success",
+			filter:          bson.M{"_id": os.Getenv(MongoDBTestId)},
+			ref:             testStruct{},
+			option:          initOptionDelete(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed struct ref",
+			filter:          bson.M{},
+			ref:             initTestInvalidStruct(),
+			option:          initOptionDelete(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type ref",
+			filter:          bson.M{},
+			ref:             initTestString(),
+			option:          initOptionDelete().SetDisableAutoCloseTransaction(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestUpdateOneById() []testUpdateOneById {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testUpdateOneById{
+		{
+			name:            "success",
+			id:              objectId,
+			update:          bson.M{"$set": bson.M{"updated": true}},
+			ref:             testStruct{},
+			option:          initOptionUpdate(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed struct ref",
+			id:              "id string",
+			update:          nil,
+			ref:             initTestInvalidStruct(),
+			option:          initOptionUpdate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type ref",
+			id:              "id string",
+			update:          nil,
+			ref:             initTestString(),
+			option:          initOptionUpdate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed update param",
+			id:              objectId,
+			update:          nil,
+			ref:             testStruct{},
+			option:          initOptionUpdate().SetDisableAutoCloseTransaction(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestUpdate() []testUpdate {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testUpdate{
+		{
+			name:            "success",
+			filter:          bson.M{"_id": objectId},
+			update:          bson.M{"$set": bson.M{"updated": true}},
+			ref:             testStruct{},
+			option:          initOptionUpdate(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed struct ref",
+			update:          nil,
+			ref:             initTestInvalidStruct(),
+			option:          initOptionUpdate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type ref",
+			update:          nil,
+			ref:             initTestString(),
+			option:          initOptionUpdate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed update param",
+			filter:          bson.M{"_id": objectId},
+			update:          nil,
+			ref:             testStruct{},
+			option:          initOptionUpdate().SetDisableAutoCloseTransaction(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestReplace() []testReplace {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testReplace{
+		{
+			name:            "success",
+			filter:          bson.M{"_id": objectId},
+			replacement:     bson.M{"$set": initTestStruct()},
+			ref:             testStruct{},
+			option:          initOptionReplace(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed struct ref",
+			replacement:     nil,
+			ref:             initTestInvalidStruct(),
+			option:          initOptionReplace(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type ref",
+			replacement:     nil,
+			ref:             initTestString(),
+			option:          initOptionReplace(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed update param",
+			filter:          bson.M{"_id": objectId},
+			replacement:     nil,
+			ref:             testStruct{},
+			option:          initOptionReplace().SetDisableAutoCloseTransaction(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
 func initOptionInsertOne() option.InsertOne {
 	return option.NewInsertOne().
 		SetBypassDocumentValidation(true).
@@ -211,10 +453,53 @@ func initOptionInsertOne() option.InsertOne {
 		SetDisableAutoCloseTransaction(false)
 }
 
+func initOptionInsertMany() option.InsertMany {
+	return option.NewInsertMany().
+		SetBypassDocumentValidation(true).
+		SetForceRecreateSession(true).
+		SetComment("comment insert golang unit test").
+		SetDisableAutoCloseTransaction(false).
+		SetDisableAutoRollback(false)
+}
+
+func initOptionDelete() option.Delete {
+	return option.NewDelete().
+		SetDisableAutoCloseTransaction(false).
+		SetComment("comment delete golang unit test").
+		SetCollation(&option.Collation{}).
+		SetHint(bson.M{}).
+		SetLet(bson.M{})
+}
+
+func initOptionUpdate() option.Update {
+	return option.NewUpdate().
+		SetDisableAutoCloseTransaction(false).
+		SetComment("comment update golang unit test").
+		SetCollation(&option.Collation{}).
+		SetHint(bson.M{}).
+		SetLet(bson.M{}).
+		SetBypassDocumentValidation(true).
+		SetArrayFilters(&option.ArrayFilters{}).
+		SetUpsert(true)
+}
+
+func initOptionReplace() option.Replace {
+	return option.NewReplace().
+		SetDisableAutoCloseTransaction(false).
+		SetComment("comment replace golang unit test").
+		SetCollation(&option.Collation{}).
+		SetHint(bson.M{}).
+		SetLet(bson.M{}).
+		SetBypassDocumentValidation(true)
+}
+
 func disconnectMongoTemplate() {
 	if mongoTemplate == nil {
 		return
 	}
+	//ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+	//defer cancel()
+	//_ = mongoTemplate.DropCollection(ctx, testStruct{})
 	mongoTemplate.Disconnect()
 	mongoTemplate = nil
 }

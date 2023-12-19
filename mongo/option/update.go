@@ -74,6 +74,11 @@ func (u Update) SetDisableAutoCloseTransaction(b bool) Update {
 	return u
 }
 
+func (u Update) SetUpsert(b bool) Update {
+	u.Upsert = b
+	return u
+}
+
 func GetUpdateOptionByParams(opts []Update) Update {
 	result := Update{}
 	for _, opt := range opts {

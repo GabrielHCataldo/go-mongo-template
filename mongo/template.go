@@ -23,15 +23,15 @@ type template struct {
 type Template interface {
 	InsertOne(ctx context.Context, document any, opts ...option.InsertOne) error
 	InsertMany(ctx context.Context, documents []any, opts ...option.InsertMany) error
-	DeleteOne(ctx context.Context, filter any, ref struct{}, opts ...option.Delete) (*mongo.DeleteResult, error)
-	DeleteMany(ctx context.Context, filter any, ref struct{}, opts ...option.Delete) (*mongo.DeleteResult, error)
-	UpdateOneById(ctx context.Context, id, update any, ref struct{}, opts ...option.Update) (*mongo.UpdateResult, error)
-	UpdateOne(ctx context.Context, filter, update any, ref struct{}, opts ...option.Update) (*mongo.UpdateResult, error)
-	UpdateMany(ctx context.Context, filter, update any, ref struct{}, opts ...option.Update) (*mongo.UpdateResult, error)
-	ReplaceOne(ctx context.Context, filter, replacement any, ref struct{}, opts ...option.Replace) (*mongo.UpdateResult, error)
+	DeleteOne(ctx context.Context, filter, ref any, opts ...option.Delete) (*mongo.DeleteResult, error)
+	DeleteMany(ctx context.Context, filter, ref any, opts ...option.Delete) (*mongo.DeleteResult, error)
+	UpdateOneById(ctx context.Context, id, update, ref any, opts ...option.Update) (*mongo.UpdateResult, error)
+	UpdateOne(ctx context.Context, filter, update, ref any, opts ...option.Update) (*mongo.UpdateResult, error)
+	UpdateMany(ctx context.Context, filter, update, ref any, opts ...option.Update) (*mongo.UpdateResult, error)
+	ReplaceOne(ctx context.Context, filter, replacement, ref any, opts ...option.Replace) (*mongo.UpdateResult, error)
 	Aggregate(ctx context.Context, pipeline, dest any, opts ...option.Aggregate) error
-	CountDocuments(ctx context.Context, filter any, ref struct{}, opts ...option.Count) (int64, error)
-	EstimatedDocumentCount(ctx context.Context, ref struct{}, opts ...option.EstimatedDocumentCount) (int64, error)
+	CountDocuments(ctx context.Context, filter, ref any, opts ...option.Count) (int64, error)
+	EstimatedDocumentCount(ctx context.Context, ref any, opts ...option.EstimatedDocumentCount) (int64, error)
 	Distinct(ctx context.Context, fieldName string, filter, dest any, opts ...option.Distinct) error
 	FindOne(ctx context.Context, filter, dest any, opts ...option.FindOne) error
 	FindOneAndDelete(ctx context.Context, filter, dest any, opts ...option.FindOneAndDelete) error
@@ -41,8 +41,8 @@ type Template interface {
 	FindPageable(ctx context.Context, filter any, input PageInput, opts ...option.FindPageable) (*PageOutput, error)
 	Watch(ctx context.Context, pipeline any, opts ...option.Watch) (*mongo.ChangeStream, error)
 	WatchHandler(ctx context.Context, pipeline any, handler HandlerWatch, opts ...option.Watch) error
-	DropCollection(ctx context.Context, ref struct{}, opts ...option.Drop) error
-	DropDatabase(ctx context.Context, ref struct{}, opts ...option.Drop) error
+	DropCollection(ctx context.Context, ref any, opts ...option.Drop) error
+	DropDatabase(ctx context.Context, ref any, opts ...option.Drop) error
 	// CreateOneIndex
 	//
 	// # Parameters:
@@ -52,12 +52,12 @@ type Template interface {
 	// - value: A document describing which keys should be used for the index. It cannot be nil. This must be an
 	// order-preserving type such as bson.D. Map types such as bson.M are not valid.
 	// See https://www.mongodb.com/docs/manual/indexes/#indexes for examples of valid documents.
-	CreateOneIndex(ctx context.Context, input IndexInput, ref struct{}) (string, error)
-	CreateManyIndex(ctx context.Context, inputs []IndexInput, ref struct{}) ([]string, error)
-	DropOneIndex(ctx context.Context, name string, ref struct{}, opts ...option.DropIndex) error
-	DropAllIndexes(ctx context.Context, ref struct{}, opts ...option.DropIndex) error
-	ListIndexes(ctx context.Context, ref struct{}, opts ...option.ListIndexes) ([]IndexOutput, error)
-	ListIndexSpecifications(ctx context.Context, ref struct{}, opts ...option.ListIndexes) ([]*mongo.IndexSpecification,
+	CreateOneIndex(ctx context.Context, input IndexInput, ref any) (string, error)
+	CreateManyIndex(ctx context.Context, inputs []IndexInput, ref any) ([]string, error)
+	DropOneIndex(ctx context.Context, name string, ref any, opts ...option.DropIndex) error
+	DropAllIndexes(ctx context.Context, ref any, opts ...option.DropIndex) error
+	ListIndexes(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexOutput, error)
+	ListIndexSpecifications(ctx context.Context, ref any, opts ...option.ListIndexes) ([]*mongo.IndexSpecification,
 		error)
 	StartSession(forceSession bool)
 	CloseSession(ctx context.Context, err error)
@@ -116,7 +116,7 @@ func (t *template) InsertMany(ctx context.Context, documents []any, opts ...opti
 	})
 }
 
-func (t *template) DeleteOne(ctx context.Context, filter any, ref struct{}, opts ...option.Delete) (
+func (t *template) DeleteOne(ctx context.Context, filter, ref any, opts ...option.Delete) (
 	*mongo.DeleteResult, error) {
 	var result *mongo.DeleteResult
 	var err error
@@ -128,10 +128,10 @@ func (t *template) DeleteOne(ctx context.Context, filter any, ref struct{}, opts
 		}
 		return err
 	})
-	return result, nil
+	return result, err
 }
 
-func (t *template) DeleteMany(ctx context.Context, filter any, ref struct{}, opts ...option.Delete) (
+func (t *template) DeleteMany(ctx context.Context, filter, ref any, opts ...option.Delete) (
 	*mongo.DeleteResult, error) {
 	var result *mongo.DeleteResult
 	var err error
@@ -143,10 +143,10 @@ func (t *template) DeleteMany(ctx context.Context, filter any, ref struct{}, opt
 		}
 		return err
 	})
-	return result, nil
+	return result, err
 }
 
-func (t *template) UpdateOneById(ctx context.Context, id, update any, ref struct{}, opts ...option.Update) (
+func (t *template) UpdateOneById(ctx context.Context, id, update, ref any, opts ...option.Update) (
 	*mongo.UpdateResult, error) {
 	var result *mongo.UpdateResult
 	var err error
@@ -158,10 +158,10 @@ func (t *template) UpdateOneById(ctx context.Context, id, update any, ref struct
 		}
 		return err
 	})
-	return result, nil
+	return result, err
 }
 
-func (t *template) UpdateOne(ctx context.Context, filter any, update any, ref struct{}, opts ...option.Update) (
+func (t *template) UpdateOne(ctx context.Context, filter any, update, ref any, opts ...option.Update) (
 	*mongo.UpdateResult, error) {
 	var result *mongo.UpdateResult
 	var err error
@@ -173,10 +173,10 @@ func (t *template) UpdateOne(ctx context.Context, filter any, update any, ref st
 		}
 		return err
 	})
-	return result, nil
+	return result, err
 }
 
-func (t *template) UpdateMany(ctx context.Context, filter any, update any, ref struct{}, opts ...option.Update) (
+func (t *template) UpdateMany(ctx context.Context, filter any, update, ref any, opts ...option.Update) (
 	*mongo.UpdateResult, error) {
 	var result *mongo.UpdateResult
 	var err error
@@ -188,10 +188,10 @@ func (t *template) UpdateMany(ctx context.Context, filter any, update any, ref s
 		}
 		return err
 	})
-	return result, nil
+	return result, err
 }
 
-func (t *template) ReplaceOne(ctx context.Context, filter any, update any, ref struct{}, opts ...option.Replace) (
+func (t *template) ReplaceOne(ctx context.Context, filter any, update, ref any, opts ...option.Replace) (
 	*mongo.UpdateResult, error) {
 	var result *mongo.UpdateResult
 	var err error
@@ -203,7 +203,7 @@ func (t *template) ReplaceOne(ctx context.Context, filter any, update any, ref s
 		}
 		return err
 	})
-	return result, nil
+	return result, err
 }
 
 func (t *template) FindOne(ctx context.Context, filter, dest any, opts ...option.FindOne) error {
@@ -400,7 +400,7 @@ func (t *template) Aggregate(ctx context.Context, pipeline any, dest any, opts .
 	return nil
 }
 
-func (t *template) CountDocuments(ctx context.Context, filter any, ref struct{}, opts ...option.Count) (int64, error) {
+func (t *template) CountDocuments(ctx context.Context, filter, ref any, opts ...option.Count) (int64, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return 0, err
@@ -418,7 +418,7 @@ func (t *template) CountDocuments(ctx context.Context, filter any, ref struct{},
 	})
 }
 
-func (t *template) EstimatedDocumentCount(ctx context.Context, ref struct{}, opts ...option.EstimatedDocumentCount) (
+func (t *template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...option.EstimatedDocumentCount) (
 	int64, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
@@ -512,7 +512,7 @@ func (t *template) WatchHandler(ctx context.Context, pipeline any, handler Handl
 	return nil
 }
 
-func (t *template) DropCollection(ctx context.Context, ref struct{}, opts ...option.Drop) error {
+func (t *template) DropCollection(ctx context.Context, ref any, opts ...option.Drop) error {
 	opt := option.GetDropOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.dropCollection(sc, ref)
@@ -523,7 +523,7 @@ func (t *template) DropCollection(ctx context.Context, ref struct{}, opts ...opt
 	})
 }
 
-func (t *template) DropDatabase(ctx context.Context, ref struct{}, opts ...option.Drop) error {
+func (t *template) DropDatabase(ctx context.Context, ref any, opts ...option.Drop) error {
 	opt := option.GetDropOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.dropDatabase(sc, ref)
@@ -534,7 +534,7 @@ func (t *template) DropDatabase(ctx context.Context, ref struct{}, opts ...optio
 	})
 }
 
-func (t *template) CreateOneIndex(ctx context.Context, input IndexInput, ref struct{}) (string, error) {
+func (t *template) CreateOneIndex(ctx context.Context, input IndexInput, ref any) (string, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return "", err
@@ -544,7 +544,7 @@ func (t *template) CreateOneIndex(ctx context.Context, input IndexInput, ref str
 	return collection.CreateOne(ctx, parseIndexInputToModel(input))
 }
 
-func (t *template) CreateManyIndex(ctx context.Context, inputs []IndexInput, ref struct{}) ([]string, error) {
+func (t *template) CreateManyIndex(ctx context.Context, inputs []IndexInput, ref any) ([]string, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
@@ -554,7 +554,7 @@ func (t *template) CreateManyIndex(ctx context.Context, inputs []IndexInput, ref
 	return collection.CreateMany(ctx, parseSliceIndexInputToModels(inputs))
 }
 
-func (t *template) DropOneIndex(ctx context.Context, name string, ref struct{}, opts ...option.DropIndex) error {
+func (t *template) DropOneIndex(ctx context.Context, name string, ref any, opts ...option.DropIndex) error {
 	opt := option.GetDropIndexOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.dropOneIndex(sc, name, ref, opt)
@@ -565,7 +565,7 @@ func (t *template) DropOneIndex(ctx context.Context, name string, ref struct{}, 
 	})
 }
 
-func (t *template) DropAllIndexes(ctx context.Context, ref struct{}, opts ...option.DropIndex) error {
+func (t *template) DropAllIndexes(ctx context.Context, ref any, opts ...option.DropIndex) error {
 	opt := option.GetDropIndexOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.dropAllIndex(sc, ref, opt)
@@ -576,7 +576,7 @@ func (t *template) DropAllIndexes(ctx context.Context, ref struct{}, opts ...opt
 	})
 }
 
-func (t *template) ListIndexes(ctx context.Context, ref struct{}, opts ...option.ListIndexes) ([]IndexOutput, error) {
+func (t *template) ListIndexes(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexOutput, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
@@ -599,7 +599,7 @@ func (t *template) ListIndexes(ctx context.Context, ref struct{}, opts ...option
 	return results, err
 }
 
-func (t *template) ListIndexSpecifications(ctx context.Context, ref struct{}, opts ...option.ListIndexes) (
+func (t *template) ListIndexSpecifications(ctx context.Context, ref any, opts ...option.ListIndexes) (
 	[]*mongo.IndexSpecification, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
@@ -685,6 +685,9 @@ func (t *template) insertMany(sc mongo.SessionContext, documents []any, opt opti
 	}
 	var errs []error
 	for i, document := range documents {
+		if document == nil {
+			continue
+		}
 		indexStr := strconv.Itoa(i)
 		if util.IsNotPointer(document) {
 			errs = append(errs, errors.New(ErrDocumentIsNotPointer.Error()+"(index: "+indexStr+")"))
@@ -693,17 +696,19 @@ func (t *template) insertMany(sc mongo.SessionContext, documents []any, opt opti
 		} else if util.IsZero(document) {
 			errs = append(errs, errors.New(ErrDocumentIsEmpty.Error()+"(index: "+indexStr+")"))
 		} else {
-			err := t.insertOne(sc, documents, option.InsertOne{
+			err := t.insertOne(sc, document, option.InsertOne{
 				BypassDocumentValidation: opt.BypassDocumentValidation,
 				Comment:                  opt.Comment,
 			})
-			errs = append(errs, err)
+			if err != nil {
+				errs = append(errs, err)
+			}
 		}
 	}
 	return errs
 }
 
-func (t *template) deleteOne(sc mongo.SessionContext, filter any, ref struct{}, opt option.Delete) (
+func (t *template) deleteOne(sc mongo.SessionContext, filter, ref any, opt option.Delete) (
 	*mongo.DeleteResult, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
@@ -719,7 +724,7 @@ func (t *template) deleteOne(sc mongo.SessionContext, filter any, ref struct{}, 
 	})
 }
 
-func (t *template) deleteMany(sc mongo.SessionContext, filter any, ref struct{}, opt option.Delete) (
+func (t *template) deleteMany(sc mongo.SessionContext, filter, ref any, opt option.Delete) (
 	*mongo.DeleteResult, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
@@ -735,7 +740,7 @@ func (t *template) deleteMany(sc mongo.SessionContext, filter any, ref struct{},
 	})
 }
 
-func (t *template) updateOne(sc mongo.SessionContext, filter, update any, ref struct{}, opt option.Update) (
+func (t *template) updateOne(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (
 	*mongo.UpdateResult, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
@@ -754,7 +759,7 @@ func (t *template) updateOne(sc mongo.SessionContext, filter, update any, ref st
 	})
 }
 
-func (t *template) updateMany(sc mongo.SessionContext, filter, update any, ref struct{}, opt option.Update) (
+func (t *template) updateMany(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (
 	*mongo.UpdateResult, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
@@ -773,7 +778,7 @@ func (t *template) updateMany(sc mongo.SessionContext, filter, update any, ref s
 	})
 }
 
-func (t *template) replaceOne(sc mongo.SessionContext, filter, update any, ref struct{}, opt option.Replace) (
+func (t *template) replaceOne(sc mongo.SessionContext, filter, update, ref any, opt option.Replace) (
 	*mongo.UpdateResult, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
@@ -852,7 +857,7 @@ func (t *template) findOneAndUpdate(sc mongo.SessionContext, filter, update, des
 	}).Decode(dest)
 }
 
-func (t *template) dropCollection(sc mongo.SessionContext, ref struct{}) error {
+func (t *template) dropCollection(sc mongo.SessionContext, ref any) error {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return err
@@ -860,7 +865,7 @@ func (t *template) dropCollection(sc mongo.SessionContext, ref struct{}) error {
 	return t.client.Database(databaseName).Collection(collectionName).Drop(sc)
 }
 
-func (t *template) dropDatabase(sc mongo.SessionContext, ref struct{}) error {
+func (t *template) dropDatabase(sc mongo.SessionContext, ref any) error {
 	databaseName, _, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return err
@@ -868,7 +873,7 @@ func (t *template) dropDatabase(sc mongo.SessionContext, ref struct{}) error {
 	return t.client.Database(databaseName).Drop(sc)
 }
 
-func (t *template) dropOneIndex(sc mongo.SessionContext, name string, ref struct{}, opt option.DropIndex) error {
+func (t *template) dropOneIndex(sc mongo.SessionContext, name string, ref any, opt option.DropIndex) error {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return err
@@ -881,7 +886,7 @@ func (t *template) dropOneIndex(sc mongo.SessionContext, name string, ref struct
 	return err
 }
 
-func (t *template) dropAllIndex(sc mongo.SessionContext, ref struct{}, opt option.DropIndex) error {
+func (t *template) dropAllIndex(sc mongo.SessionContext, ref any, opt option.DropIndex) error {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return err
@@ -904,9 +909,12 @@ func getMongoInfosByAny(a any) (databaseName string, collectionName string, err 
 		databaseName = util.GetDatabaseNameBySlice(a)
 		collectionName = util.GetCollectionNameBySlice(a)
 		break
-	default:
+	case reflect.Struct:
 		databaseName = util.GetDatabaseNameByStruct(a)
 		collectionName = util.GetCollectionNameByStruct(a)
+		break
+	default:
+		return "", "", ErrRefDocument
 	}
 	if len(databaseName) == 0 {
 		return "", "", ErrDatabaseNotConfigured
