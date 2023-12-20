@@ -41,6 +41,7 @@ type Template interface {
 	UpdateMany(ctx context.Context, filter, update, ref any, opts ...option.Update) (*mongo.UpdateResult, error)
 	ReplaceOne(ctx context.Context, filter, replacement, ref any, opts ...option.Replace) (*mongo.UpdateResult, error)
 	FindOne(ctx context.Context, filter, dest any, opts ...option.FindOne) error
+	FindOneById(ctx context.Context, id, dest any, opts ...option.FindOne) error
 	FindOneAndDelete(ctx context.Context, filter, dest any, opts ...option.FindOneAndDelete) error
 	FindOneAndReplace(ctx context.Context, filter, replacement, dest any, opts ...option.FindOneAndReplace) error
 	FindOneAndUpdate(ctx context.Context, filter, update, dest any, opts ...option.FindOneAndUpdate) error
@@ -217,37 +218,12 @@ func (t *template) ReplaceOne(ctx context.Context, filter any, update, ref any, 
 	return result, err
 }
 
+func (t *template) FindOneById(ctx context.Context, id, dest any, opts ...option.FindOne) error {
+	return t.findOne(ctx, bson.D{{"_id", id}}, dest, opts...)
+}
+
 func (t *template) FindOne(ctx context.Context, filter, dest any, opts ...option.FindOne) error {
-	if util.IsNotPointer(dest) {
-		return ErrDestIsNotPointer
-	} else if util.IsNotStruct(dest) {
-		return ErrDestIsNotStruct
-	}
-	databaseName, collectionName, err := getMongoInfosByAny(dest)
-	if err != nil {
-		return err
-	}
-	opt := option.GetFindOneOptionByParams(opts)
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName)
-	err = collection.FindOne(ctx, filter, &options.FindOneOptions{
-		AllowPartialResults: opt.AllowPartialResults,
-		Collation:           option.ParseCollationMongoOptions(opt.Collation),
-		Comment:             opt.Comment,
-		Hint:                opt.Hint,
-		Max:                 opt.Max,
-		MaxTime:             opt.MaxTime,
-		Min:                 opt.Min,
-		Projection:          opt.Projection,
-		ReturnKey:           opt.ReturnKey,
-		ShowRecordID:        opt.ShowRecordID,
-		Skip:                opt.Skip,
-		Sort:                opt.Sort,
-	}).Decode(dest)
-	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
-		return err
-	}
-	return nil
+	return t.findOne(ctx, filter, dest, opts...)
 }
 
 func (t *template) FindOneAndDelete(ctx context.Context, filter, dest any, opts ...option.FindOneAndDelete) error {
@@ -267,12 +243,12 @@ func (t *template) FindOneAndDelete(ctx context.Context, filter, dest any, opts 
 }
 
 func (t *template) FindOneAndReplace(ctx context.Context, filter, replacement, dest any, opts ...option.FindOneAndReplace) error {
+	opt := option.GetFindOneAndReplaceOptionByParams(opts)
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	} else if util.IsNotStruct(dest) {
 		return ErrDestIsNotStruct
 	}
-	opt := option.GetFindOneAndReplaceOptionByParams(opts)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.findOneAndReplace(sc, filter, replacement, dest, opt)
 		if !opt.DisableAutoCloseSession {
@@ -805,6 +781,39 @@ func (t *template) replaceOne(sc mongo.SessionContext, filter, update, ref any, 
 		Upsert:                   opt.Upsert,
 		Let:                      opt.Let,
 	})
+}
+
+func (t *template) findOne(ctx context.Context, filter, dest any, opts ...option.FindOne) error {
+	if util.IsNotPointer(dest) {
+		return ErrDestIsNotPointer
+	} else if util.IsNotStruct(dest) {
+		return ErrDestIsNotStruct
+	}
+	databaseName, collectionName, err := getMongoInfosByAny(dest)
+	if err != nil {
+		return err
+	}
+	opt := option.GetFindOneOptionByParams(opts)
+	database := t.client.Database(databaseName)
+	collection := database.Collection(collectionName)
+	err = collection.FindOne(ctx, filter, &options.FindOneOptions{
+		AllowPartialResults: opt.AllowPartialResults,
+		Collation:           option.ParseCollationMongoOptions(opt.Collation),
+		Comment:             opt.Comment,
+		Hint:                opt.Hint,
+		Max:                 opt.Max,
+		MaxTime:             opt.MaxTime,
+		Min:                 opt.Min,
+		Projection:          opt.Projection,
+		ReturnKey:           opt.ReturnKey,
+		ShowRecordID:        opt.ShowRecordID,
+		Skip:                opt.Skip,
+		Sort:                opt.Sort,
+	}).Decode(dest)
+	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		return err
+	}
+	return nil
 }
 
 func (t *template) findOneAndDelete(sc mongo.SessionContext, filter, dest any, opt option.FindOneAndDelete) error {

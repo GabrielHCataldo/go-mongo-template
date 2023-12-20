@@ -89,6 +89,43 @@ type testAggregate struct {
 	wantErr         bool
 }
 
+type testFindOneById struct {
+	name            string
+	id              any
+	dest            any
+	option          option.FindOne
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testFindOne struct {
+	name            string
+	filter          any
+	dest            any
+	option          option.FindOne
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testFindOneAndDelete struct {
+	name            string
+	filter          any
+	dest            any
+	option          option.FindOneAndDelete
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testFindOneAndReplace struct {
+	name            string
+	filter          any
+	replacement     any
+	dest            any
+	option          option.FindOneAndReplace
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
 type testCountDocuments struct {
 	name            string
 	filter          any
@@ -478,6 +515,167 @@ func initListTestReplace() []testReplace {
 	}
 }
 
+func initListTestFindOneById() []testFindOneById {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testFindOneById{
+		{
+			name:            "success",
+			id:              objectId,
+			dest:            &testStruct{},
+			option:          initOptionFindOne(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name: "failed struct dest",
+			id:   nil,
+			dest: &testInvalidStruct{},
+			option: initOptionFindOne().
+				SetCollation(&option.Collation{}).
+				SetSkip(2),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type dest",
+			id:              nil,
+			dest:            initTestString(),
+			option:          initOptionFindOne(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed dest non pointer",
+			id:              nil,
+			dest:            *initTestString(),
+			option:          initOptionFindOne(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestFindOne() []testFindOne {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testFindOne{
+		{
+			name:            "success",
+			filter:          bson.D{{"_id", objectId}},
+			dest:            &testStruct{},
+			option:          initOptionFindOne(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:   "failed struct dest",
+			filter: nil,
+			dest:   &testInvalidStruct{},
+			option: initOptionFindOne().
+				SetCollation(&option.Collation{}).
+				SetSkip(2),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type dest",
+			filter:          nil,
+			dest:            initTestString(),
+			option:          initOptionFindOne(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed dest non pointer",
+			filter:          nil,
+			dest:            *initTestString(),
+			option:          initOptionFindOne(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestFindOneAndDelete() []testFindOneAndDelete {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testFindOneAndDelete{
+		{
+			name:            "success",
+			filter:          bson.D{{"_id", objectId}},
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndDelete(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:   "failed struct dest",
+			filter: nil,
+			dest:   &testInvalidStruct{},
+			option: initOptionFindOneAndDelete().
+				SetCollation(&option.Collation{}).
+				SetDisableAutoCloseTransaction(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type dest",
+			filter:          nil,
+			dest:            initTestString(),
+			option:          initOptionFindOneAndDelete(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed dest non pointer",
+			filter:          nil,
+			dest:            *initTestString(),
+			option:          initOptionFindOneAndDelete(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestFindOneAndReplace() []testFindOneAndReplace {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testFindOneAndReplace{
+		{
+			name:            "success",
+			filter:          bson.D{{"_id", objectId}},
+			replacement:     *initTestStruct(),
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndReplace(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:        "failed struct dest",
+			filter:      nil,
+			replacement: nil,
+			dest:        &testInvalidStruct{},
+			option: initOptionFindOneAndReplace().
+				SetCollation(&option.Collation{}).
+				SetReturnDocument(option.ReturnDocumentAfter).
+				SetBypassDocumentValidation(true).
+				SetDisableAutoCloseTransaction(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type dest",
+			filter:          nil,
+			replacement:     nil,
+			dest:            initTestString(),
+			option:          initOptionFindOneAndReplace(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed dest non pointer",
+			filter:          nil,
+			dest:            *initTestString(),
+			option:          initOptionFindOneAndReplace(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
 func initListTestAggregate() []testAggregate {
 	return []testAggregate{
 		{
@@ -502,6 +700,15 @@ func initListTestAggregate() []testAggregate {
 			name:            "failed type dest",
 			pipeline:        nil,
 			dest:            initTestString(),
+			option:          initOptionAggregate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+
+		{
+			name:            "failed dest non pointer",
+			pipeline:        nil,
+			dest:            *initTestString(),
 			option:          initOptionAggregate(),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
@@ -629,6 +836,48 @@ func initOptionReplace() option.Replace {
 		SetBypassDocumentValidation(true)
 }
 
+func initOptionFindOne() option.FindOne {
+	return option.NewFindOne().
+		SetAllowPartialResults(true).
+		SetCollation(nil).
+		SetMaxTime(5 * time.Second).
+		SetComment("comment golang unit test").
+		SetHint(bson.M{}).
+		SetMax(bson.M{}).
+		SetMin(bson.M{}).
+		SetProjection(bson.M{}).
+		SetReturnKey(true).
+		SetShowRecordID(true).
+		SetSkip(0).
+		SetSort(bson.M{})
+
+}
+
+func initOptionFindOneAndDelete() option.FindOneAndDelete {
+	return option.NewFindOneAndDelete().
+		SetCollation(nil).
+		SetComment("comment golang unit test").
+		SetHint(bson.M{}).
+		SetMaxTime(5 * time.Second).
+		SetProjection(bson.M{}).
+		SetSort(bson.M{}).
+		SetLet(bson.M{}).
+		SetDisableAutoCloseTransaction(false)
+}
+
+func initOptionFindOneAndReplace() option.FindOneAndReplace {
+	return option.NewFindOneAndReplace().
+		SetCollation(nil).
+		SetComment("comment golang unit test").
+		SetHint(bson.M{}).
+		SetMaxTime(5 * time.Second).
+		SetProjection(bson.M{}).
+		SetSort(bson.M{}).
+		SetLet(bson.M{}).
+		SetDisableAutoCloseTransaction(false).
+		SetUpsert(true)
+}
+
 func initOptionAggregate() option.Aggregate {
 	return option.NewAggregate().
 		SetAllowDiskUse(false).
@@ -637,7 +886,7 @@ func initOptionAggregate() option.Aggregate {
 		SetCollation(nil).
 		SetMaxTime(5 * time.Second).
 		SetMaxAwaitTime(2 * time.Second).
-		SetComment("comment aggregate golang unit test").
+		SetComment("comment golang unit test").
 		SetHint(bson.M{}).
 		SetLet(bson.M{}).
 		SetCustom(bson.M{})

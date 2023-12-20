@@ -570,8 +570,8 @@ func (f FindOne) SetSkip(i int64) FindOne {
 	return f
 }
 
-func (f FindOne) SetSort(i int64) FindOne {
-	f.Sort = i
+func (f FindOne) SetSort(a any) FindOne {
+	f.Sort = a
 	return f
 }
 
@@ -600,8 +600,8 @@ func (f FindOneAndDelete) SetProjection(v any) FindOneAndDelete {
 	return f
 }
 
-func (f FindOneAndDelete) SetSort(i int64) FindOneAndDelete {
-	f.Sort = i
+func (f FindOneAndDelete) SetSort(a any) FindOneAndDelete {
+	f.Sort = a
 	return f
 }
 
@@ -665,8 +665,8 @@ func (f FindOneAndReplace) SetLet(v any) FindOneAndReplace {
 	return f
 }
 
-func (f FindOneAndReplace) SetSort(i int64) FindOneAndReplace {
-	f.Sort = i
+func (f FindOneAndReplace) SetSort(a any) FindOneAndReplace {
+	f.Sort = a
 	return f
 }
 
@@ -956,7 +956,7 @@ func GetFindOneAndReplaceOptionByParams(opts []FindOneAndReplace) FindOneAndRepl
 		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.ReturnDocument.IsEnumValid() {
+		if opt.ReturnDocument != nil {
 			result.ReturnDocument = opt.ReturnDocument
 		}
 	}

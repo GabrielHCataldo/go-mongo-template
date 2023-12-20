@@ -165,6 +165,86 @@ func TestTemplateReplaceOne(t *testing.T) {
 	}
 }
 
+func TestTemplateFindOneById(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFindOneById() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.FindOneById(ctx, tt.id, tt.dest, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FindOneById() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			mongoTemplate.CloseSession(ctx, err)
+		})
+	}
+}
+
+func TestTemplateFindOne(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFindOne() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.FindOne(ctx, tt.filter, tt.dest, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FindOne() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			mongoTemplate.CloseSession(ctx, err)
+		})
+	}
+}
+
+func TestTemplateFindOneAndDelete(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFindOneAndDelete() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.FindOneAndDelete(ctx, tt.filter, tt.dest, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FindOneAndDelete() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			mongoTemplate.CloseSession(ctx, err)
+		})
+	}
+}
+
+func TestTemplateFindOneAndReplace(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFindOneAndReplace() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.FindOneAndReplace(ctx, tt.filter, tt.replacement, tt.dest, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FindOneAndReplace() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			mongoTemplate.CloseSession(ctx, err)
+		})
+	}
+}
+
+func TestTemplate_FindOneAndUpdate(t *testing.T) {
+
+}
+
+func TestTemplate_Find(t *testing.T) {
+
+}
+
+func TestTemplate_FindPageable(t *testing.T) {
+
+}
+
 func TestTemplateAggregate(t *testing.T) {
 	initDocument()
 	for _, tt := range initListTestAggregate() {
@@ -214,4 +294,48 @@ func TestTemplateEstimatedDocumentCount(t *testing.T) {
 			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
+}
+
+func TestTemplate_Distinct(t *testing.T) {
+
+}
+
+func TestTemplate_Watch(t *testing.T) {
+
+}
+
+func TestTemplate_WatchHandler(t *testing.T) {
+
+}
+
+func TestTemplate_DropCollection(t *testing.T) {
+
+}
+
+func TestTemplate_DropDatabase(t *testing.T) {
+
+}
+
+func TestTemplate_CreateOneIndex(t *testing.T) {
+
+}
+
+func TestTemplate_CreateManyIndex(t *testing.T) {
+
+}
+
+func TestTemplate_DropOneIndex(t *testing.T) {
+
+}
+
+func TestTemplate_DropAllIndexes(t *testing.T) {
+
+}
+
+func TestTemplate_ListIndexes(t *testing.T) {
+
+}
+
+func TestTemplate_ListIndexSpecifications(t *testing.T) {
+
 }
