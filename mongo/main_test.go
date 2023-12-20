@@ -138,8 +138,8 @@ func TestMain(t *testing.M) {
 	initMongoTemplate()
 	clearCollection()
 	t.Run()
-	disconnectMongoTemplate()
 	clearCollection()
+	disconnectMongoTemplate()
 }
 
 func initMongoTemplate() {
@@ -483,7 +483,7 @@ func initListTestAggregate() []testAggregate {
 		{
 			name:            "success",
 			pipeline:        Pipeline{bson.D{{"$match", bson.D{{"_id", bson.M{"$exists": true}}}}}},
-			dest:            &testStruct{},
+			dest:            &[]testStruct{},
 			option:          initOptionAggregate(),
 			durationTimeout: 5 * time.Second,
 		},
@@ -647,8 +647,6 @@ func initOptionCount() option.Count {
 	return option.NewCount().
 		SetCollation(nil).
 		SetComment("comment count golang unit test").
-		SetLimit(0).
-		SetSkip(0).
 		SetHint(bson.M{}).
 		SetMaxTime(5 * time.Second)
 }

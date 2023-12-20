@@ -40,16 +40,16 @@ type Template interface {
 	UpdateOne(ctx context.Context, filter, update, ref any, opts ...option.Update) (*mongo.UpdateResult, error)
 	UpdateMany(ctx context.Context, filter, update, ref any, opts ...option.Update) (*mongo.UpdateResult, error)
 	ReplaceOne(ctx context.Context, filter, replacement, ref any, opts ...option.Replace) (*mongo.UpdateResult, error)
-	Aggregate(ctx context.Context, pipeline, dest any, opts ...option.Aggregate) error
-	CountDocuments(ctx context.Context, filter, ref any, opts ...option.Count) (int64, error)
-	EstimatedDocumentCount(ctx context.Context, ref any, opts ...option.EstimatedDocumentCount) (int64, error)
-	Distinct(ctx context.Context, fieldName string, filter, dest any, opts ...option.Distinct) error
 	FindOne(ctx context.Context, filter, dest any, opts ...option.FindOne) error
 	FindOneAndDelete(ctx context.Context, filter, dest any, opts ...option.FindOneAndDelete) error
 	FindOneAndReplace(ctx context.Context, filter, replacement, dest any, opts ...option.FindOneAndReplace) error
 	FindOneAndUpdate(ctx context.Context, filter, update, dest any, opts ...option.FindOneAndUpdate) error
 	Find(ctx context.Context, filter, dest any, opts ...option.Find) error
 	FindPageable(ctx context.Context, filter any, input PageInput, opts ...option.FindPageable) (*PageOutput, error)
+	Aggregate(ctx context.Context, pipeline, dest any, opts ...option.Aggregate) error
+	CountDocuments(ctx context.Context, filter, ref any, opts ...option.Count) (int64, error)
+	EstimatedDocumentCount(ctx context.Context, ref any, opts ...option.EstimatedDocumentCount) (int64, error)
+	Distinct(ctx context.Context, fieldName string, filter, dest any, opts ...option.Distinct) error
 	Watch(ctx context.Context, pipeline any, opts ...option.Watch) (*mongo.ChangeStream, error)
 	WatchHandler(ctx context.Context, pipeline any, handler HandlerWatch, opts ...option.Watch) error
 	DropCollection(ctx context.Context, ref any, opts ...option.Drop) error

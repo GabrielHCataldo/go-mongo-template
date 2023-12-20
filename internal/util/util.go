@@ -45,13 +45,11 @@ func IsZero(a any) bool {
 
 func GetDatabaseNameByStruct(a any) string {
 	var result string
-	v := reflect.ValueOf(a)
 	t := reflect.TypeOf(a)
-	if v.Kind() == reflect.Interface || v.Kind() == reflect.Pointer {
-		v = v.Elem()
+	if t.Kind() == reflect.Interface || t.Kind() == reflect.Pointer {
 		t = t.Elem()
 	}
-	for i := 0; i < v.NumField(); i++ {
+	for i := 0; i < t.NumField(); i++ {
 		result = t.Field(i).Tag.Get("database")
 		if len(result) != 0 {
 			break
@@ -61,32 +59,20 @@ func GetDatabaseNameByStruct(a any) string {
 }
 
 func GetDatabaseNameBySlice(a any) string {
-	var result string
 	v := reflect.ValueOf(a)
-	for i := 0; i < v.Len(); i++ {
-		indexValue := v.Index(i)
-		if !indexValue.CanInterface() {
-			continue
-		}
-		if indexValue.Kind() == reflect.Struct {
-			result = GetDatabaseNameByStruct(indexValue.Interface())
-			if len(result) != 0 {
-				break
-			}
-		}
+	if v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface {
+		v = v.Elem()
 	}
-	return result
+	return GetDatabaseNameByStruct(reflect.New(v.Type().Elem()).Interface())
 }
 
 func GetCollectionNameByStruct(a any) string {
 	var result string
-	v := reflect.ValueOf(a)
 	t := reflect.TypeOf(a)
-	if v.Kind() == reflect.Interface || v.Kind() == reflect.Pointer {
-		v = v.Elem()
+	if t.Kind() == reflect.Interface || t.Kind() == reflect.Pointer {
 		t = t.Elem()
 	}
-	for i := 0; i < v.NumField(); i++ {
+	for i := 0; i < t.NumField(); i++ {
 		result = t.Field(i).Tag.Get("collection")
 		if len(result) != 0 {
 			break
@@ -96,21 +82,11 @@ func GetCollectionNameByStruct(a any) string {
 }
 
 func GetCollectionNameBySlice(a any) string {
-	var result string
 	v := reflect.ValueOf(a)
-	for i := 0; i < v.Len(); i++ {
-		indexValue := v.Index(i)
-		if !indexValue.CanInterface() {
-			continue
-		}
-		if indexValue.Kind() == reflect.Struct {
-			result = GetCollectionNameByStruct(indexValue.Interface())
-			if len(result) != 0 {
-				break
-			}
-		}
+	if v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface {
+		v = v.Elem()
 	}
-	return result
+	return GetCollectionNameByStruct(reflect.New(v.Type().Elem()).Interface())
 }
 
 func SetInsertedIdOnDocument(insertedId, a any) {

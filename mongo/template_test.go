@@ -16,7 +16,6 @@ func TestNewTemplate(t *testing.T) {
 			} else if temp != nil {
 				temp.Disconnect()
 			}
-			disconnectMongoTemplate()
 		})
 	}
 
@@ -64,7 +63,6 @@ func TestTemplateInsertMany(t *testing.T) {
 			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
-	disconnectMongoTemplate()
 }
 
 func TestTemplateDeleteOne(t *testing.T) {
@@ -82,7 +80,6 @@ func TestTemplateDeleteOne(t *testing.T) {
 			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
-	disconnectMongoTemplate()
 }
 
 func TestTemplateDeleteMany(t *testing.T) {
@@ -99,7 +96,6 @@ func TestTemplateDeleteMany(t *testing.T) {
 			}
 		})
 	}
-	disconnectMongoTemplate()
 }
 
 func TestTemplateUpdateOneById(t *testing.T) {
@@ -116,7 +112,6 @@ func TestTemplateUpdateOneById(t *testing.T) {
 			}
 		})
 	}
-	disconnectMongoTemplate()
 }
 
 func TestTemplateUpdateOne(t *testing.T) {
@@ -134,7 +129,6 @@ func TestTemplateUpdateOne(t *testing.T) {
 			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
-	disconnectMongoTemplate()
 }
 
 func TestTemplateUpdateMany(t *testing.T) {
@@ -152,7 +146,6 @@ func TestTemplateUpdateMany(t *testing.T) {
 			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
-	disconnectMongoTemplate()
 }
 
 func TestTemplateReplaceOne(t *testing.T) {
@@ -170,7 +163,6 @@ func TestTemplateReplaceOne(t *testing.T) {
 			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
-	disconnectMongoTemplate()
 }
 
 func TestTemplateAggregate(t *testing.T) {
@@ -188,7 +180,6 @@ func TestTemplateAggregate(t *testing.T) {
 			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
-	disconnectMongoTemplate()
 }
 
 func TestTemplateCountDocuments(t *testing.T) {
@@ -206,7 +197,6 @@ func TestTemplateCountDocuments(t *testing.T) {
 			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
-	disconnectMongoTemplate()
 }
 
 func TestTemplateEstimatedDocumentCount(t *testing.T) {
@@ -224,5 +214,4 @@ func TestTemplateEstimatedDocumentCount(t *testing.T) {
 			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
-	disconnectMongoTemplate()
 }
