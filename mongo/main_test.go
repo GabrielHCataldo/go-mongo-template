@@ -80,10 +80,36 @@ type testReplace struct {
 	wantErr         bool
 }
 
+type testAggregate struct {
+	name            string
+	pipeline        any
+	dest            any
+	option          option.Aggregate
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testCountDocuments struct {
+	name            string
+	filter          any
+	ref             any
+	option          option.Count
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testEstimatedDocumentCount struct {
+	name            string
+	ref             any
+	option          option.EstimatedDocumentCount
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
 var mongoTemplate Template
 
 type testStruct struct {
-	Id        primitive.ObjectID `json:"id,omitempty" bson:"id,omitempty" database:"test" collection:"test"`
+	Id        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty" database:"test" collection:"test"`
 	Name      string             `json:"name,omitempty" bson:"name,omitempty"`
 	BirthDate primitive.DateTime `json:"birthDate,omitempty" bson:"birthDate,omitempty"`
 	Emails    []string           `json:"emails,omitempty" bson:"emails,omitempty"`
@@ -110,8 +136,10 @@ type testEmptyStruct struct {
 
 func TestMain(t *testing.M) {
 	initMongoTemplate()
+	clearCollection()
 	t.Run()
 	disconnectMongoTemplate()
+	clearCollection()
 }
 
 func initMongoTemplate() {
@@ -134,8 +162,12 @@ func initDocument() {
 	err := mongoTemplate.InsertOne(ctx, test)
 	if err != nil {
 		logger.Error("error init document:", err)
+		return
 	}
-	_ = os.Setenv(MongoDBTestId, test.Id.String())
+	err = os.Setenv(MongoDBTestId, test.Id.Hex())
+	if err != nil {
+		logger.Error("err set MongoDBTestId env:", err)
+	}
 }
 
 func initTestStruct() *testStruct {
@@ -284,7 +316,9 @@ func initListTestInsertMany() []testInsertMany {
 				initTestString(),
 				"test string normal",
 			},
-			option:          initOptionInsertMany().SetDisableAutoCloseTransaction(true),
+			option: initOptionInsertMany().
+				SetDisableAutoRollback(true).
+				SetDisableAutoCloseTransaction(true),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -332,9 +366,9 @@ func initListTestUpdateOneById() []testUpdateOneById {
 		{
 			name:            "success",
 			id:              objectId,
-			update:          bson.M{"$set": bson.M{"updated": true}},
+			update:          bson.M{"$set": bson.M{"name": "Updated Test Name"}},
 			ref:             testStruct{},
-			option:          initOptionUpdate(),
+			option:          initOptionUpdate().SetUpsert(false).SetArrayFilters(nil),
 			durationTimeout: 5 * time.Second,
 		},
 		{
@@ -368,14 +402,13 @@ func initListTestUpdateOneById() []testUpdateOneById {
 }
 
 func initListTestUpdate() []testUpdate {
-	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
 	return []testUpdate{
 		{
 			name:            "success",
-			filter:          bson.M{"_id": objectId},
-			update:          bson.M{"$set": bson.M{"updated": true}},
+			filter:          bson.M{"_id": bson.M{"$exists": true}},
+			update:          bson.M{"$set": bson.M{"name": "Updated Test Name"}},
 			ref:             testStruct{},
-			option:          initOptionUpdate(),
+			option:          initOptionUpdate().SetUpsert(false).SetArrayFilters(nil),
 			durationTimeout: 5 * time.Second,
 		},
 		{
@@ -396,7 +429,7 @@ func initListTestUpdate() []testUpdate {
 		},
 		{
 			name:            "failed update param",
-			filter:          bson.M{"_id": objectId},
+			filter:          bson.M{"_id": bson.M{"$exists": true}},
 			update:          nil,
 			ref:             testStruct{},
 			option:          initOptionUpdate().SetDisableAutoCloseTransaction(true),
@@ -412,7 +445,7 @@ func initListTestReplace() []testReplace {
 		{
 			name:            "success",
 			filter:          bson.M{"_id": objectId},
-			replacement:     bson.M{"$set": initTestStruct()},
+			replacement:     *initTestStruct(),
 			ref:             testStruct{},
 			option:          initOptionReplace(),
 			durationTimeout: 5 * time.Second,
@@ -439,6 +472,109 @@ func initListTestReplace() []testReplace {
 			replacement:     nil,
 			ref:             testStruct{},
 			option:          initOptionReplace().SetDisableAutoCloseTransaction(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestAggregate() []testAggregate {
+	return []testAggregate{
+		{
+			name:            "success",
+			pipeline:        Pipeline{bson.D{{"$match", bson.D{{"_id", bson.M{"$exists": true}}}}}},
+			dest:            &testStruct{},
+			option:          initOptionAggregate(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:     "failed struct dest",
+			pipeline: nil,
+			dest:     &testInvalidStruct{},
+			option: initOptionAggregate().
+				SetAllowDiskUse(true).
+				SetCollation(&option.Collation{}).
+				SetBatchSize(10),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type dest",
+			pipeline:        nil,
+			dest:            initTestString(),
+			option:          initOptionAggregate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestCountDocuments() []testCountDocuments {
+	return []testCountDocuments{
+		{
+			name:            "success",
+			filter:          bson.D{{"_id", bson.M{"$exists": true}}},
+			ref:             &testStruct{},
+			option:          initOptionCount(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:   "failed filter",
+			filter: "filter string err",
+			option: initOptionCount().
+				SetCollation(&option.Collation{}).
+				SetLimit(10).
+				SetSkip(10),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:   "failed struct ref",
+			filter: nil,
+			ref:    &testInvalidStruct{},
+			option: initOptionCount().
+				SetCollation(&option.Collation{}).
+				SetLimit(10).
+				SetSkip(10),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type ref",
+			filter:          nil,
+			ref:             initTestString(),
+			option:          initOptionCount(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestEstimatedDocumentCount() []testEstimatedDocumentCount {
+	return []testEstimatedDocumentCount{
+		{
+			name:            "success",
+			ref:             &testStruct{},
+			option:          initOptionEstimatedDocumentCount(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed filter",
+			option:          initOptionEstimatedDocumentCount(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed struct ref",
+			ref:             &testInvalidStruct{},
+			option:          initOptionEstimatedDocumentCount(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type ref",
+			ref:             initTestString(),
+			option:          initOptionEstimatedDocumentCount(),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -493,13 +629,54 @@ func initOptionReplace() option.Replace {
 		SetBypassDocumentValidation(true)
 }
 
+func initOptionAggregate() option.Aggregate {
+	return option.NewAggregate().
+		SetAllowDiskUse(false).
+		SetBatchSize(0).
+		SetBypassDocumentValidation(true).
+		SetCollation(nil).
+		SetMaxTime(5 * time.Second).
+		SetMaxAwaitTime(2 * time.Second).
+		SetComment("comment aggregate golang unit test").
+		SetHint(bson.M{}).
+		SetLet(bson.M{}).
+		SetCustom(bson.M{})
+}
+
+func initOptionCount() option.Count {
+	return option.NewCount().
+		SetCollation(nil).
+		SetComment("comment count golang unit test").
+		SetLimit(0).
+		SetSkip(0).
+		SetHint(bson.M{}).
+		SetMaxTime(5 * time.Second)
+}
+
+func initOptionEstimatedDocumentCount() option.EstimatedDocumentCount {
+	return option.NewEstimatedDocumentCount().
+		SetComment("comment estimated document count golang unit test").
+		SetMaxTime(5 * time.Second)
+}
+
 func disconnectMongoTemplate() {
 	if mongoTemplate == nil {
 		return
 	}
-	//ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	//defer cancel()
-	//_ = mongoTemplate.DropCollection(ctx, testStruct{})
 	mongoTemplate.Disconnect()
 	mongoTemplate = nil
+}
+
+func clearCollection() {
+	if mongoTemplate == nil {
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+	defer cancel()
+	_, err := mongoTemplate.DeleteMany(ctx, bson.M{"_id": bson.M{"$exists": true}}, testStruct{})
+	if err != nil {
+		logger.Error("error clean collection:", err)
+	} else {
+		logger.Info("collection cleaned!")
+	}
 }

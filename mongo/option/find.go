@@ -9,22 +9,22 @@ type Find struct {
 	// This option is only valid for MongoDB versions >= 4.4. Server versions >= 3.2 will report an error if this option
 	// is specified. For server versions < 3.2, the driver will return a client-side error if this option is specified.
 	// The default value is false.
-	AllowDiskUse bool
+	AllowDiskUse *bool
 	// AllowPartial results specifies whether the Find operation on a sharded cluster can return partial results if some
 	// shards are down rather than returning an error. The default value is false.
-	AllowPartialResults bool
+	AllowPartialResults *bool
 	// BatchSize is the maximum number of documents to be included in each batch returned by the server.
-	BatchSize int32
+	BatchSize *int32
 	// Collation specifies a collation to use for string comparisons during the operation. This option is only valid for
 	// MongoDB versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
 	// default value is nil, which means the default collation of the collection will be used.
 	Collation *Collation
 	// A string that will be included in server logs, profiling logs, and currentOp queries to help trace the operation.
 	// The default is nil, which means that no comment will be included in the logs.
-	Comment string
+	Comment *string
 	// CursorType specifies the type of cursor that should be created for the operation. The default is NonTailable, which
 	// means that the cursor will be closed by the server when the last batch of documents is retrieved.
-	CursorType CursorType
+	CursorType *CursorType
 	// Hint is the index to use for the Find operation. This should either be the index name as a string or the index
 	// specification as a document. The driver will return an error if the hint parameter is a multi-key map. The default
 	// value is nil, which means that no hint will be sent.
@@ -32,38 +32,38 @@ type Find struct {
 	// Limit is the maximum number of documents to return. The default value is 0, which means that all documents matching the
 	// filter will be returned. A negative limit specifies that the resulting documents should be returned in a single
 	// batch. The default value is 0.
-	Limit int64
+	Limit *int64
 	// Max is a document specifying the exclusive upper bound for a specific index. The default value is nil, which means that
 	// there is no maximum value.
 	Max any
 	// MaxAwaitTime is the maximum amount of time that the server should wait for new documents to satisfy a tailable cursor
 	// query. This option is only valid for tailable await cursors (see the CursorType option for more information) and
 	// MongoDB versions >= 3.2. For other cursor types or previous server versions, this option is ignored.
-	MaxAwaitTime time.Duration
+	MaxAwaitTime *time.Duration
 	// MaxTime is the maximum amount of time that the query can run on the server. The default value is nil, meaning that there
 	// is no time limit for query execution.
 	//
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used in its
 	// place to control the amount of time that a single operation can run before returning an error. MaxTime is ignored if
 	// Timeout is set on the client.
-	MaxTime time.Duration
+	MaxTime *time.Duration
 	// Min is a document specifying the inclusive lower bound for a specific index. The default value is 0, which means that
 	// there is no minimum value.
 	Min any
 	// NoCursorTimeout specifies whether the cursor created by the operation will not time out after a period of inactivity.
 	// The default value is false.
-	NoCursorTimeout bool
+	NoCursorTimeout *bool
 	// Project is a document describing which fields will be included in the documents returned by the Find operation. The
 	// default value is nil, which means all fields will be included.
 	Projection any
 	// ReturnKey specifies whether the documents returned by the Find operation will only contain fields corresponding to the
 	// index used. The default value is false.
-	ReturnKey bool
+	ReturnKey *bool
 	// ShowRecordID specifies whether a $recordId field with a record identifier will be included in the documents returned by
 	// the Find operation. The default value is false.
-	ShowRecordID bool
+	ShowRecordID *bool
 	// Skip is the number of documents to skip before adding documents to the result. The default value is 0.
-	Skip int64
+	Skip *int64
 	// Sort is a document specifying the order in which documents should be returned.  The driver will return an error if the
 	// sort parameter is a multi-key map.
 	Sort any
@@ -79,22 +79,22 @@ type FindPageable struct {
 	// This option is only valid for MongoDB versions >= 4.4. Server versions >= 3.2 will report an error if this option
 	// is specified. For server versions < 3.2, the driver will return a client-side error if this option is specified.
 	// The default value is false.
-	AllowDiskUse bool
+	AllowDiskUse *bool
 	// AllowPartial results specifies whether the Find operation on a sharded cluster can return partial results if some
 	// shards are down rather than returning an error. The default value is false.
-	AllowPartialResults bool
+	AllowPartialResults *bool
 	// BatchSize is the maximum number of documents to be included in each batch returned by the server.
-	BatchSize int32
+	BatchSize *int32
 	// Collation specifies a collation to use for string comparisons during the operation. This option is only valid for
 	// MongoDB versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
 	// default value is nil, which means the default collation of the collection will be used.
 	Collation *Collation
 	// A string that will be included in server logs, profiling logs, and currentOp queries to help trace the operation.
 	// The default is nil, which means that no comment will be included in the logs.
-	Comment string
+	Comment *string
 	// CursorType specifies the type of cursor that should be created for the operation. The default is NonTailable, which
 	// means that the cursor will be closed by the server when the last batch of documents is retrieved.
-	CursorType CursorType
+	CursorType *CursorType
 	// Hint is the index to use for the Find operation. This should either be the index name as a string or the index
 	// specification as a document. The driver will return an error if the hint parameter is a multi-key map. The default
 	// value is nil, which means that no hint will be sent.
@@ -105,29 +105,29 @@ type FindPageable struct {
 	// MaxAwaitTime is the maximum amount of time that the server should wait for new documents to satisfy a tailable cursor
 	// query. This option is only valid for tailable await cursors (see the CursorType option for more information) and
 	// MongoDB versions >= 3.2. For other cursor types or previous server versions, this option is ignored.
-	MaxAwaitTime time.Duration
+	MaxAwaitTime *time.Duration
 	// MaxTime is the maximum amount of time that the query can run on the server. The default value is nil, meaning that there
 	// is no time limit for query execution.
 	//
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used in its
 	// place to control the amount of time that a single operation can run before returning an error. MaxTime is ignored if
 	// Timeout is set on the client.
-	MaxTime time.Duration
+	MaxTime *time.Duration
 	// Min is a document specifying the inclusive lower bound for a specific index. The default value is 0, which means that
 	// there is no minimum value.
 	Min any
 	// NoCursorTimeout specifies whether the cursor created by the operation will not time out after a period of inactivity.
 	// The default value is false.
-	NoCursorTimeout bool
+	NoCursorTimeout *bool
 	// Project is a document describing which fields will be included in the documents returned by the Find operation. The
 	// default value is nil, which means all fields will be included.
 	Projection any
 	// ReturnKey specifies whether the documents returned by the Find operation will only contain fields corresponding to the
 	// index used. The default value is false.
-	ReturnKey bool
+	ReturnKey *bool
 	// ShowRecordID specifies whether a $recordId field with a record identifier will be included in the documents returned by
 	// the Find operation. The default value is false.
-	ShowRecordID bool
+	ShowRecordID *bool
 	// Let specifies parameters for the find expression. This option is only valid for MongoDB versions >= 5.0. Older
 	// servers will report an error for using this option. This must be a document mapping parameter names to values.
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
@@ -138,14 +138,14 @@ type FindPageable struct {
 type FindOne struct {
 	// If true, an operation on a sharded cluster can return partial results if some shards are down rather than
 	// returning an error. The default value is false.
-	AllowPartialResults bool
+	AllowPartialResults *bool
 	// Specifies a collation to use for string comparisons during the operation. This option is only valid for MongoDB
 	// versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
 	// default value is nil, which means the default collation of the collection will be used.
 	Collation *Collation
 	// A string that will be included in server logs, profiling logs, and currentOp queries to help trace the operation.
 	// The default is nil, which means that no comment will be included in the logs.
-	Comment string
+	Comment *string
 	// The index to use for the aggregation. This should either be the index name as a string or the index specification
 	// as a document. The driver will return an error if the hint parameter is a multi-key map. The default value is nil,
 	// which means that no hint will be sent.
@@ -159,7 +159,7 @@ type FindOne struct {
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used
 	// in its place to control the amount of time that a single operation can run before returning an error. MaxTime
 	// is ignored if Timeout is set on the client.
-	MaxTime time.Duration
+	MaxTime *time.Duration
 	// A document specifying the inclusive lower bound for a specific index. The default value is 0, which means that
 	// there is no minimum value.
 	Min any
@@ -168,12 +168,12 @@ type FindOne struct {
 	Projection any
 	// If true, the document returned by the operation will only contain fields corresponding to the index used. The
 	// default value is false.
-	ReturnKey bool
+	ReturnKey *bool
 	// If true, a $recordId field with a record identifier will be included in the document returned by the operation.
 	// The default value is false.
-	ShowRecordID bool
+	ShowRecordID *bool
 	// The number of documents to skip before selecting the document to be returned. The default value is 0.
-	Skip int64
+	Skip *int64
 	// A document specifying the sort order to apply to the query. The first document in the sorted order will be
 	// returned. The driver will return an error if the sort parameter is a multi-key map.
 	Sort any
@@ -193,7 +193,7 @@ type FindOneAndDelete struct {
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used
 	// in its place to control the amount of time that a single operation can run before returning an error. MaxTime
 	// is ignored if Timeout is set on the client.
-	MaxTime time.Duration
+	MaxTime *time.Duration
 	// A document describing which fields will be included in the document returned by the operation. The default value
 	// is nil, which means all fields will be included.
 	Projection any
@@ -221,7 +221,7 @@ type FindOneAndReplace struct {
 	// option is valid for MongoDB versions >= 3.2 and is ignored for previous server versions. The default value is
 	// false. See https://www.mongodb.com/docs/manual/core/schema-validation/ for more information about document
 	// validation.
-	BypassDocumentValidation bool
+	BypassDocumentValidation *bool
 	// Specifies a collation to use for string comparisons during the operation. This option is only valid for MongoDB
 	// versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
 	// default value is nil, which means the default collation of the collection will be used.
@@ -235,20 +235,20 @@ type FindOneAndReplace struct {
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used
 	// in its place to control the amount of time that a single operation can run before returning an error. MaxTime
 	// is ignored if Timeout is set on the client.
-	MaxTime time.Duration
+	MaxTime *time.Duration
 	// A document describing which fields will be included in the document returned by the operation. The default value
 	// is nil, which means all fields will be included.
 	Projection any
 	// Specifies whether the original or replaced document should be returned by the operation. The default value is
 	// Before, which means the original document will be returned from before the replacement is performed.
-	ReturnDocument ReturnDocument
+	ReturnDocument *ReturnDocument
 	// A document specifying which document should be replaced if the filter used by the operation matches multiple
 	// documents in the collection. If set, the first document in the sorted order will be replaced. The driver will
 	// return an error if the sort parameter is a multi-key map. The default value is nil.
 	Sort any
 	// If true, a new document will be inserted if the filter does not match any documents in the collection. The
 	// default value is false.
-	Upsert bool
+	Upsert *bool
 	// The index to use for the operation. This should either be the index name as a string or the index specification
 	// as a document. This option is only valid for MongoDB versions >= 4.4. MongoDB version 4.2 will report an error if
 	// this option is specified. For server versions < 4.2, the driver will return an error if this option is specified.
@@ -273,7 +273,7 @@ type FindOneAndUpdate struct {
 	// option is valid for MongoDB versions >= 3.2 and is ignored for previous server versions. The default value is
 	// false. See https://www.mongodb.com/docs/manual/core/schema-validation/ for more information about document
 	// validation.
-	BypassDocumentValidation bool
+	BypassDocumentValidation *bool
 	// Specifies a collation to use for string comparisons during the operation. This option is only valid for MongoDB
 	// versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
 	// default value is nil, which means the default collation of the collection will be used.
@@ -287,20 +287,20 @@ type FindOneAndUpdate struct {
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used
 	// in its place to control the amount of time that a single operation can run before returning an error. MaxTime is
 	// ignored if Timeout is set on the client.
-	MaxTime time.Duration
+	MaxTime *time.Duration
 	// A document describing which fields will be included in the document returned by the operation. The default value
 	// is nil, which means all fields will be included.
 	Projection any
 	// Specifies whether the original or replaced document should be returned by the operation. The default value is
 	// Before, which means the original document will be returned before the replacement is performed.
-	ReturnDocument ReturnDocument
+	ReturnDocument *ReturnDocument
 	// A document specifying which document should be updated if the filter used by the operation matches multiple
 	// documents in the collection. If set, the first document in the sorted order will be updated. The driver will
 	// return an error if the sort parameter is a multi-key map. The default value is nil.
 	Sort any
 	// If true, a new document will be inserted if the filter does not match any documents in the collection. The
 	// default value is false.
-	Upsert bool
+	Upsert *bool
 	// The index to use for the operation. This should either be the index name as a string or the index specification
 	// as a document. This option is only valid for MongoDB versions >= 4.4. MongoDB version 4.2 will report an error if
 	// this option is specified. For server versions < 4.2, the driver will return an error if this option is specified.
@@ -341,17 +341,17 @@ func NewFindOneAndUpdate() FindOneAndUpdate {
 }
 
 func (f Find) SetAllowDiskUse(b bool) Find {
-	f.AllowDiskUse = b
+	f.AllowDiskUse = &b
 	return f
 }
 
 func (f Find) SetAllowPartialResults(b bool) Find {
-	f.AllowPartialResults = b
+	f.AllowPartialResults = &b
 	return f
 }
 
 func (f Find) SetBatchSize(i int32) Find {
-	f.BatchSize = i
+	f.BatchSize = &i
 	return f
 }
 
@@ -361,12 +361,12 @@ func (f Find) SetCollation(c *Collation) Find {
 }
 
 func (f Find) SetComment(s string) Find {
-	f.Comment = s
+	f.Comment = &s
 	return f
 }
 
 func (f Find) SetCursorType(c CursorType) Find {
-	f.CursorType = c
+	f.CursorType = &c
 	return f
 }
 
@@ -376,7 +376,7 @@ func (f Find) SetHint(v any) Find {
 }
 
 func (f Find) SetLimit(i int64) Find {
-	f.Limit = i
+	f.Limit = &i
 	return f
 }
 
@@ -386,12 +386,12 @@ func (f Find) SetMax(v any) Find {
 }
 
 func (f Find) SetMaxAwaitTime(d time.Duration) Find {
-	f.MaxAwaitTime = d
+	f.MaxAwaitTime = &d
 	return f
 }
 
 func (f Find) SetMaxTime(d time.Duration) Find {
-	f.MaxTime = d
+	f.MaxTime = &d
 	return f
 }
 
@@ -401,7 +401,7 @@ func (f Find) SetMin(v any) Find {
 }
 
 func (f Find) SetNoCursorTimeout(b bool) Find {
-	f.NoCursorTimeout = b
+	f.NoCursorTimeout = &b
 	return f
 }
 
@@ -411,17 +411,17 @@ func (f Find) SetProjection(v any) Find {
 }
 
 func (f Find) SetReturnKey(b bool) Find {
-	f.ReturnKey = b
+	f.ReturnKey = &b
 	return f
 }
 
 func (f Find) SetShowRecordID(b bool) Find {
-	f.ShowRecordID = b
+	f.ShowRecordID = &b
 	return f
 }
 
 func (f Find) SetSkip(i int64) Find {
-	f.Skip = i
+	f.Skip = &i
 	return f
 }
 
@@ -436,17 +436,17 @@ func (f Find) SetLet(v any) Find {
 }
 
 func (f FindPageable) SetAllowDiskUse(b bool) FindPageable {
-	f.AllowDiskUse = b
+	f.AllowDiskUse = &b
 	return f
 }
 
 func (f FindPageable) SetAllowPartialResults(b bool) FindPageable {
-	f.AllowPartialResults = b
+	f.AllowPartialResults = &b
 	return f
 }
 
 func (f FindPageable) SetBatchSize(i int32) FindPageable {
-	f.BatchSize = i
+	f.BatchSize = &i
 	return f
 }
 
@@ -456,12 +456,12 @@ func (f FindPageable) SetCollation(c *Collation) FindPageable {
 }
 
 func (f FindPageable) SetComment(s string) FindPageable {
-	f.Comment = s
+	f.Comment = &s
 	return f
 }
 
 func (f FindPageable) SetCursorType(c CursorType) FindPageable {
-	f.CursorType = c
+	f.CursorType = &c
 	return f
 }
 
@@ -476,12 +476,12 @@ func (f FindPageable) SetMax(v any) FindPageable {
 }
 
 func (f FindPageable) SetMaxAwaitTime(d time.Duration) FindPageable {
-	f.MaxAwaitTime = d
+	f.MaxAwaitTime = &d
 	return f
 }
 
 func (f FindPageable) SetMaxTime(d time.Duration) FindPageable {
-	f.MaxTime = d
+	f.MaxTime = &d
 	return f
 }
 
@@ -491,7 +491,7 @@ func (f FindPageable) SetMin(v any) FindPageable {
 }
 
 func (f FindPageable) SetNoCursorTimeout(b bool) FindPageable {
-	f.NoCursorTimeout = b
+	f.NoCursorTimeout = &b
 	return f
 }
 
@@ -501,12 +501,12 @@ func (f FindPageable) SetProjection(v any) FindPageable {
 }
 
 func (f FindPageable) SetReturnKey(b bool) FindPageable {
-	f.ReturnKey = b
+	f.ReturnKey = &b
 	return f
 }
 
 func (f FindPageable) SetShowRecordID(b bool) FindPageable {
-	f.ShowRecordID = b
+	f.ShowRecordID = &b
 	return f
 }
 
@@ -516,7 +516,7 @@ func (f FindPageable) SetLet(v any) FindPageable {
 }
 
 func (f FindOne) SetAllowPartialResults(b bool) FindOne {
-	f.AllowPartialResults = b
+	f.AllowPartialResults = &b
 	return f
 }
 
@@ -526,7 +526,7 @@ func (f FindOne) SetCollation(c *Collation) FindOne {
 }
 
 func (f FindOne) SetComment(s string) FindOne {
-	f.Comment = s
+	f.Comment = &s
 	return f
 }
 
@@ -541,7 +541,7 @@ func (f FindOne) SetMax(v any) FindOne {
 }
 
 func (f FindOne) SetMaxTime(d time.Duration) FindOne {
-	f.MaxTime = d
+	f.MaxTime = &d
 	return f
 }
 
@@ -556,17 +556,17 @@ func (f FindOne) SetProjection(v any) FindOne {
 }
 
 func (f FindOne) SetReturnKey(b bool) FindOne {
-	f.ReturnKey = b
+	f.ReturnKey = &b
 	return f
 }
 
 func (f FindOne) SetShowRecordID(b bool) FindOne {
-	f.ShowRecordID = b
+	f.ShowRecordID = &b
 	return f
 }
 
 func (f FindOne) SetSkip(i int64) FindOne {
-	f.Skip = i
+	f.Skip = &i
 	return f
 }
 
@@ -591,7 +591,7 @@ func (f FindOneAndDelete) SetHint(v any) FindOneAndDelete {
 }
 
 func (f FindOneAndDelete) SetMaxTime(d time.Duration) FindOneAndDelete {
-	f.MaxTime = d
+	f.MaxTime = &d
 	return f
 }
 
@@ -621,7 +621,7 @@ func (f FindOneAndReplace) SetDisableAutoCloseTransaction(b bool) FindOneAndRepl
 }
 
 func (f FindOneAndReplace) SetBypassDocumentValidation(b bool) FindOneAndReplace {
-	f.BypassDocumentValidation = b
+	f.BypassDocumentValidation = &b
 	return f
 }
 
@@ -641,7 +641,7 @@ func (f FindOneAndReplace) SetHint(v any) FindOneAndReplace {
 }
 
 func (f FindOneAndReplace) SetMaxTime(d time.Duration) FindOneAndReplace {
-	f.MaxTime = d
+	f.MaxTime = &d
 	return f
 }
 
@@ -651,12 +651,12 @@ func (f FindOneAndReplace) SetProjection(v any) FindOneAndReplace {
 }
 
 func (f FindOneAndReplace) SetReturnDocument(r ReturnDocument) FindOneAndReplace {
-	f.ReturnDocument = r
+	f.ReturnDocument = &r
 	return f
 }
 
 func (f FindOneAndReplace) SetUpsert(b bool) FindOneAndReplace {
-	f.Upsert = b
+	f.Upsert = &b
 	return f
 }
 
@@ -681,7 +681,7 @@ func (f FindOneAndUpdate) SetArrayFilters(a *ArrayFilters) FindOneAndUpdate {
 }
 
 func (f FindOneAndUpdate) SetBypassDocumentValidation(b bool) FindOneAndUpdate {
-	f.BypassDocumentValidation = b
+	f.BypassDocumentValidation = &b
 	return f
 }
 
@@ -706,7 +706,7 @@ func (f FindOneAndUpdate) SetLet(v any) FindOneAndUpdate {
 }
 
 func (f FindOneAndUpdate) SetMaxTime(d time.Duration) FindOneAndUpdate {
-	f.MaxTime = d
+	f.MaxTime = &d
 	return f
 }
 
@@ -716,7 +716,7 @@ func (f FindOneAndUpdate) SetProjection(v any) FindOneAndUpdate {
 }
 
 func (f FindOneAndUpdate) SetReturnDocument(r ReturnDocument) FindOneAndUpdate {
-	f.ReturnDocument = r
+	f.ReturnDocument = &r
 	return f
 }
 
@@ -726,38 +726,38 @@ func (f FindOneAndUpdate) SetSort(i int64) FindOneAndUpdate {
 }
 
 func (f FindOneAndUpdate) SetUpsert(b bool) FindOneAndUpdate {
-	f.Upsert = b
+	f.Upsert = &b
 	return f
 }
 
 func GetFindOptionByParams(opts []Find) Find {
 	result := Find{}
 	for _, opt := range opts {
-		if opt.AllowDiskUse {
+		if opt.AllowDiskUse != nil {
 			result.AllowDiskUse = opt.AllowDiskUse
 		}
-		if opt.AllowPartialResults {
+		if opt.AllowPartialResults != nil {
 			result.AllowPartialResults = opt.AllowPartialResults
 		}
-		if opt.NoCursorTimeout {
+		if opt.NoCursorTimeout != nil {
 			result.NoCursorTimeout = opt.NoCursorTimeout
 		}
-		if opt.ReturnKey {
+		if opt.ReturnKey != nil {
 			result.ReturnKey = opt.ReturnKey
 		}
-		if opt.ShowRecordID {
+		if opt.ShowRecordID != nil {
 			result.ShowRecordID = opt.ShowRecordID
 		}
 		if opt.CursorType.IsEnumValid() {
 			result.CursorType = opt.CursorType
 		}
-		if opt.BatchSize != 0 {
+		if opt.BatchSize != nil {
 			result.BatchSize = opt.BatchSize
 		}
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
 		}
-		if len(opt.Comment) != 0 {
+		if opt.Comment != nil {
 			result.Comment = opt.Comment
 		}
 		if opt.Hint != nil {
@@ -766,10 +766,10 @@ func GetFindOptionByParams(opts []Find) Find {
 		if opt.Let != nil {
 			result.Let = opt.Let
 		}
-		if opt.Limit > 0 {
+		if opt.Limit != nil {
 			result.Limit = opt.Limit
 		}
-		if opt.Skip > 0 {
+		if opt.Skip != nil {
 			result.Skip = opt.Skip
 		}
 		if opt.Max != nil {
@@ -784,10 +784,10 @@ func GetFindOptionByParams(opts []Find) Find {
 		if opt.Projection != nil {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime > 0 {
+		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.MaxAwaitTime > 0 {
+		if opt.MaxAwaitTime != nil {
 			result.MaxAwaitTime = opt.MaxAwaitTime
 		}
 	}
@@ -797,31 +797,31 @@ func GetFindOptionByParams(opts []Find) Find {
 func GetFindPageableOptionByParams(opts []FindPageable) FindPageable {
 	result := FindPageable{}
 	for _, opt := range opts {
-		if opt.AllowDiskUse {
+		if opt.AllowDiskUse != nil {
 			result.AllowDiskUse = opt.AllowDiskUse
 		}
-		if opt.AllowPartialResults {
+		if opt.AllowPartialResults != nil {
 			result.AllowPartialResults = opt.AllowPartialResults
 		}
-		if opt.NoCursorTimeout {
+		if opt.NoCursorTimeout != nil {
 			result.NoCursorTimeout = opt.NoCursorTimeout
 		}
-		if opt.ReturnKey {
+		if opt.ReturnKey != nil {
 			result.ReturnKey = opt.ReturnKey
 		}
-		if opt.ShowRecordID {
+		if opt.ShowRecordID != nil {
 			result.ShowRecordID = opt.ShowRecordID
 		}
 		if opt.CursorType.IsEnumValid() {
 			result.CursorType = opt.CursorType
 		}
-		if opt.BatchSize != 0 {
+		if opt.BatchSize != nil {
 			result.BatchSize = opt.BatchSize
 		}
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
 		}
-		if len(opt.Comment) != 0 {
+		if opt.Comment != nil {
 			result.Comment = opt.Comment
 		}
 		if opt.Hint != nil {
@@ -839,10 +839,10 @@ func GetFindPageableOptionByParams(opts []FindPageable) FindPageable {
 		if opt.Projection != nil {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime > 0 {
+		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.MaxAwaitTime > 0 {
+		if opt.MaxAwaitTime != nil {
 			result.MaxAwaitTime = opt.MaxAwaitTime
 		}
 	}
@@ -852,25 +852,25 @@ func GetFindPageableOptionByParams(opts []FindPageable) FindPageable {
 func GetFindOneOptionByParams(opts []FindOne) FindOne {
 	result := FindOne{}
 	for _, opt := range opts {
-		if opt.AllowPartialResults {
+		if opt.AllowPartialResults != nil {
 			result.AllowPartialResults = opt.AllowPartialResults
 		}
-		if opt.ReturnKey {
+		if opt.ReturnKey != nil {
 			result.ReturnKey = opt.ReturnKey
 		}
-		if opt.ShowRecordID {
+		if opt.ShowRecordID != nil {
 			result.ShowRecordID = opt.ShowRecordID
 		}
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
 		}
-		if len(opt.Comment) != 0 {
+		if opt.Comment != nil {
 			result.Comment = opt.Comment
 		}
 		if opt.Hint != nil {
 			result.Hint = opt.Hint
 		}
-		if opt.Skip > 0 {
+		if opt.Skip != nil {
 			result.Skip = opt.Skip
 		}
 		if opt.Max != nil {
@@ -885,7 +885,7 @@ func GetFindOneOptionByParams(opts []FindOne) FindOne {
 		if opt.Projection != nil {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime > 0 {
+		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
 	}
@@ -916,7 +916,7 @@ func GetFindOneAndDeleteOptionByParams(opts []FindOneAndDelete) FindOneAndDelete
 		if opt.Projection != nil {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime > 0 {
+		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
 	}
@@ -926,13 +926,13 @@ func GetFindOneAndDeleteOptionByParams(opts []FindOneAndDelete) FindOneAndDelete
 func GetFindOneAndReplaceOptionByParams(opts []FindOneAndReplace) FindOneAndReplace {
 	result := FindOneAndReplace{}
 	for _, opt := range opts {
-		if opt.BypassDocumentValidation {
+		if opt.BypassDocumentValidation != nil {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
 		if opt.DisableAutoCloseSession {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
-		if opt.Upsert {
+		if opt.Upsert != nil {
 			result.Upsert = opt.Upsert
 		}
 		if opt.Collation != nil {
@@ -953,7 +953,7 @@ func GetFindOneAndReplaceOptionByParams(opts []FindOneAndReplace) FindOneAndRepl
 		if opt.Projection != nil {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime > 0 {
+		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
 		if opt.ReturnDocument.IsEnumValid() {
@@ -966,13 +966,13 @@ func GetFindOneAndReplaceOptionByParams(opts []FindOneAndReplace) FindOneAndRepl
 func GetFindOneAndUpdateOptionByParams(opts []FindOneAndUpdate) FindOneAndUpdate {
 	result := FindOneAndUpdate{}
 	for _, opt := range opts {
-		if opt.BypassDocumentValidation {
+		if opt.BypassDocumentValidation != nil {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
 		if opt.DisableAutoCloseSession {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
-		if opt.Upsert {
+		if opt.Upsert != nil {
 			result.Upsert = opt.Upsert
 		}
 		if opt.ArrayFilters != nil {
@@ -996,7 +996,7 @@ func GetFindOneAndUpdateOptionByParams(opts []FindOneAndUpdate) FindOneAndUpdate
 		if opt.Projection != nil {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime > 0 {
+		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
 		if opt.ReturnDocument.IsEnumValid() {

@@ -73,20 +73,20 @@ type DropIndex struct {
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used
 	// in its place to control the amount of time that a single operation can run before returning an error. MaxTime
 	// is ignored if Timeout is set on the client.
-	MaxTime                 time.Duration
+	MaxTime                 *time.Duration
 	DisableAutoCloseSession bool
 }
 
 type ListIndexes struct {
 	// The maximum number of documents to be included in each batch returned by the server.
-	BatchSize int32
+	BatchSize *int32
 	// The maximum amount of time that the query can run on the server. The default value is nil, meaning that there
 	// is no time limit for query execution.
 	//
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used
 	// in its place to control the amount of time that a single operation can run before returning an error. MaxTime
 	// is ignored if Timeout is set on the client.
-	MaxTime time.Duration
+	MaxTime *time.Duration
 }
 
 func NewIndex() Index {
@@ -216,7 +216,7 @@ func (i Index) SetHidden(hidden bool) Index {
 }
 
 func (d DropIndex) SetMaxTime(duration time.Duration) DropIndex {
-	d.MaxTime = duration
+	d.MaxTime = &duration
 	return d
 }
 
@@ -226,19 +226,19 @@ func (d DropIndex) SetDisableAutoCloseTransaction(b bool) DropIndex {
 }
 
 func (l ListIndexes) SetMaxTime(duration time.Duration) ListIndexes {
-	l.MaxTime = duration
+	l.MaxTime = &duration
 	return l
 }
 
 func (l ListIndexes) SetDisableAutoCloseTransaction(i int32) ListIndexes {
-	l.BatchSize = i
+	l.BatchSize = &i
 	return l
 }
 
 func GetDropIndexOptionByParams(opts []DropIndex) DropIndex {
 	result := DropIndex{}
 	for _, opt := range opts {
-		if opt.MaxTime > 0 {
+		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
 		if opt.DisableAutoCloseSession {
@@ -251,10 +251,10 @@ func GetDropIndexOptionByParams(opts []DropIndex) DropIndex {
 func GetListIndexesOptionByParams(opts []ListIndexes) ListIndexes {
 	result := ListIndexes{}
 	for _, opt := range opts {
-		if opt.MaxTime > 0 {
+		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.BatchSize > 0 {
+		if opt.BatchSize != nil {
 			result.BatchSize = opt.BatchSize
 		}
 	}

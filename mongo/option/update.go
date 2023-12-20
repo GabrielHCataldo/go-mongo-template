@@ -9,7 +9,7 @@ type Update struct {
 	// option is valid for MongoDB versions >= 3.2 and is ignored for previous server versions. The default value is
 	// false. See https://www.mongodb.com/docs/manual/core/schema-validation/ for more information about document
 	// validation.
-	BypassDocumentValidation bool
+	BypassDocumentValidation *bool
 	// Specifies a collation to use for string comparisons during the operation. This option is only valid for MongoDB
 	// versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
 	// default value is nil, which means the default collation of the collection will be used.
@@ -26,7 +26,7 @@ type Update struct {
 	Hint any
 	// If true, a new document will be inserted if the filter does not match any documents in the collection. The
 	// default value is false.
-	Upsert bool
+	Upsert *bool
 	// Specifies parameters for the update expression. This option is only valid for MongoDB versions >= 5.0. Older
 	// servers will report an error for using this option. This must be a document mapping parameter names to values.
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
@@ -40,7 +40,7 @@ func NewUpdate() Update {
 }
 
 func (u Update) SetBypassDocumentValidation(b bool) Update {
-	u.BypassDocumentValidation = b
+	u.BypassDocumentValidation = &b
 	return u
 }
 
@@ -75,7 +75,7 @@ func (u Update) SetDisableAutoCloseTransaction(b bool) Update {
 }
 
 func (u Update) SetUpsert(b bool) Update {
-	u.Upsert = b
+	u.Upsert = &b
 	return u
 }
 

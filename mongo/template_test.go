@@ -172,3 +172,57 @@ func TestTemplateReplaceOne(t *testing.T) {
 	}
 	disconnectMongoTemplate()
 }
+
+func TestTemplateAggregate(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestAggregate() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.Aggregate(ctx, tt.pipeline, tt.dest, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Aggregate() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			mongoTemplate.CloseSession(ctx, err)
+		})
+	}
+	disconnectMongoTemplate()
+}
+
+func TestTemplateCountDocuments(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestCountDocuments() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			_, err := mongoTemplate.CountDocuments(ctx, tt.filter, tt.ref, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CountDocuments() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			mongoTemplate.CloseSession(ctx, err)
+		})
+	}
+	disconnectMongoTemplate()
+}
+
+func TestTemplateEstimatedDocumentCount(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestEstimatedDocumentCount() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			_, err := mongoTemplate.EstimatedDocumentCount(ctx, tt.ref, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("EstimatedDocumentCount() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			mongoTemplate.CloseSession(ctx, err)
+		})
+	}
+	disconnectMongoTemplate()
+}

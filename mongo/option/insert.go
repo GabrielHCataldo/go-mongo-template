@@ -5,7 +5,7 @@ type InsertOne struct {
 	// option is valid for MongoDB versions >= 3.2 and is ignored for previous server versions. The default value is
 	// false. See https://www.mongodb.com/docs/manual/core/schema-validation/ for more information about document
 	// validation.
-	BypassDocumentValidation bool
+	BypassDocumentValidation *bool
 	// A string or document that will be included in server logs, profiling logs, and currentOp queries to help trace
 	// the operation.  The default value is nil, which means that no comment will be included in the logs.
 	Comment                 any
@@ -18,7 +18,7 @@ type InsertMany struct {
 	// option is valid for MongoDB versions >= 3.2 and is ignored for previous server versions. The default value is
 	// false. See https://www.mongodb.com/docs/manual/core/schema-validation/ for more information about document
 	// validation.
-	BypassDocumentValidation bool
+	BypassDocumentValidation *bool
 	// A string or document that will be included in server logs, profiling logs, and currentOp queries to help trace
 	// the operation.  The default value is nil, which means that no comment will be included in the logs.
 	Comment                    any
@@ -36,7 +36,7 @@ func NewInsertMany() InsertMany {
 }
 
 func (i InsertOne) SetBypassDocumentValidation(b bool) InsertOne {
-	i.BypassDocumentValidation = b
+	i.BypassDocumentValidation = &b
 	return i
 }
 
@@ -56,7 +56,7 @@ func (i InsertOne) SetForceRecreateSession(b bool) InsertOne {
 }
 
 func (i InsertMany) SetBypassDocumentValidation(b bool) InsertMany {
-	i.BypassDocumentValidation = b
+	i.BypassDocumentValidation = &b
 	return i
 }
 
@@ -83,7 +83,7 @@ func (i InsertMany) SetForceRecreateSession(b bool) InsertMany {
 func GetInsertOneOptionByParams(opts []InsertOne) InsertOne {
 	result := InsertOne{}
 	for _, opt := range opts {
-		if opt.BypassDocumentValidation {
+		if opt.BypassDocumentValidation != nil {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
 		if opt.Comment != nil {
@@ -105,7 +105,7 @@ func GetInsertManyOptionByParams(opts []InsertMany) InsertMany {
 		if opt.ForceRecreateSession {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
-		if opt.BypassDocumentValidation {
+		if opt.BypassDocumentValidation != nil {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
 		if opt.Comment != nil {

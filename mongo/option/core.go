@@ -57,26 +57,26 @@ func ParseArrayFiltersMongoOptions(a *ArrayFilters) *options.ArrayFilters {
 	}
 }
 
-func ParseCursorType(c CursorType) *options.CursorType {
-	if !c.IsEnumValid() {
+func ParseCursorType(c *CursorType) *options.CursorType {
+	if c == nil {
 		return nil
 	}
-	result := options.CursorType(c)
+	result := options.CursorType(*c)
 	return &result
 }
 
-func ParseReturnDocument(c ReturnDocument) *options.ReturnDocument {
-	if !c.IsEnumValid() {
+func ParseReturnDocument(r *ReturnDocument) *options.ReturnDocument {
+	if r == nil {
 		return nil
 	}
-	result := options.ReturnDocument(c)
+	result := options.ReturnDocument(*r)
 	return &result
 }
 
-func ParseFullDocument(c FullDocument) *options.FullDocument {
-	if !c.IsEnumValid() {
+func ParseFullDocument(f *FullDocument) *options.FullDocument {
+	if f == nil {
 		return nil
 	}
-	result := options.FullDocument(c)
+	result := options.FullDocument(*f)
 	return &result
 }

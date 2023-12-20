@@ -1,7 +1,6 @@
 package util
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"reflect"
 	"strings"
 )
@@ -17,16 +16,6 @@ func IsNotStruct(v any) bool {
 func IsNotPointer(v any) bool {
 	r := reflect.ValueOf(v)
 	return r.Kind() != reflect.Pointer
-}
-
-func IsObjectId(v reflect.Value) bool {
-	if v.Kind() == reflect.Pointer {
-		v = v.Elem()
-	}
-	if _, ok := v.Interface().(primitive.ObjectID); ok {
-		return true
-	}
-	return false
 }
 
 func IsNilValueReflect(v reflect.Value) bool {
@@ -124,26 +113,24 @@ func GetCollectionNameBySlice(a any) string {
 	return result
 }
 
-func SetInsertedIdsOnDocuments(insertedIds, as []any) {
-	for i, a := range as {
-		SetInsertedIdOnDocument(insertedIds[i], a)
-	}
-}
-
 func SetInsertedIdOnDocument(insertedId, a any) {
 	rInsertedId := reflect.ValueOf(insertedId)
 	v := reflect.ValueOf(a)
+	vr := reflect.ValueOf(a)
 	t := reflect.TypeOf(a)
 	if v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface {
-		v = v.Elem()
+		vr = v.Elem()
 		t = t.Elem()
 	}
-	for i := 0; i < v.NumField(); i++ {
-		fieldValue := v.Field(i)
+	for i := 0; i < vr.NumField(); i++ {
+		fieldValue := vr.Field(i)
 		fieldStruct := t.Field(i)
-		if strings.Contains(fieldStruct.Tag.Get("bson"), "_id") && IsObjectId(fieldValue) {
-			valueToSet := reflect.New(fieldValue.Type())
-			valueToSet.Set(rInsertedId)
+		if fieldValue.Kind() == reflect.Pointer || fieldValue.Kind() == reflect.Interface {
+			fieldValue = fieldValue.Elem()
+		}
+		if strings.Contains(fieldStruct.Tag.Get("bson"), "_id") &&
+			rInsertedId.Kind() == fieldValue.Kind() {
+			fieldValue.Set(rInsertedId)
 		}
 	}
 }

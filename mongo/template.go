@@ -15,6 +15,17 @@ import (
 	"strings"
 )
 
+// Pipeline is a type that makes creating aggregation pipelines easier. It is a
+// helper and is intended for serializing to BSON.
+//
+// Example usage:
+//
+//	mongo.Pipeline{
+//		{{"$group", bson.D{{"_id", "$state"}, {"totalPop", bson.D{{"$sum", "$pop"}}}}}},
+//		{{"$match", bson.D{{"totalPop", bson.D{{"$gte", 10*1000*1000}}}}}},
+//	}
+type Pipeline []bson.D
+
 type template struct {
 	client  *mongo.Client
 	session mongo.Session
@@ -152,7 +163,7 @@ func (t *template) UpdateOneById(ctx context.Context, id, update, ref any, opts 
 	var err error
 	opt := option.GetUpdateOptionByParams(opts)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		result, err = t.updateOne(sc, bson.M{"_id": id}, update, ref, opt)
+		result, err = t.updateOne(sc, bson.D{{"_id", id}}, update, ref, opt)
 		if !opt.DisableAutoCloseSession {
 			t.CloseSession(sc, err)
 		}
@@ -220,17 +231,17 @@ func (t *template) FindOne(ctx context.Context, filter, dest any, opts ...option
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName)
 	err = collection.FindOne(ctx, filter, &options.FindOneOptions{
-		AllowPartialResults: &opt.AllowPartialResults,
+		AllowPartialResults: opt.AllowPartialResults,
 		Collation:           option.ParseCollationMongoOptions(opt.Collation),
-		Comment:             &opt.Comment,
+		Comment:             opt.Comment,
 		Hint:                opt.Hint,
 		Max:                 opt.Max,
-		MaxTime:             &opt.MaxTime,
+		MaxTime:             opt.MaxTime,
 		Min:                 opt.Min,
 		Projection:          opt.Projection,
-		ReturnKey:           &opt.ReturnKey,
-		ShowRecordID:        &opt.ShowRecordID,
-		Skip:                &opt.Skip,
+		ReturnKey:           opt.ReturnKey,
+		ShowRecordID:        opt.ShowRecordID,
+		Skip:                opt.Skip,
 		Sort:                opt.Sort,
 	}).Decode(dest)
 	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
@@ -299,23 +310,23 @@ func (t *template) Find(ctx context.Context, filter, dest any, opts ...option.Fi
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName)
 	cursor, err := collection.Find(ctx, filter, &options.FindOptions{
-		AllowDiskUse:        &opt.AllowDiskUse,
-		AllowPartialResults: &opt.AllowPartialResults,
-		BatchSize:           &opt.BatchSize,
+		AllowDiskUse:        opt.AllowDiskUse,
+		AllowPartialResults: opt.AllowPartialResults,
+		BatchSize:           opt.BatchSize,
 		Collation:           option.ParseCollationMongoOptions(opt.Collation),
-		Comment:             &opt.Comment,
+		Comment:             opt.Comment,
 		CursorType:          option.ParseCursorType(opt.CursorType),
 		Hint:                opt.Hint,
-		Limit:               &opt.Limit,
+		Limit:               opt.Limit,
 		Max:                 opt.Max,
-		MaxAwaitTime:        &opt.MaxAwaitTime,
-		MaxTime:             &opt.MaxTime,
+		MaxAwaitTime:        opt.MaxAwaitTime,
+		MaxTime:             opt.MaxTime,
 		Min:                 opt.Min,
-		NoCursorTimeout:     &opt.NoCursorTimeout,
+		NoCursorTimeout:     opt.NoCursorTimeout,
 		Projection:          opt.Projection,
-		ReturnKey:           &opt.ReturnKey,
-		ShowRecordID:        &opt.ShowRecordID,
-		Skip:                &opt.Skip,
+		ReturnKey:           opt.ReturnKey,
+		ShowRecordID:        opt.ShowRecordID,
+		Skip:                opt.Skip,
 		Sort:                opt.Sort,
 		Let:                 opt.Let,
 	})
@@ -335,22 +346,22 @@ func (t *template) FindPageable(ctx context.Context, filter any, input PageInput
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName)
 	cursor, err := collection.Find(ctx, filter, &options.FindOptions{
-		AllowDiskUse:        &opt.AllowDiskUse,
-		AllowPartialResults: &opt.AllowPartialResults,
-		BatchSize:           &opt.BatchSize,
+		AllowDiskUse:        opt.AllowDiskUse,
+		AllowPartialResults: opt.AllowPartialResults,
+		BatchSize:           opt.BatchSize,
 		Collation:           option.ParseCollationMongoOptions(opt.Collation),
-		Comment:             &opt.Comment,
+		Comment:             opt.Comment,
 		CursorType:          option.ParseCursorType(opt.CursorType),
 		Hint:                opt.Hint,
 		Limit:               &input.PageSize,
 		Max:                 opt.Max,
-		MaxAwaitTime:        &opt.MaxAwaitTime,
-		MaxTime:             &opt.MaxTime,
+		MaxAwaitTime:        opt.MaxAwaitTime,
+		MaxTime:             opt.MaxTime,
 		Min:                 opt.Min,
-		NoCursorTimeout:     &opt.NoCursorTimeout,
+		NoCursorTimeout:     opt.NoCursorTimeout,
 		Projection:          opt.Projection,
-		ReturnKey:           &opt.ReturnKey,
-		ShowRecordID:        &opt.ShowRecordID,
+		ReturnKey:           opt.ReturnKey,
+		ShowRecordID:        opt.ShowRecordID,
 		Skip:                &input.Page,
 		Sort:                input.Sort,
 		Let:                 opt.Let,
@@ -379,13 +390,13 @@ func (t *template) Aggregate(ctx context.Context, pipeline any, dest any, opts .
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName)
 	cursor, err := collection.Aggregate(ctx, pipeline, &options.AggregateOptions{
-		AllowDiskUse:             &opt.AllowDiskUse,
-		BatchSize:                &opt.BatchSize,
-		BypassDocumentValidation: &opt.BypassDocumentValidation,
+		AllowDiskUse:             opt.AllowDiskUse,
+		BatchSize:                opt.BatchSize,
+		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
-		MaxTime:                  &opt.MaxTime,
-		MaxAwaitTime:             &opt.MaxAwaitTime,
-		Comment:                  &opt.Comment,
+		MaxTime:                  opt.MaxTime,
+		MaxAwaitTime:             opt.MaxAwaitTime,
+		Comment:                  opt.Comment,
 		Hint:                     opt.Hint,
 		Let:                      opt.Let,
 		Custom:                   opt.Custom,
@@ -410,11 +421,11 @@ func (t *template) CountDocuments(ctx context.Context, filter, ref any, opts ...
 	collection := database.Collection(collectionName)
 	return collection.CountDocuments(ctx, filter, &options.CountOptions{
 		Collation: option.ParseCollationMongoOptions(opt.Collation),
-		Comment:   &opt.Comment,
-		Hint:      &opt.Hint,
-		Limit:     &opt.Limit,
-		MaxTime:   &opt.MaxTime,
-		Skip:      &opt.Skip,
+		Comment:   opt.Comment,
+		Hint:      opt.Hint,
+		Limit:     opt.Limit,
+		MaxTime:   opt.MaxTime,
+		Skip:      opt.Skip,
 	})
 }
 
@@ -428,8 +439,8 @@ func (t *template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName)
 	return collection.EstimatedDocumentCount(ctx, &options.EstimatedDocumentCountOptions{
-		Comment: &opt.Comment,
-		MaxTime: &opt.MaxTime,
+		Comment: opt.Comment,
+		MaxTime: opt.MaxTime,
 	})
 }
 
@@ -446,8 +457,8 @@ func (t *template) Distinct(ctx context.Context, fieldName string, filter, dest 
 	collection := database.Collection(collectionName)
 	result, err := collection.Distinct(ctx, fieldName, filter, &options.DistinctOptions{
 		Collation: option.ParseCollationMongoOptions(opt.Collation),
-		Comment:   &opt.Comment,
-		MaxTime:   &opt.MaxTime,
+		Comment:   opt.Comment,
+		MaxTime:   opt.MaxTime,
 	})
 	if err != nil {
 		return err
@@ -466,14 +477,14 @@ func (t *template) Watch(ctx context.Context, pipeline any, opts ...option.Watch
 	var watchChangeEvents *mongo.ChangeStream
 	var err error
 	optionsChangeStream := &options.ChangeStreamOptions{
-		BatchSize:                &opt.BatchSize,
+		BatchSize:                opt.BatchSize,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
-		Comment:                  &opt.Comment,
+		Comment:                  opt.Comment,
 		FullDocument:             option.ParseFullDocument(opt.FullDocument),
 		FullDocumentBeforeChange: option.ParseFullDocument(opt.FullDocumentBeforeChange),
-		MaxAwaitTime:             &opt.MaxAwaitTime,
+		MaxAwaitTime:             opt.MaxAwaitTime,
 		ResumeAfter:              opt.ResumeAfter,
-		ShowExpandedEvents:       &opt.ShowExpandedEvents,
+		ShowExpandedEvents:       opt.ShowExpandedEvents,
 		StartAtOperationTime:     opt.StartAtOperationTime,
 		StartAfter:               opt.StartAfter,
 		Custom:                   opt.Custom,
@@ -585,8 +596,8 @@ func (t *template) ListIndexes(ctx context.Context, ref any, opts ...option.List
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName).Indexes()
 	cursor, err := collection.List(ctx, &options.ListIndexesOptions{
-		BatchSize: &opt.BatchSize,
-		MaxTime:   &opt.MaxTime,
+		BatchSize: opt.BatchSize,
+		MaxTime:   opt.MaxTime,
 	})
 	if err != nil {
 		return nil, err
@@ -609,8 +620,8 @@ func (t *template) ListIndexSpecifications(ctx context.Context, ref any, opts ..
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName).Indexes()
 	return collection.ListSpecifications(ctx, &options.ListIndexesOptions{
-		BatchSize: &opt.BatchSize,
-		MaxTime:   &opt.MaxTime,
+		BatchSize: opt.BatchSize,
+		MaxTime:   opt.MaxTime,
 	})
 }
 
@@ -669,7 +680,7 @@ func (t *template) insertOne(sc mongo.SessionContext, document any, opt option.I
 	database := t.client.Database(databaseName)
 	coll := database.Collection(collectionName)
 	result, err := coll.InsertOne(sc, document, &options.InsertOneOptions{
-		BypassDocumentValidation: &opt.BypassDocumentValidation,
+		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Comment:                  opt.Comment,
 	})
 	if err != nil {
@@ -750,11 +761,11 @@ func (t *template) updateOne(sc mongo.SessionContext, filter, update, ref any, o
 	coll := database.Collection(collectionName)
 	return coll.UpdateOne(sc, filter, update, &options.UpdateOptions{
 		ArrayFilters:             option.ParseArrayFiltersMongoOptions(opt.ArrayFilters),
-		BypassDocumentValidation: &opt.BypassDocumentValidation,
+		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
 		Comment:                  opt.Comment,
 		Hint:                     opt.Hint,
-		Upsert:                   &opt.Upsert,
+		Upsert:                   opt.Upsert,
 		Let:                      opt.Let,
 	})
 }
@@ -769,11 +780,11 @@ func (t *template) updateMany(sc mongo.SessionContext, filter, update, ref any, 
 	coll := database.Collection(collectionName)
 	return coll.UpdateMany(sc, filter, update, &options.UpdateOptions{
 		ArrayFilters:             option.ParseArrayFiltersMongoOptions(opt.ArrayFilters),
-		BypassDocumentValidation: &opt.BypassDocumentValidation,
+		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
 		Comment:                  opt.Comment,
 		Hint:                     opt.Hint,
-		Upsert:                   &opt.Upsert,
+		Upsert:                   opt.Upsert,
 		Let:                      opt.Let,
 	})
 }
@@ -787,11 +798,11 @@ func (t *template) replaceOne(sc mongo.SessionContext, filter, update, ref any, 
 	database := t.client.Database(databaseName)
 	coll := database.Collection(collectionName)
 	return coll.ReplaceOne(sc, filter, update, &options.ReplaceOptions{
-		BypassDocumentValidation: &opt.BypassDocumentValidation,
+		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
 		Comment:                  opt.Comment,
 		Hint:                     opt.Hint,
-		Upsert:                   &opt.Upsert,
+		Upsert:                   opt.Upsert,
 		Let:                      opt.Let,
 	})
 }
@@ -806,7 +817,7 @@ func (t *template) findOneAndDelete(sc mongo.SessionContext, filter, dest any, o
 	return coll.FindOneAndDelete(sc, filter, &options.FindOneAndDeleteOptions{
 		Collation:  option.ParseCollationMongoOptions(opt.Collation),
 		Comment:    opt.Comment,
-		MaxTime:    &opt.MaxTime,
+		MaxTime:    opt.MaxTime,
 		Projection: opt.Projection,
 		Sort:       opt.Sort,
 		Hint:       opt.Hint,
@@ -822,14 +833,14 @@ func (t *template) findOneAndReplace(sc mongo.SessionContext, filter, replacemen
 	database := t.client.Database(databaseName)
 	coll := database.Collection(collectionName)
 	return coll.FindOneAndReplace(sc, filter, replacement, &options.FindOneAndReplaceOptions{
-		BypassDocumentValidation: &opt.BypassDocumentValidation,
+		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
 		Comment:                  opt.Comment,
-		MaxTime:                  &opt.MaxTime,
+		MaxTime:                  opt.MaxTime,
 		Projection:               opt.Projection,
 		ReturnDocument:           option.ParseReturnDocument(opt.ReturnDocument),
 		Sort:                     opt.Sort,
-		Upsert:                   &opt.Upsert,
+		Upsert:                   opt.Upsert,
 		Hint:                     opt.Hint,
 		Let:                      opt.Let,
 	}).Decode(dest)
@@ -844,14 +855,14 @@ func (t *template) findOneAndUpdate(sc mongo.SessionContext, filter, update, des
 	coll := database.Collection(collectionName)
 	return coll.FindOneAndUpdate(sc, filter, update, &options.FindOneAndUpdateOptions{
 		ArrayFilters:             option.ParseArrayFiltersMongoOptions(opt.ArrayFilters),
-		BypassDocumentValidation: &opt.BypassDocumentValidation,
+		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
 		Comment:                  opt.Comment,
-		MaxTime:                  &opt.MaxTime,
+		MaxTime:                  opt.MaxTime,
 		Projection:               opt.Projection,
 		ReturnDocument:           option.ParseReturnDocument(opt.ReturnDocument),
 		Sort:                     opt.Sort,
-		Upsert:                   &opt.Upsert,
+		Upsert:                   opt.Upsert,
 		Hint:                     opt.Hint,
 		Let:                      opt.Let,
 	}).Decode(dest)
@@ -881,7 +892,7 @@ func (t *template) dropOneIndex(sc mongo.SessionContext, name string, ref any, o
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName).Indexes()
 	_, err = collection.DropOne(sc, name, &options.DropIndexesOptions{
-		MaxTime: &opt.MaxTime,
+		MaxTime: opt.MaxTime,
 	})
 	return err
 }
@@ -894,7 +905,7 @@ func (t *template) dropAllIndex(sc mongo.SessionContext, ref any, opt option.Dro
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName).Indexes()
 	_, err = collection.DropAll(sc, &options.DropIndexesOptions{
-		MaxTime: &opt.MaxTime,
+		MaxTime: opt.MaxTime,
 	})
 	return err
 }

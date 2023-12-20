@@ -9,23 +9,23 @@ type Count struct {
 	Collation *Collation
 	// A string or document that will be included in server logs, profiling logs, and currentOp queries to help trace
 	// the operation.  The default is nil, which means that no comment will be included in the logs.
-	Comment string
+	Comment *string
 	// The index to use for the aggregation. This should either be the index name as a string or the index specification
 	// as a document. The driver will return an error if the hint parameter is a multi-key map. The default value is nil,
 	// which means that no hint will be sent.
 	Hint any
 	// The maximum number of documents to count. The default value is 0, which means that there is no limit and all
 	// documents matching the filter will be counted.
-	Limit int64
+	Limit *int64
 	// The maximum amount of time that the query can run on the server. The default value is nil, meaning that there is
 	// no time limit for query execution.
 	//
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used in
 	// its place to control the amount of time that a single operation can run before returning an error. MaxTime is
 	// ignored if Timeout is set on the client.
-	MaxTime time.Duration
+	MaxTime *time.Duration
 	// The number of documents to skip before counting. The default value is 0.
-	Skip int64
+	Skip *int64
 }
 
 type EstimatedDocumentCount struct {
@@ -38,7 +38,7 @@ type EstimatedDocumentCount struct {
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used
 	// in its place to control the amount of time that a single operation can run before returning an error. MaxTime
 	// is ignored if Timeout is set on the client.
-	MaxTime time.Duration
+	MaxTime *time.Duration
 }
 
 func NewCount() Count {
@@ -55,7 +55,7 @@ func (c Count) SetCollation(collation *Collation) Count {
 }
 
 func (c Count) SetComment(comment string) Count {
-	c.Comment = comment
+	c.Comment = &comment
 	return c
 }
 
@@ -65,22 +65,22 @@ func (c Count) SetHint(a any) Count {
 }
 
 func (c Count) SetLimit(i int64) Count {
-	c.Limit = i
+	c.Limit = &i
 	return c
 }
 
 func (c Count) SetMaxTime(d time.Duration) Count {
-	c.MaxTime = d
+	c.MaxTime = &d
 	return c
 }
 
 func (c Count) SetSkip(i int64) Count {
-	c.Skip = i
+	c.Skip = &i
 	return c
 }
 
 func (e EstimatedDocumentCount) SetMaxTime(d time.Duration) EstimatedDocumentCount {
-	e.MaxTime = d
+	e.MaxTime = &d
 	return e
 }
 
@@ -95,19 +95,19 @@ func GetCountOptionByParams(opts []Count) Count {
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
 		}
-		if len(opt.Comment) != 0 {
+		if opt.Comment != nil {
 			result.Comment = opt.Comment
 		}
 		if opt.Hint != nil {
 			result.Hint = opt.Hint
 		}
-		if opt.MaxTime > 0 {
+		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.Limit > 0 {
+		if opt.Limit != nil {
 			result.Limit = opt.Limit
 		}
-		if opt.Skip > 0 {
+		if opt.Skip != nil {
 			result.Skip = opt.Skip
 		}
 	}
@@ -120,7 +120,7 @@ func GetEstimatedDocumentCountOptionByParams(opts []EstimatedDocumentCount) Esti
 		if opt.Comment != nil {
 			result.Comment = opt.Comment
 		}
-		if opt.MaxTime > 0 {
+		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
 	}

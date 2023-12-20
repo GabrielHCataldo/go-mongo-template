@@ -17,27 +17,23 @@ type Watch struct {
 	//
 	// default: 5 seconds
 	DelayLoop time.Duration
-	// Wait to watch return value
-	//
-	// default: 0 seconds
-	WaitTime time.Duration
 	// The maximum number of documents to be included in each batch returned by the server.
-	BatchSize int32
+	BatchSize *int32
 	// Specifies a collation to use for string comparisons during the operation. This option is only valid for MongoDB
 	// versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
 	// default value is nil, which means the default collation of the collection will be used.
 	Collation *Collation
 	// A string that will be included in server logs, profiling logs, and currentOp queries to help trace the operation.
 	// The default is nil, which means that no comment will be included in the logs.
-	Comment string
+	Comment *string
 	// Specifies how the updated document should be returned in change notifications for update operations. The default
 	// is options.Default, which means that only partial update deltas will be included in the change notification.
-	FullDocument FullDocument
+	FullDocument *FullDocument
 	// Specifies how the pre-update document should be returned in change notifications for update operations. The default
 	// is options.Off, which means that the pre-update document will not be included in the change notification.
-	FullDocumentBeforeChange FullDocument
+	FullDocumentBeforeChange *FullDocument
 	// The maximum amount of time that the server should wait for new documents to satisfy a tailable cursor query.
-	MaxAwaitTime time.Duration
+	MaxAwaitTime *time.Duration
 	// A document specifying the logical starting point for the change stream. Only changes corresponding to an oplog
 	// entry immediately after the resume token will be returned. If this is specified, StartAtOperationTime and
 	// StartAfter must not be set.
@@ -45,7 +41,7 @@ type Watch struct {
 	// ShowExpandedEvents specifies whether the server will return an expanded list of change stream events. Additional
 	// events include: createIndexes, dropIndexes, modify, create, shardCollection, reshardCollection and
 	// refineCollectionShardKey. This option is only valid for MongoDB versions >= 6.0.
-	ShowExpandedEvents bool
+	ShowExpandedEvents *bool
 	// If specified, the change stream will only return changes that occurred at or after the given timestamp. This
 	// option is only valid for MongoDB versions >= 4.0. If this is specified, ResumeAfter and StartAfter must not be
 	// set.
@@ -90,13 +86,8 @@ func (w Watch) SetDelayLoop(d time.Duration) Watch {
 	return w
 }
 
-func (w Watch) SetWaitTime(d time.Duration) Watch {
-	w.WaitTime = d
-	return w
-}
-
 func (w Watch) SetBatchSize(i int32) Watch {
-	w.BatchSize = i
+	w.BatchSize = &i
 	return w
 }
 
@@ -106,22 +97,22 @@ func (w Watch) SetCollation(c *Collation) Watch {
 }
 
 func (w Watch) SetComment(s string) Watch {
-	w.Comment = s
+	w.Comment = &s
 	return w
 }
 
 func (w Watch) SetFullDocument(f FullDocument) Watch {
-	w.FullDocument = f
+	w.FullDocument = &f
 	return w
 }
 
 func (w Watch) SetFullDocumentBeforeChange(f FullDocument) Watch {
-	w.FullDocumentBeforeChange = f
+	w.FullDocumentBeforeChange = &f
 	return w
 }
 
 func (w Watch) SetMaxAwaitTime(d time.Duration) Watch {
-	w.MaxAwaitTime = d
+	w.MaxAwaitTime = &d
 	return w
 }
 
@@ -131,7 +122,7 @@ func (w Watch) SetResumeAfter(a any) Watch {
 }
 
 func (w Watch) SetShowExpandedEvents(b bool) Watch {
-	w.ShowExpandedEvents = b
+	w.ShowExpandedEvents = &b
 	return w
 }
 
@@ -164,16 +155,13 @@ func GetWatchOptionByParams(opts []Watch) Watch {
 		if opt.DelayLoop > 0 {
 			result.DelayLoop = opt.DelayLoop
 		}
-		if opt.WaitTime > 0 {
-			result.WaitTime = opt.WaitTime
-		}
-		if opt.BatchSize != 0 {
+		if opt.BatchSize != nil {
 			result.BatchSize = opt.BatchSize
 		}
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
 		}
-		if len(opt.Comment) != 0 {
+		if opt.Comment != nil {
 			result.Comment = opt.Comment
 		}
 		if len(opt.DatabaseName) != 0 {
@@ -182,7 +170,7 @@ func GetWatchOptionByParams(opts []Watch) Watch {
 		if len(opt.CollectionName) != 0 {
 			result.CollectionName = opt.CollectionName
 		}
-		if opt.MaxAwaitTime > 0 {
+		if opt.MaxAwaitTime != nil {
 			result.MaxAwaitTime = opt.MaxAwaitTime
 		}
 		if opt.Custom != nil {
@@ -191,13 +179,13 @@ func GetWatchOptionByParams(opts []Watch) Watch {
 		if opt.ResumeAfter != nil {
 			result.ResumeAfter = opt.ResumeAfter
 		}
-		if opt.FullDocument.IsEnumValid() {
+		if opt.FullDocument != nil {
 			result.FullDocument = opt.FullDocument
 		}
-		if opt.FullDocumentBeforeChange.IsEnumValid() {
+		if opt.FullDocumentBeforeChange != nil {
 			result.FullDocumentBeforeChange = opt.FullDocumentBeforeChange
 		}
-		if opt.ShowExpandedEvents {
+		if opt.ShowExpandedEvents != nil {
 			result.ShowExpandedEvents = opt.ShowExpandedEvents
 		}
 		if opt.StartAtOperationTime != nil {

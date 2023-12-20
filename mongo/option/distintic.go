@@ -16,7 +16,7 @@ type Distinct struct {
 	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be
 	// used in its place to control the amount of time that a single operation can run before returning an error.
 	// MaxTime is ignored if Timeout is set on the client.
-	MaxTime time.Duration
+	MaxTime *time.Duration
 }
 
 func NewDistinct() Distinct {
@@ -29,7 +29,7 @@ func (d Distinct) SetCollation(c *Collation) Distinct {
 }
 
 func (d Distinct) SetMaxTime(duration time.Duration) Distinct {
-	d.MaxTime = duration
+	d.MaxTime = &duration
 	return d
 }
 
@@ -47,7 +47,7 @@ func GetDistinctOptionByParams(opts []Distinct) Distinct {
 		if opt.Comment != nil {
 			result.Comment = opt.Comment
 		}
-		if opt.MaxTime > 0 {
+		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
 	}
