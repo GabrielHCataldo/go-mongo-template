@@ -338,8 +338,21 @@ func TestTemplateEstimatedDocumentCount(t *testing.T) {
 	}
 }
 
-func TestTemplate_Distinct(t *testing.T) {
-
+func TestTemplateDistinct(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFind() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.Distinct(ctx, tt.filter, tt.dest, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Distinct() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			mongoTemplate.CloseSession(ctx, err)
+		})
+	}
 }
 
 func TestTemplate_Watch(t *testing.T) {

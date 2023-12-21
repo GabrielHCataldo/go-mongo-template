@@ -357,17 +357,10 @@ func (t *template) FindPageable(ctx context.Context, filter any, input PageInput
 	}
 	dest := input.Ref
 	err = cursor.All(ctx, &dest)
-	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
-		return nil, err
-	} else if err != nil {
+	if err != nil {
 		return nil, err
 	}
-	countTotal, err := collection.CountDocuments(ctx, filter)
-	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
-		return nil, err
-	} else if err != nil {
-		return nil, err
-	}
+	countTotal, _ := collection.CountDocuments(ctx, filter)
 	return NewPageOutput(input, dest, countTotal), nil
 }
 
@@ -398,7 +391,7 @@ func (t *template) Aggregate(ctx context.Context, pipeline any, dest any, opts .
 		return err
 	}
 	err = cursor.All(ctx, dest)
-	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+	if err != nil {
 		return err
 	}
 	return nil

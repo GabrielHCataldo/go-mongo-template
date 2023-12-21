@@ -80,15 +80,6 @@ type testReplace struct {
 	wantErr         bool
 }
 
-type testAggregate struct {
-	name            string
-	pipeline        any
-	dest            any
-	option          option.Aggregate
-	durationTimeout time.Duration
-	wantErr         bool
-}
-
 type testFindOneById struct {
 	name            string
 	id              any
@@ -154,6 +145,15 @@ type testFindPageable struct {
 	wantErr         bool
 }
 
+type testAggregate struct {
+	name            string
+	pipeline        any
+	dest            any
+	option          option.Aggregate
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
 type testCountDocuments struct {
 	name            string
 	filter          any
@@ -167,6 +167,16 @@ type testEstimatedDocumentCount struct {
 	name            string
 	ref             any
 	option          option.EstimatedDocumentCount
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testDistinct struct {
+	name            string
+	fieldName       string
+	filter          any
+	dest            any
+	option          option.Distinct
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -232,6 +242,28 @@ func initDocument() {
 	err = os.Setenv(MongoDBTestId, test.Id.Hex())
 	if err != nil {
 		logger.Error("err set MongoDBTestId env:", err)
+	}
+}
+
+func disconnectMongoTemplate() {
+	if mongoTemplate == nil {
+		return
+	}
+	mongoTemplate.Disconnect()
+	mongoTemplate = nil
+}
+
+func clearCollection() {
+	if mongoTemplate == nil {
+		return
+	}
+	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+	defer cancel()
+	_, err := mongoTemplate.DeleteMany(ctx, bson.M{"_id": bson.M{"$exists": true}}, testStruct{})
+	if err != nil {
+		logger.Error("error clean collection:", err)
+	} else {
+		logger.Info("collection cleaned!")
 	}
 }
 
@@ -972,6 +1004,47 @@ func initListTestEstimatedDocumentCount() []testEstimatedDocumentCount {
 	}
 }
 
+func initListTestDistinct() []testDistinct {
+	return []testDistinct{
+		{
+			name:            "success",
+			fieldName:       "_id",
+			filter:          bson.D{{"_id", bson.D{{"$exists", true}}}},
+			dest:            &[]testStruct{},
+			option:          initOptionDistinct(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:      "failed struct dest",
+			fieldName: "_id",
+			filter:    nil,
+			dest:      &[]testInvalidStruct{},
+			option: initOptionDistinct().
+				SetCollation(&option.Collation{}),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type dest",
+			fieldName:       "_id",
+			filter:          nil,
+			dest:            initTestString(),
+			option:          initOptionDistinct(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed dest non pointer",
+			fieldName:       "_id",
+			filter:          nil,
+			dest:            *initTestString(),
+			option:          initOptionDistinct(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
 func initOptionInsertOne() option.InsertOne {
 	return option.NewInsertOne().
 		SetBypassDocumentValidation(true).
@@ -1136,24 +1209,9 @@ func initOptionEstimatedDocumentCount() option.EstimatedDocumentCount {
 		SetMaxTime(5 * time.Second)
 }
 
-func disconnectMongoTemplate() {
-	if mongoTemplate == nil {
-		return
-	}
-	mongoTemplate.Disconnect()
-	mongoTemplate = nil
-}
-
-func clearCollection() {
-	if mongoTemplate == nil {
-		return
-	}
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	_, err := mongoTemplate.DeleteMany(ctx, bson.M{"_id": bson.M{"$exists": true}}, testStruct{})
-	if err != nil {
-		logger.Error("error clean collection:", err)
-	} else {
-		logger.Info("collection cleaned!")
-	}
+func initOptionDistinct() option.Distinct {
+	return option.NewDistinct().
+		SetCollation(nil).
+		SetComment("comment golang unit test").
+		SetMaxTime(5 * time.Second)
 }
