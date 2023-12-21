@@ -21,6 +21,7 @@ type Delete struct {
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let                     any
 	DisableAutoCloseSession bool
+	ForceRecreateSession    bool
 }
 
 func NewDelete() Delete {
@@ -52,6 +53,11 @@ func (d Delete) SetDisableAutoCloseTransaction(b bool) Delete {
 	return d
 }
 
+func (d Delete) SetForceRecreateSession(b bool) Delete {
+	d.ForceRecreateSession = b
+	return d
+}
+
 func GetDeleteOptionByParams(opts []Delete) Delete {
 	result := Delete{}
 	for _, opt := range opts {
@@ -69,6 +75,9 @@ func GetDeleteOptionByParams(opts []Delete) Delete {
 		}
 		if opt.DisableAutoCloseSession {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
+		}
+		if opt.ForceRecreateSession {
+			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
 	}
 	return result

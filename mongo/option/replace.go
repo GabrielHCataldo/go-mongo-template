@@ -29,6 +29,7 @@ type Replace struct {
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let                     any
 	DisableAutoCloseSession bool
+	ForceRecreateSession    bool
 }
 
 func NewReplace() Replace {
@@ -65,6 +66,11 @@ func (r Replace) SetDisableAutoCloseTransaction(b bool) Replace {
 	return r
 }
 
+func (r Replace) SetForceRecreateSession(b bool) Replace {
+	r.ForceRecreateSession = b
+	return r
+}
+
 func GetReplaceOptionByParams(opts []Replace) Replace {
 	result := Replace{}
 	for _, opt := range opts {
@@ -82,6 +88,9 @@ func GetReplaceOptionByParams(opts []Replace) Replace {
 		}
 		if opt.DisableAutoCloseSession {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
+		}
+		if opt.ForceRecreateSession {
+			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
 	}
 	return result

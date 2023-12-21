@@ -214,6 +214,7 @@ type FindOneAndDelete struct {
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let                     any
 	DisableAutoCloseSession bool
+	ForceRecreateSession    bool
 }
 
 type FindOneAndReplace struct {
@@ -262,6 +263,7 @@ type FindOneAndReplace struct {
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let                     any
 	DisableAutoCloseSession bool
+	ForceRecreateSession    bool
 }
 
 type FindOneAndUpdate struct {
@@ -314,6 +316,7 @@ type FindOneAndUpdate struct {
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let                     any
 	DisableAutoCloseSession bool
+	ForceRecreateSession    bool
 }
 
 func NewFind() Find {
@@ -425,8 +428,8 @@ func (f Find) SetSkip(i int64) Find {
 	return f
 }
 
-func (f Find) SetSort(i int64) Find {
-	f.Sort = i
+func (f Find) SetSort(a any) Find {
+	f.Sort = a
 	return f
 }
 
@@ -615,8 +618,18 @@ func (f FindOneAndDelete) SetDisableAutoCloseTransaction(b bool) FindOneAndDelet
 	return f
 }
 
+func (f FindOneAndDelete) SetForceRecreateSession(b bool) FindOneAndDelete {
+	f.ForceRecreateSession = b
+	return f
+}
+
 func (f FindOneAndReplace) SetDisableAutoCloseTransaction(b bool) FindOneAndReplace {
 	f.DisableAutoCloseSession = b
+	return f
+}
+
+func (f FindOneAndReplace) SetForceRecreateSession(b bool) FindOneAndReplace {
+	f.ForceRecreateSession = b
 	return f
 }
 
@@ -675,6 +688,11 @@ func (f FindOneAndUpdate) SetDisableAutoCloseTransaction(b bool) FindOneAndUpdat
 	return f
 }
 
+func (f FindOneAndUpdate) SetForceRecreateSession(b bool) FindOneAndUpdate {
+	f.ForceRecreateSession = b
+	return f
+}
+
 func (f FindOneAndUpdate) SetArrayFilters(a *ArrayFilters) FindOneAndUpdate {
 	f.ArrayFilters = a
 	return f
@@ -720,7 +738,7 @@ func (f FindOneAndUpdate) SetReturnDocument(r ReturnDocument) FindOneAndUpdate {
 	return f
 }
 
-func (f FindOneAndUpdate) SetSort(i int64) FindOneAndUpdate {
+func (f FindOneAndUpdate) SetSort(i any) FindOneAndUpdate {
 	f.Sort = i
 	return f
 }
@@ -748,7 +766,7 @@ func GetFindOptionByParams(opts []Find) Find {
 		if opt.ShowRecordID != nil {
 			result.ShowRecordID = opt.ShowRecordID
 		}
-		if opt.CursorType.IsEnumValid() {
+		if opt.CursorType != nil {
 			result.CursorType = opt.CursorType
 		}
 		if opt.BatchSize != nil {
@@ -812,7 +830,7 @@ func GetFindPageableOptionByParams(opts []FindPageable) FindPageable {
 		if opt.ShowRecordID != nil {
 			result.ShowRecordID = opt.ShowRecordID
 		}
-		if opt.CursorType.IsEnumValid() {
+		if opt.CursorType != nil {
 			result.CursorType = opt.CursorType
 		}
 		if opt.BatchSize != nil {
@@ -898,6 +916,12 @@ func GetFindOneAndDeleteOptionByParams(opts []FindOneAndDelete) FindOneAndDelete
 		if opt.DisableAutoCloseSession {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
+		if opt.ForceRecreateSession {
+			result.ForceRecreateSession = opt.ForceRecreateSession
+		}
+		if opt.ForceRecreateSession {
+			result.ForceRecreateSession = opt.ForceRecreateSession
+		}
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
 		}
@@ -931,6 +955,9 @@ func GetFindOneAndReplaceOptionByParams(opts []FindOneAndReplace) FindOneAndRepl
 		}
 		if opt.DisableAutoCloseSession {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
+		}
+		if opt.ForceRecreateSession {
+			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
 		if opt.Upsert != nil {
 			result.Upsert = opt.Upsert
@@ -972,6 +999,9 @@ func GetFindOneAndUpdateOptionByParams(opts []FindOneAndUpdate) FindOneAndUpdate
 		if opt.DisableAutoCloseSession {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
+		if opt.ForceRecreateSession {
+			result.ForceRecreateSession = opt.ForceRecreateSession
+		}
 		if opt.Upsert != nil {
 			result.Upsert = opt.Upsert
 		}
@@ -999,7 +1029,7 @@ func GetFindOneAndUpdateOptionByParams(opts []FindOneAndUpdate) FindOneAndUpdate
 		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.ReturnDocument.IsEnumValid() {
+		if opt.ReturnDocument != nil {
 			result.ReturnDocument = opt.ReturnDocument
 		}
 	}

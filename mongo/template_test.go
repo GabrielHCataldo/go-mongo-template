@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"github.com/GabrielHCataldo/go-logger/logger"
 	"testing"
 )
 
@@ -24,15 +25,15 @@ func TestNewTemplate(t *testing.T) {
 func TestTemplateInsertOne(t *testing.T) {
 	for _, tt := range initListTestInsertOne() {
 		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
 			initMongoTemplate()
 			if tt.beforeStartSession {
-				mongoTemplate.StartSession(true)
+				mongoTemplate.StartSession(ctx, true)
 			}
 			if tt.beforeCloseMongoClient {
 				mongoTemplate.Disconnect()
 			}
-			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
-			defer cancel()
 			err := mongoTemplate.InsertOne(ctx, tt.value, tt.option)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InsertOne() error = %v, wantErr %v", err, tt.wantErr)
@@ -233,16 +234,57 @@ func TestTemplateFindOneAndReplace(t *testing.T) {
 	}
 }
 
-func TestTemplate_FindOneAndUpdate(t *testing.T) {
-
+func TestTemplateFindOneAndUpdate(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFindOneAndUpdate() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.FindOneAndUpdate(ctx, tt.filter, tt.update, tt.dest, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FindOneAndUpdate() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			mongoTemplate.CloseSession(ctx, err)
+		})
+	}
 }
 
-func TestTemplate_Find(t *testing.T) {
-
+func TestTemplateFind(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFind() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.Find(ctx, tt.filter, tt.dest, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Find() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			mongoTemplate.CloseSession(ctx, err)
+		})
+	}
 }
 
-func TestTemplate_FindPageable(t *testing.T) {
-
+func TestTemplateFindPageable(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFindPageable() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			v, err := mongoTemplate.FindPageable(ctx, tt.filter, tt.pageInput, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FindPageable() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			} else {
+				logger.Info("result pageable:", v)
+			}
+			mongoTemplate.CloseSession(ctx, err)
+		})
+	}
 }
 
 func TestTemplateAggregate(t *testing.T) {

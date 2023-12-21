@@ -64,14 +64,14 @@ type Template interface {
 	// - value: A document describing which keys should be used for the index. It cannot be nil. This must be an
 	// order-preserving type such as bson.D. Map types such as bson.M are not valid.
 	// See https://www.mongodb.com/docs/manual/indexes/#indexes for examples of valid documents.
-	CreateOneIndex(ctx context.Context, input IndexInput, ref any) (string, error)
+	CreateOneIndex(ctx context.Context, input IndexInput, ref any) (string, error) //todo -> adicionar sessao para isso
 	CreateManyIndex(ctx context.Context, inputs []IndexInput, ref any) ([]string, error)
 	DropOneIndex(ctx context.Context, name string, ref any, opts ...option.DropIndex) error
 	DropAllIndexes(ctx context.Context, ref any, opts ...option.DropIndex) error
 	ListIndexes(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexOutput, error)
 	ListIndexSpecifications(ctx context.Context, ref any, opts ...option.ListIndexes) ([]*mongo.IndexSpecification,
 		error)
-	StartSession(forceSession bool)
+	StartSession(ctx context.Context, forceSession bool)
 	CloseSession(ctx context.Context, err error)
 	Disconnect()
 }
@@ -92,7 +92,7 @@ func NewTemplate(ctx context.Context, opts ...*options.ClientOptions) (Template,
 
 func (t *template) InsertOne(ctx context.Context, document any, opts ...option.InsertOne) error {
 	opt := option.GetInsertOneOptionByParams(opts)
-	t.StartSession(opt.ForceRecreateSession)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.insertOne(sc, document, opt)
 		if !opt.DisableAutoCloseSession {
@@ -104,6 +104,7 @@ func (t *template) InsertOne(ctx context.Context, document any, opts ...option.I
 
 func (t *template) InsertMany(ctx context.Context, documents []any, opts ...option.InsertMany) error {
 	opt := option.GetInsertManyOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		var err error
 		errs := t.insertMany(sc, documents, opt)
@@ -133,6 +134,7 @@ func (t *template) DeleteOne(ctx context.Context, filter, ref any, opts ...optio
 	var result *mongo.DeleteResult
 	var err error
 	opt := option.GetDeleteOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		result, err = t.deleteOne(sc, filter, ref, opt)
 		if !opt.DisableAutoCloseSession {
@@ -148,6 +150,7 @@ func (t *template) DeleteMany(ctx context.Context, filter, ref any, opts ...opti
 	var result *mongo.DeleteResult
 	var err error
 	opt := option.GetDeleteOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		result, err = t.deleteMany(sc, filter, ref, opt)
 		if !opt.DisableAutoCloseSession {
@@ -163,6 +166,7 @@ func (t *template) UpdateOneById(ctx context.Context, id, update, ref any, opts 
 	var result *mongo.UpdateResult
 	var err error
 	opt := option.GetUpdateOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		result, err = t.updateOne(sc, bson.D{{"_id", id}}, update, ref, opt)
 		if !opt.DisableAutoCloseSession {
@@ -178,6 +182,7 @@ func (t *template) UpdateOne(ctx context.Context, filter any, update, ref any, o
 	var result *mongo.UpdateResult
 	var err error
 	opt := option.GetUpdateOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		result, err = t.updateOne(sc, filter, update, ref, opt)
 		if !opt.DisableAutoCloseSession {
@@ -193,6 +198,7 @@ func (t *template) UpdateMany(ctx context.Context, filter any, update, ref any, 
 	var result *mongo.UpdateResult
 	var err error
 	opt := option.GetUpdateOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		result, err = t.updateMany(sc, filter, update, ref, opt)
 		if !opt.DisableAutoCloseSession {
@@ -208,6 +214,7 @@ func (t *template) ReplaceOne(ctx context.Context, filter any, update, ref any, 
 	var result *mongo.UpdateResult
 	var err error
 	opt := option.GetReplaceOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		result, err = t.replaceOne(sc, filter, update, ref, opt)
 		if !opt.DisableAutoCloseSession {
@@ -233,6 +240,7 @@ func (t *template) FindOneAndDelete(ctx context.Context, filter, dest any, opts 
 		return ErrDestIsNotStruct
 	}
 	opt := option.GetFindOneAndDeleteOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.findOneAndDelete(sc, filter, dest, opt)
 		if !opt.DisableAutoCloseSession {
@@ -243,12 +251,13 @@ func (t *template) FindOneAndDelete(ctx context.Context, filter, dest any, opts 
 }
 
 func (t *template) FindOneAndReplace(ctx context.Context, filter, replacement, dest any, opts ...option.FindOneAndReplace) error {
-	opt := option.GetFindOneAndReplaceOptionByParams(opts)
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	} else if util.IsNotStruct(dest) {
 		return ErrDestIsNotStruct
 	}
+	opt := option.GetFindOneAndReplaceOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.findOneAndReplace(sc, filter, replacement, dest, opt)
 		if !opt.DisableAutoCloseSession {
@@ -265,6 +274,7 @@ func (t *template) FindOneAndUpdate(ctx context.Context, filter, update, dest an
 		return ErrDestIsNotStruct
 	}
 	opt := option.GetFindOneAndUpdateOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.findOneAndUpdate(sc, filter, update, dest, opt)
 		if !opt.DisableAutoCloseSession {
@@ -342,13 +352,20 @@ func (t *template) FindPageable(ctx context.Context, filter any, input PageInput
 		Sort:                input.Sort,
 		Let:                 opt.Let,
 	})
+	if err != nil {
+		return nil, err
+	}
 	dest := input.Ref
-	err = cursor.All(ctx, dest)
+	err = cursor.All(ctx, &dest)
 	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 	countTotal, err := collection.CountDocuments(ctx, filter)
 	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
+		return nil, err
+	} else if err != nil {
 		return nil, err
 	}
 	return NewPageOutput(input, dest, countTotal), nil
@@ -501,6 +518,7 @@ func (t *template) WatchHandler(ctx context.Context, pipeline any, handler Handl
 
 func (t *template) DropCollection(ctx context.Context, ref any, opts ...option.Drop) error {
 	opt := option.GetDropOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.dropCollection(sc, ref)
 		if !opt.DisableAutoCloseSession {
@@ -512,6 +530,7 @@ func (t *template) DropCollection(ctx context.Context, ref any, opts ...option.D
 
 func (t *template) DropDatabase(ctx context.Context, ref any, opts ...option.Drop) error {
 	opt := option.GetDropOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.dropDatabase(sc, ref)
 		if !opt.DisableAutoCloseSession {
@@ -543,6 +562,7 @@ func (t *template) CreateManyIndex(ctx context.Context, inputs []IndexInput, ref
 
 func (t *template) DropOneIndex(ctx context.Context, name string, ref any, opts ...option.DropIndex) error {
 	opt := option.GetDropIndexOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.dropOneIndex(sc, name, ref, opt)
 		if !opt.DisableAutoCloseSession {
@@ -554,6 +574,7 @@ func (t *template) DropOneIndex(ctx context.Context, name string, ref any, opts 
 
 func (t *template) DropAllIndexes(ctx context.Context, ref any, opts ...option.DropIndex) error {
 	opt := option.GetDropIndexOptionByParams(opts)
+	t.StartSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.dropAllIndex(sc, ref, opt)
 		if !opt.DisableAutoCloseSession {
@@ -632,9 +653,11 @@ func (t *template) Disconnect() {
 	logger.Info("Connection to MongoDB closed.")
 }
 
-func (t *template) StartSession(forceSession bool) {
+func (t *template) StartSession(ctx context.Context, forceSession bool) {
 	if t.session != nil && !forceSession {
 		return
+	} else if t.session != nil {
+		t.CloseSession(ctx, nil)
 	}
 	session, _ := t.client.StartSession()
 	_ = session.StartTransaction()
@@ -926,8 +949,12 @@ func getMongoInfosByAny(a any) (databaseName string, collectionName string, err 
 	}
 	switch v.Kind() {
 	case reflect.Slice, reflect.Array:
-		databaseName = util.GetDatabaseNameBySlice(a)
-		collectionName = util.GetCollectionNameBySlice(a)
+		if v.Type().Elem().Kind() == reflect.Struct {
+			databaseName = util.GetDatabaseNameBySlice(a)
+			collectionName = util.GetCollectionNameBySlice(a)
+		} else {
+			return "", "", ErrRefDocument
+		}
 		break
 	case reflect.Struct:
 		databaseName = util.GetDatabaseNameByStruct(a)

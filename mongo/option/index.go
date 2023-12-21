@@ -75,6 +75,7 @@ type DropIndex struct {
 	// is ignored if Timeout is set on the client.
 	MaxTime                 *time.Duration
 	DisableAutoCloseSession bool
+	ForceRecreateSession    bool
 }
 
 type ListIndexes struct {
@@ -225,6 +226,11 @@ func (d DropIndex) SetDisableAutoCloseTransaction(b bool) DropIndex {
 	return d
 }
 
+func (d DropIndex) SetForceRecreateSession(b bool) DropIndex {
+	d.ForceRecreateSession = b
+	return d
+}
+
 func (l ListIndexes) SetMaxTime(duration time.Duration) ListIndexes {
 	l.MaxTime = &duration
 	return l
@@ -243,6 +249,9 @@ func GetDropIndexOptionByParams(opts []DropIndex) DropIndex {
 		}
 		if opt.DisableAutoCloseSession {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
+		}
+		if opt.ForceRecreateSession {
+			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
 	}
 	return result

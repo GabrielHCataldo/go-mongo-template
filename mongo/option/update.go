@@ -33,6 +33,7 @@ type Update struct {
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let                     any
 	DisableAutoCloseSession bool
+	ForceRecreateSession    bool
 }
 
 func NewUpdate() Update {
@@ -74,6 +75,11 @@ func (u Update) SetDisableAutoCloseTransaction(b bool) Update {
 	return u
 }
 
+func (u Update) SetForceRecreateSession(b bool) Update {
+	u.ForceRecreateSession = b
+	return u
+}
+
 func (u Update) SetUpsert(b bool) Update {
 	u.Upsert = &b
 	return u
@@ -99,6 +105,9 @@ func GetUpdateOptionByParams(opts []Update) Update {
 		}
 		if opt.DisableAutoCloseSession {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
+		}
+		if opt.ForceRecreateSession {
+			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
 	}
 	return result

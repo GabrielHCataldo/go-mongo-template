@@ -126,6 +126,34 @@ type testFindOneAndReplace struct {
 	wantErr         bool
 }
 
+type testFindOneAndUpdate struct {
+	name            string
+	filter          any
+	update          any
+	dest            any
+	option          option.FindOneAndUpdate
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testFind struct {
+	name            string
+	filter          any
+	dest            any
+	option          option.Find
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testFindPageable struct {
+	name            string
+	filter          any
+	pageInput       PageInput
+	option          option.FindPageable
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
 type testCountDocuments struct {
 	name            string
 	filter          any
@@ -676,6 +704,162 @@ func initListTestFindOneAndReplace() []testFindOneAndReplace {
 	}
 }
 
+func initListTestFindOneAndUpdate() []testFindOneAndUpdate {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testFindOneAndUpdate{
+		{
+			name:            "success",
+			filter:          bson.D{{"_id", objectId}},
+			update:          bson.M{"$set": bson.M{"name": "Updated Test Name"}},
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndUpdate(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:   "failed struct dest",
+			filter: nil,
+			update: nil,
+			dest:   &testInvalidStruct{},
+			option: initOptionFindOneAndUpdate().
+				SetCollation(&option.Collation{}).
+				SetReturnDocument(option.ReturnDocumentAfter).
+				SetBypassDocumentValidation(true).
+				SetDisableAutoCloseTransaction(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type dest",
+			filter:          nil,
+			update:          nil,
+			dest:            initTestString(),
+			option:          initOptionFindOneAndUpdate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed dest non pointer",
+			filter:          nil,
+			update:          nil,
+			dest:            *initTestString(),
+			option:          initOptionFindOneAndUpdate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestFind() []testFind {
+	return []testFind{
+		{
+			name:            "success",
+			filter:          bson.D{{"_id", bson.D{{"$exists", true}}}},
+			dest:            &[]testStruct{},
+			option:          initOptionFind(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:   "failed struct dest",
+			filter: nil,
+			dest:   &[]testInvalidStruct{},
+			option: initOptionFind().
+				SetCollation(&option.Collation{}).
+				SetNoCursorTimeout(true).
+				SetLimit(10).
+				SetSkip(1),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type dest",
+			filter:          nil,
+			dest:            initTestString(),
+			option:          initOptionFind(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed dest non pointer",
+			filter:          nil,
+			dest:            *initTestString(),
+			option:          initOptionFind(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestFindPageable() []testFindPageable {
+	return []testFindPageable{
+		{
+			name:   "success",
+			filter: bson.D{{"_id", bson.D{{"$exists", true}}}},
+			pageInput: PageInput{
+				Page:     0,
+				PageSize: 10,
+				Ref:      []testStruct{},
+				Sort:     nil,
+			},
+			option:          initOptionFindPageable(),
+			durationTimeout: 5 * time.Second,
+		},
+
+		{
+			name:   "success empty",
+			filter: bson.D{{"_id", bson.D{{"$exists", false}}}},
+			pageInput: PageInput{
+				Page:     0,
+				PageSize: 10,
+				Ref:      []testStruct{},
+				Sort:     nil,
+			},
+			option:          initOptionFindPageable(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:   "failed struct dest",
+			filter: nil,
+			pageInput: PageInput{
+				Page:     0,
+				PageSize: 10,
+				Ref:      []testInvalidStruct{},
+				Sort:     nil,
+			},
+			option: initOptionFindPageable().
+				SetNoCursorTimeout(true).
+				SetCollation(&option.Collation{}),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:   "failed type dest",
+			filter: nil,
+			pageInput: PageInput{
+				Page:     0,
+				PageSize: 10,
+				Ref:      *initTestString(),
+				Sort:     nil,
+			},
+			option:          initOptionFindPageable(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:   "failed type slice dest",
+			filter: nil,
+			pageInput: PageInput{
+				Page:     0,
+				PageSize: 10,
+				Ref:      []string{},
+				Sort:     nil,
+			},
+			option:          initOptionFindPageable(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
 func initListTestAggregate() []testAggregate {
 	return []testAggregate{
 		{
@@ -876,6 +1060,52 @@ func initOptionFindOneAndReplace() option.FindOneAndReplace {
 		SetLet(bson.M{}).
 		SetDisableAutoCloseTransaction(false).
 		SetUpsert(true)
+}
+
+func initOptionFindOneAndUpdate() option.FindOneAndUpdate {
+	return option.NewFindOneAndUpdate().
+		SetCollation(nil).
+		SetComment("comment golang unit test").
+		SetHint(bson.M{}).
+		SetMaxTime(5 * time.Second).
+		SetProjection(bson.M{}).
+		SetSort(bson.M{}).
+		SetLet(bson.M{}).
+		SetDisableAutoCloseTransaction(false).
+		SetUpsert(true)
+}
+
+func initOptionFind() option.Find {
+	return option.NewFind().
+		SetCollation(nil).
+		SetComment("comment golang unit test").
+		SetHint(bson.M{}).
+		SetMaxTime(5 * time.Second).
+		SetProjection(bson.M{}).
+		SetSort(bson.M{}).
+		SetLet(bson.M{}).
+		SetAllowPartialResults(true).
+		SetShowRecordID(true).
+		SetAllowDiskUse(true).
+		SetNoCursorTimeout(false).
+		SetMin(bson.M{}).
+		SetMax(bson.M{})
+}
+
+func initOptionFindPageable() option.FindPageable {
+	return option.NewFindPageable().
+		SetCollation(nil).
+		SetComment("comment golang unit test").
+		SetHint(bson.M{}).
+		SetMaxTime(5 * time.Second).
+		SetProjection(bson.M{}).
+		SetLet(bson.M{}).
+		SetAllowPartialResults(true).
+		SetShowRecordID(true).
+		SetAllowDiskUse(true).
+		SetNoCursorTimeout(false).
+		SetMin(bson.M{}).
+		SetMax(bson.M{})
 }
 
 func initOptionAggregate() option.Aggregate {
