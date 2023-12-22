@@ -132,3 +132,7 @@ func MinInt64(value, min int64) int64 {
 	}
 	return value
 }
+
+func ConvertToPointer[T any](a T) *T {
+	return &a
+}

@@ -2,7 +2,7 @@ package mongo
 
 import (
 	"go-mongo/mongo/option"
-	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -15,15 +15,21 @@ type IndexInput struct {
 	Keys any
 	// The options to use to create the index.
 	Options option.Index
-	Ref     any
+	// Struct reference contained database and collection tag
+	Ref any
 }
 
 type IndexOutput struct {
-	Key                bson.M `bson:"key,omitempty"`
-	Name               string `bson:"name,omitempty"`
-	Ns                 string `bson:"ns,omitempty"`
-	ExpireAfterSeconds int32  `bson:"expireAfterSeconds,omitempty"`
-	Unique             bool   `bson:"unique,omitempty"`
+	Id         any             `bson:"id,omitempty"`
+	Ns         string          `bson:"ns,omitempty"`
+	FirstBatch FirstBatchIndex `bson:"firstBatch,omitempty"`
+}
+
+type FirstBatchIndex struct {
+	V    int         `bson:"v,omitempty"`
+	Key  primitive.M `bson:"key,omitempty"`
+	Name string      `bson:"name,omitempty"`
+	Ns   string      `bson:"ns,omitempty"`
 }
 
 func parseIndexInputToModel(input IndexInput) mongo.IndexModel {

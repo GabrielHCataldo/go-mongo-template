@@ -266,6 +266,22 @@ func TestTemplateFind(t *testing.T) {
 	}
 }
 
+func TestTemplateFindAll(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFind() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.FindAll(ctx, tt.dest, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("FindAll() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+		})
+	}
+}
+
 func TestTemplateFindPageable(t *testing.T) {
 	initDocument()
 	for _, tt := range initListTestFindPageable() {
@@ -275,6 +291,42 @@ func TestTemplateFindPageable(t *testing.T) {
 			v, err := mongoTemplate.FindPageable(ctx, tt.filter, tt.pageInput, tt.option)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FindPageable() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			} else {
+				logger.Info("result pageable:", v)
+			}
+		})
+	}
+}
+
+func TestTemplateExists(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestExists() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			v, err := mongoTemplate.Exists(ctx, tt.filter, tt.ref, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Exists() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			} else {
+				logger.Info("result pageable:", v)
+			}
+		})
+	}
+}
+
+func TestTemplateExistsById(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestExistsById() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			v, err := mongoTemplate.ExistsById(ctx, tt.id, tt.ref, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ExistsById() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
 				t.Log("err expected:", err)
 			} else {

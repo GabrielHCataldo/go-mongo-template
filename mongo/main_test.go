@@ -86,7 +86,7 @@ type testFindOneById struct {
 	name            string
 	id              any
 	dest            any
-	option          option.FindOne
+	option          option.FindOneById
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -143,6 +143,24 @@ type testFindPageable struct {
 	filter          any
 	pageInput       PageInput
 	option          option.FindPageable
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testExists struct {
+	name            string
+	filter          any
+	ref             any
+	option          option.Exists
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testExistsById struct {
+	name            string
+	id              any
+	ref             any
+	option          option.Exists
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -693,23 +711,22 @@ func initListTestFindOneById() []testFindOneById {
 			name:            "success",
 			id:              objectId,
 			dest:            &testStruct{},
-			option:          initOptionFindOne(),
+			option:          initOptionFindOneById(),
 			durationTimeout: 5 * time.Second,
 		},
 		{
 			name:            "success no content",
 			id:              primitive.NewObjectID(),
 			dest:            &testStruct{},
-			option:          initOptionFindOne(),
+			option:          initOptionFindOneById(),
 			durationTimeout: 5 * time.Second,
 		},
 		{
 			name: "failed",
 			id:   objectId,
 			dest: &testStruct{},
-			option: initOptionFindOne().
-				SetCollation(&option.Collation{}).
-				SetSkip(2),
+			option: initOptionFindOneById().
+				SetCollation(&option.Collation{}),
 			durationTimeout: 1 * time.Millisecond,
 			wantErr:         true,
 		},
@@ -717,7 +734,7 @@ func initListTestFindOneById() []testFindOneById {
 			name:            "failed struct dest",
 			id:              nil,
 			dest:            &testInvalidStruct{},
-			option:          initOptionFindOne(),
+			option:          initOptionFindOneById(),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -725,7 +742,7 @@ func initListTestFindOneById() []testFindOneById {
 			name:            "failed type dest",
 			id:              nil,
 			dest:            initTestString(),
-			option:          initOptionFindOne(),
+			option:          initOptionFindOneById(),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -733,7 +750,7 @@ func initListTestFindOneById() []testFindOneById {
 			name:            "failed dest non pointer",
 			id:              nil,
 			dest:            *initTestString(),
-			option:          initOptionFindOne(),
+			option:          initOptionFindOneById(),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -798,6 +815,14 @@ func initListTestFindOneAndDelete() []testFindOneAndDelete {
 			durationTimeout: 5 * time.Second,
 		},
 		{
+			name:            "failed not found",
+			filter:          bson.D{{"_id", primitive.NewObjectID()}},
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndDelete(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
 			name:   "failed",
 			filter: bson.D{{"_id", objectId}},
 			dest:   &testStruct{},
@@ -844,6 +869,15 @@ func initListTestFindOneAndReplace() []testFindOneAndReplace {
 			dest:            &testStruct{},
 			option:          initOptionFindOneAndReplace(),
 			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed not found",
+			filter:          bson.D{{"_id", primitive.NewObjectID()}},
+			replacement:     *initTestStruct(),
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndReplace(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
 		},
 		{
 			name:        "failed",
@@ -897,6 +931,15 @@ func initListTestFindOneAndUpdate() []testFindOneAndUpdate {
 			dest:            &testStruct{},
 			option:          initOptionFindOneAndUpdate(),
 			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed not found",
+			filter:          bson.D{{"_id", primitive.NewObjectID()}},
+			update:          bson.M{"$set": bson.M{"name": "Updated Test Name"}},
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndUpdate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
 		},
 		{
 			name:   "failed struct dest",
@@ -1084,6 +1127,93 @@ func initListTestFindPageable() []testFindPageable {
 				Sort:     nil,
 			},
 			option:          initOptionFindPageable(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestExists() []testExists {
+	return []testExists{
+		{
+			name:            "success",
+			filter:          bson.D{{"_id", bson.D{{"$exists", true}}}},
+			ref:             testStruct{},
+			option:          initOptionExists(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "success not exists",
+			filter:          bson.D{{"_id", bson.D{{"$exists", false}}}},
+			ref:             testStruct{},
+			option:          initOptionExists(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed timeout",
+			filter:          bson.D{{"_id", bson.D{{"$exists", false}}}},
+			ref:             testStruct{},
+			option:          initOptionExists().SetCollation(&option.Collation{}),
+			durationTimeout: 1 * time.Millisecond,
+			wantErr:         true,
+		},
+		{
+			name:            "failed ref",
+			filter:          bson.D{{"_id", bson.D{{"$exists", false}}}},
+			ref:             testInvalidStruct{},
+			option:          initOptionExists(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type ref",
+			filter:          bson.D{{"_id", bson.D{{"$exists", false}}}},
+			ref:             "",
+			option:          initOptionExists(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestExistsById() []testExistsById {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testExistsById{
+		{
+			name:            "success",
+			id:              objectId,
+			ref:             testStruct{},
+			option:          initOptionExists(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "success not exists",
+			id:              primitive.NewObjectID(),
+			ref:             testStruct{},
+			option:          initOptionExists(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed timeout",
+			id:              primitive.NewObjectID(),
+			ref:             testStruct{},
+			option:          initOptionExists(),
+			durationTimeout: 1 * time.Millisecond,
+			wantErr:         true,
+		},
+		{
+			name:            "failed ref",
+			id:              primitive.NewObjectID(),
+			ref:             testInvalidStruct{},
+			option:          initOptionExists(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type ref",
+			id:              primitive.NewObjectID(),
+			ref:             "",
+			option:          initOptionExists(),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -1682,6 +1812,21 @@ func initOptionFindOne() option.FindOne {
 
 }
 
+func initOptionFindOneById() option.FindOneById {
+	return option.NewFindOneById().
+		SetAllowPartialResults(true).
+		SetCollation(nil).
+		SetMaxTime(5 * time.Second).
+		SetComment("comment golang unit test").
+		SetHint(bson.M{}).
+		SetMax(bson.M{}).
+		SetMin(bson.M{}).
+		SetProjection(bson.M{}).
+		SetReturnKey(true).
+		SetShowRecordID(true)
+
+}
+
 func initOptionFindOneAndDelete() option.FindOneAndDelete {
 	return option.NewFindOneAndDelete().
 		SetForceRecreateSession(true).
@@ -1756,6 +1901,14 @@ func initOptionFindPageable() option.FindPageable {
 		SetNoCursorTimeout(false).
 		SetMin(bson.M{}).
 		SetMax(bson.M{})
+}
+
+func initOptionExists() option.Exists {
+	return option.NewExists().
+		SetCollation(nil).
+		SetComment("comment count golang unit test").
+		SetHint(bson.M{}).
+		SetMaxTime(5 * time.Second)
 }
 
 func initOptionAggregate() option.Aggregate {

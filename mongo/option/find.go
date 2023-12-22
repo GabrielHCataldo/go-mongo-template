@@ -179,6 +179,45 @@ type FindOne struct {
 	Sort any
 }
 
+type FindOneById struct {
+	// If true, an operation on a sharded cluster can return partial results if some shards are down rather than
+	// returning an error. The default value is false.
+	AllowPartialResults *bool
+	// Specifies a collation to use for string comparisons during the operation. This option is only valid for MongoDB
+	// versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
+	// default value is nil, which means the default collation of the collection will be used.
+	Collation *Collation
+	// A string that will be included in server logs, profiling logs, and currentOp queries to help trace the operation.
+	// The default is nil, which means that no comment will be included in the logs.
+	Comment *string
+	// The index to use for the aggregation. This should either be the index name as a string or the index specification
+	// as a document. The driver will return an error if the hint parameter is a multi-key map. The default value is nil,
+	// which means that no hint will be sent.
+	Hint any
+	// A document specifying the exclusive upper bound for a specific index. The default value is nil, which means that
+	// there is no maximum value.
+	Max any
+	// The maximum amount of time that the query can run on the server. The default value is nil, meaning that there
+	// is no time limit for query execution.
+	//
+	// NOTE: MaxTime will be deprecated in a future release. The more general Timeout option may be used
+	// in its place to control the amount of time that a single operation can run before returning an error. MaxTime
+	// is ignored if Timeout is set on the client.
+	MaxTime *time.Duration
+	// A document specifying the inclusive lower bound for a specific index. The default value is 0, which means that
+	// there is no minimum value.
+	Min any
+	// A document describing which fields will be included in the document returned by the operation. The default value
+	// is nil, which means all fields will be included.
+	Projection any
+	// If true, the document returned by the operation will only contain fields corresponding to the index used. The
+	// default value is false.
+	ReturnKey *bool
+	// If true, a $recordId field with a record identifier will be included in the document returned by the operation.
+	// The default value is false.
+	ShowRecordID *bool
+}
+
 type FindOneAndDelete struct {
 	// Specifies a collation to use for string comparisons during the operation. This option is only valid for MongoDB
 	// versions >= 3.4. For previous server versions, the driver will return an error if this option is used. The
@@ -329,6 +368,10 @@ func NewFindPageable() FindPageable {
 
 func NewFindOne() FindOne {
 	return FindOne{}
+}
+
+func NewFindOneById() FindOneById {
+	return FindOneById{}
 }
 
 func NewFindOneAndDelete() FindOneAndDelete {
@@ -575,6 +618,56 @@ func (f FindOne) SetSkip(i int64) FindOne {
 
 func (f FindOne) SetSort(a any) FindOne {
 	f.Sort = a
+	return f
+}
+
+func (f FindOneById) SetAllowPartialResults(b bool) FindOneById {
+	f.AllowPartialResults = &b
+	return f
+}
+
+func (f FindOneById) SetCollation(c *Collation) FindOneById {
+	f.Collation = c
+	return f
+}
+
+func (f FindOneById) SetComment(s string) FindOneById {
+	f.Comment = &s
+	return f
+}
+
+func (f FindOneById) SetHint(v any) FindOneById {
+	f.Hint = v
+	return f
+}
+
+func (f FindOneById) SetMax(v any) FindOneById {
+	f.Max = v
+	return f
+}
+
+func (f FindOneById) SetMaxTime(d time.Duration) FindOneById {
+	f.MaxTime = &d
+	return f
+}
+
+func (f FindOneById) SetMin(v any) FindOneById {
+	f.Min = v
+	return f
+}
+
+func (f FindOneById) SetProjection(v any) FindOneById {
+	f.Projection = v
+	return f
+}
+
+func (f FindOneById) SetReturnKey(b bool) FindOneById {
+	f.ReturnKey = &b
+	return f
+}
+
+func (f FindOneById) SetShowRecordID(b bool) FindOneById {
+	f.ShowRecordID = &b
 	return f
 }
 
@@ -899,6 +992,43 @@ func GetFindOneOptionByParams(opts []FindOne) FindOne {
 		}
 		if opt.Sort != nil {
 			result.Sort = opt.Sort
+		}
+		if opt.Projection != nil {
+			result.Projection = opt.Projection
+		}
+		if opt.MaxTime != nil {
+			result.MaxTime = opt.MaxTime
+		}
+	}
+	return result
+}
+
+func GetFindOneByIdOptionByParams(opts []FindOneById) FindOneById {
+	result := FindOneById{}
+	for _, opt := range opts {
+		if opt.AllowPartialResults != nil {
+			result.AllowPartialResults = opt.AllowPartialResults
+		}
+		if opt.ReturnKey != nil {
+			result.ReturnKey = opt.ReturnKey
+		}
+		if opt.ShowRecordID != nil {
+			result.ShowRecordID = opt.ShowRecordID
+		}
+		if opt.Collation != nil {
+			result.Collation = opt.Collation
+		}
+		if opt.Comment != nil {
+			result.Comment = opt.Comment
+		}
+		if opt.Hint != nil {
+			result.Hint = opt.Hint
+		}
+		if opt.Max != nil {
+			result.Max = opt.Max
+		}
+		if opt.Min != nil {
+			result.Min = opt.Min
 		}
 		if opt.Projection != nil {
 			result.Projection = opt.Projection
