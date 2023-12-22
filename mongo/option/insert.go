@@ -22,7 +22,7 @@ type InsertMany struct {
 	// A string or document that will be included in server logs, profiling logs, and currentOp queries to help trace
 	// the operation.  The default value is nil, which means that no comment will be included in the logs.
 	Comment                    any
-	DisableAutoSessionRollback bool
+	DisableAutoRollbackSession bool
 	DisableAutoCloseSession    bool
 	ForceRecreateSession       bool
 }
@@ -45,7 +45,7 @@ func (i InsertOne) SetComment(a any) InsertOne {
 	return i
 }
 
-func (i InsertOne) SetDisableAutoCloseTransaction(b bool) InsertOne {
+func (i InsertOne) SetDisableAutoCloseSession(b bool) InsertOne {
 	i.DisableAutoCloseSession = b
 	return i
 }
@@ -66,11 +66,11 @@ func (i InsertMany) SetComment(a any) InsertMany {
 }
 
 func (i InsertMany) SetDisableAutoRollback(b bool) InsertMany {
-	i.DisableAutoSessionRollback = b
+	i.DisableAutoRollbackSession = b
 	return i
 }
 
-func (i InsertMany) SetDisableAutoCloseTransaction(b bool) InsertMany {
+func (i InsertMany) SetDisableAutoCloseSession(b bool) InsertMany {
 	i.DisableAutoCloseSession = b
 	return i
 }
@@ -111,8 +111,8 @@ func GetInsertManyOptionByParams(opts []InsertMany) InsertMany {
 		if opt.Comment != nil {
 			result.Comment = opt.Comment
 		}
-		if opt.DisableAutoSessionRollback {
-			result.DisableAutoSessionRollback = opt.DisableAutoSessionRollback
+		if opt.DisableAutoRollbackSession {
+			result.DisableAutoRollbackSession = opt.DisableAutoRollbackSession
 		}
 		if opt.DisableAutoCloseSession {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession

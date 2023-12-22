@@ -61,7 +61,7 @@ func (r Replace) SetLet(a any) Replace {
 	return r
 }
 
-func (r Replace) SetDisableAutoCloseTransaction(b bool) Replace {
+func (r Replace) SetDisableAutoCloseSession(b bool) Replace {
 	r.DisableAutoCloseSession = b
 	return r
 }

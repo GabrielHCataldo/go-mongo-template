@@ -1,9 +1,5 @@
 package option
 
-type Enum interface {
-	IsEnumValid() bool
-}
-
 // CursorType specifies whether a cursor should close when the last data is retrieved. See
 // NonTailable, Tailable, and TailableAwait.
 type CursorType int8
@@ -15,6 +11,7 @@ type ReturnDocument int8
 // FullDocument specifies how a change stream should return the modified document.
 type FullDocument string
 
+//goland:noinspection ALL
 const (
 	// FullDocumentDefault does not include a document copy.
 	FullDocumentDefault FullDocument = "default"
@@ -29,12 +26,16 @@ const (
 	// if the post-image for this event is available.
 	FullDocumentWhenAvailable FullDocument = "whenAvailable"
 )
+
+//goland:noinspection ALL
 const (
 	// ReturnDocumentBefore specifies that findAndUpdate should return the document as it was before the update.
 	ReturnDocumentBefore ReturnDocument = iota
 	// ReturnDocumentAfter specifies that findAndUpdate should return the document as it is after the update.
 	ReturnDocumentAfter
 )
+
+//goland:noinspection ALL
 const (
 	// CursorTypeNonTailable specifies that a cursor should close after retrieving the last data.
 	CursorTypeNonTailable CursorType = iota
@@ -44,27 +45,3 @@ const (
 	// that it should block for a certain amount of time for new data before returning no data.
 	CursorTypeTailableAwait
 )
-
-func (c CursorType) IsEnumValid() bool {
-	switch c {
-	case CursorTypeNonTailable, CursorTypeTailable, CursorTypeTailableAwait:
-		return true
-	}
-	return false
-}
-
-func (r ReturnDocument) IsEnumValid() bool {
-	switch r {
-	case ReturnDocumentBefore, ReturnDocumentAfter:
-		return true
-	}
-	return false
-}
-
-func (f FullDocument) IsEnumValid() bool {
-	switch f {
-	case FullDocumentDefault, FullDocumentOff, FullDocumentRequired, FullDocumentUpdateLookup, FullDocumentWhenAvailable:
-		return true
-	}
-	return false
-}

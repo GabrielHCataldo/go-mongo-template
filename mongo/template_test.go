@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"testing"
+	"time"
 )
 
 func TestNewTemplate(t *testing.T) {
@@ -178,7 +179,6 @@ func TestTemplateFindOneById(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
 }
@@ -195,7 +195,6 @@ func TestTemplateFindOne(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
 }
@@ -263,7 +262,6 @@ func TestTemplateFind(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
 }
@@ -282,7 +280,6 @@ func TestTemplateFindPageable(t *testing.T) {
 			} else {
 				logger.Info("result pageable:", v)
 			}
-			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
 }
@@ -299,7 +296,6 @@ func TestTemplateAggregate(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
 }
@@ -316,7 +312,6 @@ func TestTemplateCountDocuments(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
 }
@@ -333,64 +328,196 @@ func TestTemplateEstimatedDocumentCount(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
 }
 
 func TestTemplateDistinct(t *testing.T) {
 	initDocument()
-	for _, tt := range initListTestFind() {
+	for _, tt := range initListTestDistinct() {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.Distinct(ctx, tt.filter, tt.dest, tt.option)
+			err := mongoTemplate.Distinct(ctx, tt.fieldName, tt.filter, tt.dest, tt.ref, tt.option)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Distinct() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
 		})
 	}
 }
 
-func TestTemplate_Watch(t *testing.T) {
-
+func TestTemplateWatch(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestWatch() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			_, err := mongoTemplate.Watch(ctx, tt.pipeline, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Watch() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+		})
+	}
 }
 
-func TestTemplate_WatchHandler(t *testing.T) {
-
+func TestTemplateWatchHandler(t *testing.T) {
+	initMongoTemplate()
+	for _, tt := range initListTestWatchHandler() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			go func() {
+				time.Sleep(2 * time.Second)
+				initDocument()
+			}()
+			err := mongoTemplate.WatchHandler(ctx, tt.pipeline, tt.handler, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("WatchHandler() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+		})
+	}
 }
 
-func TestTemplate_DropCollection(t *testing.T) {
-
+func TestTemplateDropCollection(t *testing.T) {
+	initDocument()
+	time.Sleep(5 * time.Second)
+	for _, tt := range initListTestDrop() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.DropCollection(ctx, tt.ref)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DropCollection() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+		})
+	}
 }
 
-func TestTemplate_DropDatabase(t *testing.T) {
-
+func TestTemplateDropDatabase(t *testing.T) {
+	initDocument()
+	time.Sleep(5 * time.Second)
+	for _, tt := range initListTestDrop() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.DropDatabase(ctx, tt.ref)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DropDatabase() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+		})
+	}
 }
 
-func TestTemplate_CreateOneIndex(t *testing.T) {
-
+func TestTemplateCreateOneIndex(t *testing.T) {
+	initDocument()
+	clearIndexes()
+	time.Sleep(5 * time.Second)
+	for _, tt := range initListTestCreateOneIndex() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			_, err := mongoTemplate.CreateOneIndex(ctx, tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CreateOneIndex() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+		})
+	}
 }
 
-func TestTemplate_CreateManyIndex(t *testing.T) {
-
+func TestTemplateCreateManyIndex(t *testing.T) {
+	initDocument()
+	clearIndexes()
+	time.Sleep(5 * time.Second)
+	for _, tt := range initListTestCreateManyIndex() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			_, err := mongoTemplate.CreateManyIndex(ctx, tt.inputs)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("CreateManyIndex() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+		})
+	}
 }
 
-func TestTemplate_DropOneIndex(t *testing.T) {
-
+func TestTemplateDropOneIndex(t *testing.T) {
+	initIndex()
+	for _, tt := range initListTestDropIndex() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.DropOneIndex(ctx, tt.nameIndex, tt.ref, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DropOneIndex() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+		})
+	}
 }
 
-func TestTemplate_DropAllIndexes(t *testing.T) {
-
+func TestTemplateDropAllIndexes(t *testing.T) {
+	initIndex()
+	for _, tt := range initListTestDropIndex() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.DropAllIndexes(ctx, tt.ref, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DropAllIndexes() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+		})
+	}
 }
 
-func TestTemplate_ListIndexes(t *testing.T) {
-
+func TestTemplateListIndexes(t *testing.T) {
+	initIndex()
+	for _, tt := range initListTestListIndexes() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			result, err := mongoTemplate.ListIndexes(ctx, tt.ref, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ListIndexes() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			} else {
+				logger.Info("result list indexes:", result)
+			}
+		})
+	}
 }
 
-func TestTemplate_ListIndexSpecifications(t *testing.T) {
-
+func TestTemplateListIndexSpecifications(t *testing.T) {
+	initIndex()
+	for _, tt := range initListTestListIndexes() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			result, err := mongoTemplate.ListIndexSpecifications(ctx, tt.ref, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ListIndexSpecifications() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			} else {
+				logger.Info("result list indexes:", result)
+			}
+		})
+	}
 }

@@ -70,7 +70,7 @@ func (u Update) SetLet(a any) Update {
 	return u
 }
 
-func (u Update) SetDisableAutoCloseTransaction(b bool) Update {
+func (u Update) SetDisableAutoCloseSession(b bool) Update {
 	u.DisableAutoCloseSession = b
 	return u
 }

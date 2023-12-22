@@ -48,7 +48,7 @@ func (d Delete) SetLet(a any) Delete {
 	return d
 }
 
-func (d Delete) SetDisableAutoCloseTransaction(b bool) Delete {
+func (d Delete) SetDisableAutoCloseSession(b bool) Delete {
 	d.DisableAutoCloseSession = b
 	return d
 }

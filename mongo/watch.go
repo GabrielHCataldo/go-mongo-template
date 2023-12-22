@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"go-mongo/mongo/option"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -11,7 +12,7 @@ type WatchEvent struct {
 	DocumentKey       documentKey         `bson:"documentKey"`
 	NS                ns                  `bson:"ns"`
 	OperationType     string              `bson:"operationType"`
-	FullDocument      any                 `bson:"fullDocument"`
+	FullDocument      bson.M              `bson:"fullDocument"`
 	UpdateDescription updateDescription   `bson:"updateDescription"`
 	ClusterTime       primitive.Timestamp `bson:"clusterTime"`
 }
@@ -38,7 +39,7 @@ type ContextWatch struct {
 
 type HandlerWatch func(ctx *ContextWatch)
 
-func processWatchNext(handler HandlerWatch, event WatchEvent, opt option.Watch) {
+func processWatchNext(handler HandlerWatch, event WatchEvent, opt option.WatchHandler) {
 	ctx, cancel := context.WithTimeout(context.TODO(), opt.ContextFuncTimeout)
 	defer cancel()
 	signal := make(chan struct{}, 1)

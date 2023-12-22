@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"go-mongo/internal/util"
@@ -50,11 +49,11 @@ type Template interface {
 	Aggregate(ctx context.Context, pipeline, dest any, opts ...option.Aggregate) error
 	CountDocuments(ctx context.Context, filter, ref any, opts ...option.Count) (int64, error)
 	EstimatedDocumentCount(ctx context.Context, ref any, opts ...option.EstimatedDocumentCount) (int64, error)
-	Distinct(ctx context.Context, fieldName string, filter, dest any, opts ...option.Distinct) error
+	Distinct(ctx context.Context, fieldName string, filter, dest, ref any, opts ...option.Distinct) error
 	Watch(ctx context.Context, pipeline any, opts ...option.Watch) (*mongo.ChangeStream, error)
-	WatchHandler(ctx context.Context, pipeline any, handler HandlerWatch, opts ...option.Watch) error
-	DropCollection(ctx context.Context, ref any, opts ...option.Drop) error
-	DropDatabase(ctx context.Context, ref any, opts ...option.Drop) error
+	WatchHandler(ctx context.Context, pipeline any, handler HandlerWatch, opts ...option.WatchHandler) error
+	DropCollection(ctx context.Context, ref any) error
+	DropDatabase(ctx context.Context, ref any) error
 	// CreateOneIndex
 	//
 	// # Parameters:
@@ -64,8 +63,8 @@ type Template interface {
 	// - value: A document describing which keys should be used for the index. It cannot be nil. This must be an
 	// order-preserving type such as bson.D. Map types such as bson.M are not valid.
 	// See https://www.mongodb.com/docs/manual/indexes/#indexes for examples of valid documents.
-	CreateOneIndex(ctx context.Context, input IndexInput, ref any) (string, error) //todo -> adicionar sessao para isso
-	CreateManyIndex(ctx context.Context, inputs []IndexInput, ref any) ([]string, error)
+	CreateOneIndex(ctx context.Context, input IndexInput) (string, error)
+	CreateManyIndex(ctx context.Context, inputs []IndexInput) ([]string, error)
 	DropOneIndex(ctx context.Context, name string, ref any, opts ...option.DropIndex) error
 	DropAllIndexes(ctx context.Context, ref any, opts ...option.DropIndex) error
 	ListIndexes(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexOutput, error)
@@ -106,21 +105,10 @@ func (t *template) InsertMany(ctx context.Context, documents []any, opts ...opti
 	opt := option.GetInsertManyOptionByParams(opts)
 	t.StartSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		var err error
-		errs := t.insertMany(sc, documents, opt)
-		if len(errs) != 0 {
-			var b strings.Builder
-			for i, errResult := range errs {
-				if i != 0 {
-					b.WriteString(", ")
-				}
-				b.WriteString(errResult.Error())
-			}
-			err = errors.New(b.String())
-		}
+		err := t.insertMany(sc, documents, opt)
 		if !opt.DisableAutoCloseSession {
 			errClose := err
-			if !opt.DisableAutoSessionRollback {
+			if !opt.DisableAutoRollbackSession {
 				errClose = nil
 			}
 			t.CloseSession(sc, errClose)
@@ -324,6 +312,11 @@ func (t *template) Find(ctx context.Context, filter, dest any, opts ...option.Fi
 
 func (t *template) FindPageable(ctx context.Context, filter any, input PageInput, opts ...option.FindPageable) (
 	*PageOutput, error) {
+	if util.IsPointer(input.Ref) {
+		return nil, errors.New("mongo: input.Ref cannot be a pointer")
+	} else if util.IsInvalid(input.Ref) {
+		return nil, errors.New("mongo: invalid type input.Ref")
+	}
 	databaseName, collectionName, err := getMongoInfosByAny(input.Ref)
 	if err != nil {
 		return nil, err
@@ -430,12 +423,12 @@ func (t *template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...
 	})
 }
 
-func (t *template) Distinct(ctx context.Context, fieldName string, filter, dest any, opts ...option.Distinct) error {
+func (t *template) Distinct(ctx context.Context, fieldName string, filter, dest, ref any, opts ...option.Distinct) error {
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	}
 	opt := option.GetDistinctOptionByParams(opts)
-	databaseName, collectionName, err := getMongoInfosByAny(dest)
+	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return err
 	}
@@ -448,14 +441,8 @@ func (t *template) Distinct(ctx context.Context, fieldName string, filter, dest 
 	})
 	if err != nil {
 		return err
-	} else if result == nil || len(result) == 0 {
-		return nil
 	}
-	b, err := json.Marshal(result)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(b, dest)
+	return util.ParseAnyJsonDest(result, dest)
 }
 
 func (t *template) Watch(ctx context.Context, pipeline any, opts ...option.Watch) (*mongo.ChangeStream, error) {
@@ -489,92 +476,89 @@ func (t *template) Watch(ctx context.Context, pipeline any, opts ...option.Watch
 	return watchChangeEvents, err
 }
 
-func (t *template) WatchHandler(ctx context.Context, pipeline any, handler HandlerWatch, opts ...option.Watch) error {
-	opt := option.GetWatchOptionByParams(opts)
-	watchChangeEvents, err := t.Watch(ctx, pipeline, opts...)
+func (t *template) WatchHandler(ctx context.Context, pipeline any, handler HandlerWatch, opts ...option.WatchHandler) error {
+	if handler == nil {
+		return ErrWatchHandlerIsNil
+	}
+	opt := option.GetWatchHandlerOptionByParams(opts)
+	watchChangeEvents, err := t.Watch(ctx, pipeline, option.Watch{
+		DatabaseName:             opt.DatabaseName,
+		CollectionName:           opt.CollectionName,
+		BatchSize:                opt.BatchSize,
+		Collation:                opt.Collation,
+		Comment:                  opt.Comment,
+		FullDocument:             opt.FullDocument,
+		FullDocumentBeforeChange: opt.FullDocumentBeforeChange,
+		MaxAwaitTime:             opt.MaxAwaitTime,
+		ResumeAfter:              opt.ResumeAfter,
+		ShowExpandedEvents:       opt.ShowExpandedEvents,
+		StartAtOperationTime:     opt.StartAtOperationTime,
+		StartAfter:               opt.StartAfter,
+		Custom:                   opt.Custom,
+		CustomPipeline:           opt.CustomPipeline,
+	})
 	if err != nil {
 		return err
 	}
-	for watchChangeEvents.Next(context.TODO()) {
+	for watchChangeEvents.Next(ctx) {
 		var event WatchEvent
-		if err = watchChangeEvents.Decode(&event); err != nil {
-			logger.Errorf("Error decoding change stream: %s", err)
-			break
-		}
+		_ = watchChangeEvents.Decode(&event)
 		processWatchNext(handler, event, opt)
 	}
-	if err = watchChangeEvents.Close(context.TODO()); err != nil {
-		return err
-	}
+	_ = watchChangeEvents.Close(ctx)
 	return nil
 }
 
-func (t *template) DropCollection(ctx context.Context, ref any, opts ...option.Drop) error {
-	opt := option.GetDropOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
-	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		err := t.dropCollection(sc, ref)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
-	})
-}
-
-func (t *template) DropDatabase(ctx context.Context, ref any, opts ...option.Drop) error {
-	opt := option.GetDropOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
-	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		err := t.dropDatabase(sc, ref)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
-	})
-}
-
-func (t *template) CreateOneIndex(ctx context.Context, input IndexInput, ref any) (string, error) {
+func (t *template) DropCollection(ctx context.Context, ref any) error {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
-		return "", err
+		return err
 	}
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName).Indexes()
-	return collection.CreateOne(ctx, parseIndexInputToModel(input))
+	return t.client.Database(databaseName).Collection(collectionName).Drop(ctx)
 }
 
-func (t *template) CreateManyIndex(ctx context.Context, inputs []IndexInput, ref any) ([]string, error) {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+func (t *template) DropDatabase(ctx context.Context, ref any) error {
+	databaseName, _, err := getMongoInfosByAny(ref)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName).Indexes()
-	return collection.CreateMany(ctx, parseSliceIndexInputToModels(inputs))
+	return t.client.Database(databaseName).Drop(ctx)
+}
+
+func (t *template) CreateOneIndex(ctx context.Context, input IndexInput) (string, error) {
+	return t.createOneIndex(ctx, input)
+}
+
+func (t *template) CreateManyIndex(ctx context.Context, inputs []IndexInput) ([]string, error) {
+	return t.createManyIndex(ctx, inputs)
 }
 
 func (t *template) DropOneIndex(ctx context.Context, name string, ref any, opts ...option.DropIndex) error {
 	opt := option.GetDropIndexOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
-	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		err := t.dropOneIndex(sc, name, ref, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
+	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	if err != nil {
 		return err
+	}
+	database := t.client.Database(databaseName)
+	collection := database.Collection(collectionName).Indexes()
+	_, err = collection.DropOne(ctx, name, &options.DropIndexesOptions{
+		MaxTime: opt.MaxTime,
 	})
+	return err
 }
 
 func (t *template) DropAllIndexes(ctx context.Context, ref any, opts ...option.DropIndex) error {
 	opt := option.GetDropIndexOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
-	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		err := t.dropAllIndex(sc, ref, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
+	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	if err != nil {
 		return err
+	}
+	database := t.client.Database(databaseName)
+	collection := database.Collection(collectionName).Indexes()
+	_, err = collection.DropAll(ctx, &options.DropIndexesOptions{
+		MaxTime: opt.MaxTime,
 	})
+	return err
 }
 
 func (t *template) ListIndexes(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexOutput, error) {
@@ -594,9 +578,6 @@ func (t *template) ListIndexes(ctx context.Context, ref any, opts ...option.List
 	}
 	var results []IndexOutput
 	err = cursor.All(ctx, &results)
-	if err != nil {
-		return nil, err
-	}
 	return results, err
 }
 
@@ -613,28 +594,6 @@ func (t *template) ListIndexSpecifications(ctx context.Context, ref any, opts ..
 		BatchSize: opt.BatchSize,
 		MaxTime:   opt.MaxTime,
 	})
-}
-
-func (t *template) CloseSession(ctx context.Context, err error) {
-	if t.session == nil {
-		return
-	}
-	if err != nil {
-		if err = t.session.AbortTransaction(ctx); err != nil {
-			logger.Error("error abort transaction")
-		} else {
-			logger.Info("transaction aborted successfully!")
-		}
-		return
-	}
-	if err = t.session.CommitTransaction(ctx); err != nil {
-		logger.Error("error commit transaction")
-	} else {
-		logger.Info("transaction commit successfully!")
-	}
-	t.session.EndSession(ctx)
-	t.session = nil
-	logger.Info("session finish successfully!")
 }
 
 func (t *template) Disconnect() {
@@ -655,6 +614,24 @@ func (t *template) StartSession(ctx context.Context, forceSession bool) {
 	session, _ := t.client.StartSession()
 	_ = session.StartTransaction()
 	t.session = session
+}
+
+func (t *template) CloseSession(ctx context.Context, err error) {
+	if err != nil {
+		if err = t.abortTransaction(ctx); err != nil {
+			logger.Error("error abort transaction")
+		} else {
+			logger.Info("transaction aborted successfully!")
+		}
+		return
+	}
+	if err = t.commitTransaction(ctx); err != nil {
+		logger.Error("error commit transaction")
+	} else {
+		logger.Info("transaction commit successfully!")
+	}
+	t.endSession(ctx)
+	logger.Info("session closed successfully!")
 }
 
 func (t *template) insertOne(sc mongo.SessionContext, document any, opt option.InsertOne) error {
@@ -682,9 +659,9 @@ func (t *template) insertOne(sc mongo.SessionContext, document any, opt option.I
 	return nil
 }
 
-func (t *template) insertMany(sc mongo.SessionContext, documents []any, opt option.InsertMany) []error {
+func (t *template) insertMany(sc mongo.SessionContext, documents []any, opt option.InsertMany) error {
 	if len(documents) == 0 {
-		return []error{ErrDocumentsIsEmpty}
+		return ErrDocumentsIsEmpty
 	}
 	var errs []error
 	for i, document := range documents {
@@ -693,7 +670,7 @@ func (t *template) insertMany(sc mongo.SessionContext, documents []any, opt opti
 		}
 		indexStr := strconv.Itoa(i)
 		if util.IsNotPointer(document) {
-			errs = append(errs, errors.New(ErrDocumentIsNotPointer.Error()+"(index: "+indexStr+")"))
+			errs = append(errs, errors.New(ErrDocumentIsNotPointer.Error()+" (index: "+indexStr+")"))
 		} else if util.IsNotStruct(document) {
 			errs = append(errs, errors.New(ErrDocumentIsNotStruct.Error()+"(index: "+indexStr+")"))
 		} else if util.IsZero(document) {
@@ -704,11 +681,21 @@ func (t *template) insertMany(sc mongo.SessionContext, documents []any, opt opti
 				Comment:                  opt.Comment,
 			})
 			if err != nil {
-				errs = append(errs, err)
+				errs = append(errs, errors.New(err.Error()+" (index: "+indexStr+")"))
 			}
 		}
 	}
-	return errs
+	if len(errs) != 0 {
+		var b strings.Builder
+		for i, errResult := range errs {
+			if i != 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString(errResult.Error())
+		}
+		return errors.New(b.String())
+	}
+	return nil
 }
 
 func (t *template) deleteOne(sc mongo.SessionContext, filter, ref any, opt option.Delete) (
@@ -893,46 +880,64 @@ func (t *template) findOneAndUpdate(sc mongo.SessionContext, filter, update, des
 	}).Decode(dest)
 }
 
-func (t *template) dropCollection(sc mongo.SessionContext, ref any) error {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+func (t *template) createOneIndex(ctx context.Context, input IndexInput) (string, error) {
+	databaseName, collectionName, err := getMongoInfosByAny(input.Ref)
 	if err != nil {
-		return err
-	}
-	return t.client.Database(databaseName).Collection(collectionName).Drop(sc)
-}
-
-func (t *template) dropDatabase(sc mongo.SessionContext, ref any) error {
-	databaseName, _, err := getMongoInfosByAny(ref)
-	if err != nil {
-		return err
-	}
-	return t.client.Database(databaseName).Drop(sc)
-}
-
-func (t *template) dropOneIndex(sc mongo.SessionContext, name string, ref any, opt option.DropIndex) error {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
-	if err != nil {
-		return err
+		return "", err
 	}
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName).Indexes()
-	_, err = collection.DropOne(sc, name, &options.DropIndexesOptions{
-		MaxTime: opt.MaxTime,
-	})
-	return err
+	return collection.CreateOne(ctx, parseIndexInputToModel(input))
 }
 
-func (t *template) dropAllIndex(sc mongo.SessionContext, ref any, opt option.DropIndex) error {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
-	if err != nil {
-		return err
+func (t *template) createManyIndex(ctx context.Context, inputs []IndexInput) ([]string, error) {
+	var result []string
+	if len(inputs) == 0 {
+		return result, ErrDocumentsIsEmpty
 	}
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName).Indexes()
-	_, err = collection.DropAll(sc, &options.DropIndexesOptions{
-		MaxTime: opt.MaxTime,
-	})
-	return err
+	var errs []error
+	for i, input := range inputs {
+		indexStr := strconv.Itoa(i)
+		r, err := t.createOneIndex(ctx, input)
+		if err != nil {
+			errs = append(errs, errors.New(err.Error()+" (index: "+indexStr+")"))
+		} else {
+			result = append(result, r)
+		}
+	}
+	if len(errs) != 0 {
+		var b strings.Builder
+		for i, errResult := range errs {
+			if i != 0 {
+				b.WriteString(", ")
+			}
+			b.WriteString(errResult.Error())
+		}
+		return result, errors.New(b.String())
+	}
+	return result, nil
+}
+
+func (t *template) commitTransaction(ctx context.Context) error {
+	if t.session == nil {
+		return nil
+	}
+	return t.session.CommitTransaction(ctx)
+}
+
+func (t *template) abortTransaction(ctx context.Context) error {
+	if t.session == nil {
+		return nil
+	}
+	return t.session.AbortTransaction(ctx)
+}
+
+func (t *template) endSession(ctx context.Context) {
+	if t.session == nil {
+		return
+	}
+	t.session.EndSession(ctx)
+	t.session = nil
 }
 
 func getMongoInfosByAny(a any) (databaseName string, collectionName string, err error) {

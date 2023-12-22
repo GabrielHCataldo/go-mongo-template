@@ -613,7 +613,7 @@ func (f FindOneAndDelete) SetLet(v any) FindOneAndDelete {
 	return f
 }
 
-func (f FindOneAndDelete) SetDisableAutoCloseTransaction(b bool) FindOneAndDelete {
+func (f FindOneAndDelete) SetDisableAutoCloseSession(b bool) FindOneAndDelete {
 	f.DisableAutoCloseSession = b
 	return f
 }
@@ -623,7 +623,7 @@ func (f FindOneAndDelete) SetForceRecreateSession(b bool) FindOneAndDelete {
 	return f
 }
 
-func (f FindOneAndReplace) SetDisableAutoCloseTransaction(b bool) FindOneAndReplace {
+func (f FindOneAndReplace) SetDisableAutoCloseSession(b bool) FindOneAndReplace {
 	f.DisableAutoCloseSession = b
 	return f
 }
@@ -683,7 +683,7 @@ func (f FindOneAndReplace) SetSort(a any) FindOneAndReplace {
 	return f
 }
 
-func (f FindOneAndUpdate) SetDisableAutoCloseTransaction(b bool) FindOneAndUpdate {
+func (f FindOneAndUpdate) SetDisableAutoCloseSession(b bool) FindOneAndUpdate {
 	f.DisableAutoCloseSession = b
 	return f
 }

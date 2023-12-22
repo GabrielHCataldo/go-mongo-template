@@ -1,9 +1,18 @@
 package util
 
 import (
+	"encoding/json"
 	"reflect"
 	"strings"
 )
+
+func ParseAnyJsonDest(a any, dest any) error {
+	b, err := json.Marshal(a)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(b, dest)
+}
 
 func IsNotStruct(v any) bool {
 	r := reflect.ValueOf(v)
@@ -14,8 +23,17 @@ func IsNotStruct(v any) bool {
 }
 
 func IsNotPointer(v any) bool {
+	return !IsPointer(v)
+}
+
+func IsPointer(v any) bool {
 	r := reflect.ValueOf(v)
-	return r.Kind() != reflect.Pointer
+	return r.Kind() == reflect.Pointer
+}
+
+func IsInvalid(v any) bool {
+	r := reflect.ValueOf(v)
+	return r.Kind() == reflect.Invalid
 }
 
 func IsNilValueReflect(v reflect.Value) bool {
@@ -101,9 +119,6 @@ func SetInsertedIdOnDocument(insertedId, a any) {
 	for i := 0; i < vr.NumField(); i++ {
 		fieldValue := vr.Field(i)
 		fieldStruct := t.Field(i)
-		if fieldValue.Kind() == reflect.Pointer || fieldValue.Kind() == reflect.Interface {
-			fieldValue = fieldValue.Elem()
-		}
 		if strings.Contains(fieldStruct.Tag.Get("bson"), "_id") &&
 			rInsertedId.Kind() == fieldValue.Kind() {
 			fieldValue.Set(rInsertedId)
