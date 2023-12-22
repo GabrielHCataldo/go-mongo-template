@@ -1,6 +1,6 @@
-module go-mongo
+module github.com/GabrielHCataldo/go-mongo
 
-go 1.21
+go 1.21.3
 
 require (
 	github.com/GabrielHCataldo/go-logger v1.0.9

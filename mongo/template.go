@@ -3,9 +3,8 @@ package mongo
 import (
 	"context"
 	"errors"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"go-mongo/internal/util"
-	"go-mongo/mongo/option"
+	"github.com/GabrielHCataldo/go-mongo/internal/util"
+	"github.com/GabrielHCataldo/go-mongo/mongo/option"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -19,7 +18,7 @@ import (
 //
 // Example usage:
 //
-//	mongo.Pipeline{
+//	Pipeline{
 //		{{"$group", bson.D{{"_id", "$state"}, {"totalPop", bson.D{{"$sum", "$pop"}}}}}},
 //		{{"$match", bson.D{{"totalPop", bson.D{{"$gte", 10*1000*1000}}}}}},
 //	}
@@ -51,7 +50,7 @@ type Template interface {
 	// The opts parameter can be used to specify options for the operation (see the option.InsertMany documentation.)
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/insert/.
-	InsertMany(ctx context.Context, documents []any, opts ...option.InsertMany) error
+	InsertMany(ctx context.Context, documents any, opts ...option.InsertMany) error
 	// DeleteOne executes a delete command to delete at most one document from the collection.
 	//
 	// The filter parameter must be a document containing query operators and can be used to select the document to be
@@ -65,6 +64,8 @@ type Template interface {
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/delete/.
 	DeleteOne(ctx context.Context, filter, ref any, opts ...option.Delete) (*mongo.DeleteResult, error)
+	// DeleteOneById todo -> finalizar documentacao
+	DeleteOneById(ctx context.Context, id, ref any, opts ...option.Delete) (*mongo.DeleteResult, error)
 	// DeleteMany executes a delete command to delete documents from the collection.
 	//
 	// The filter parameter must be a document containing query operators and can be used to select the documents to
@@ -143,6 +144,8 @@ type Template interface {
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
 	ReplaceOne(ctx context.Context, filter, replacement, ref any, opts ...option.Replace) (*mongo.UpdateResult, error)
+	// ReplaceOneById todo -> finalizar documentacao
+	ReplaceOneById(ctx context.Context, id, replacement, ref any, opts ...option.Replace) (*mongo.UpdateResult, error)
 	// FindOne executes a find command, if successful it returns the corresponding documents in the collection in the dest
 	// parameter with return error nil. Otherwise, it returns corresponding error.
 	//
@@ -400,15 +403,16 @@ type Template interface {
 	//
 	// The ref parameter must be the collection structure with database and collection tags configured.
 	ListIndexSpecifications(ctx context.Context, ref any, opts ...option.ListIndexes) ([]*mongo.IndexSpecification, error)
-	// StartSession starts a session and a transaction, if the forceSession parameter is true it will not persist any
-	// existing session, it will close any open session committing the transactions, and open a new one.
-	StartSession(ctx context.Context, forceSession bool)
-	// CloseSession closes session and transaction, if param error is not null it will commit the changes,
+	// CloseSession closes session and transaction, if param abort is false it will commit the changes,
 	// otherwise it will abort all transactions.
-	CloseSession(ctx context.Context, err error)
+	CloseSession(ctx context.Context, abort bool) error
+	// CommitTransaction commit all transactions on session
+	CommitTransaction(ctx context.Context) error
+	// AbortTransaction abort all transactions on session
+	AbortTransaction(ctx context.Context) error
 	// Disconnect
 	// closes the mongodb connection client
-	Disconnect()
+	Disconnect(ctx context.Context) error
 }
 
 func NewTemplate(ctx context.Context, opts ...*options.ClientOptions) (Template, error) {
@@ -427,76 +431,67 @@ func NewTemplate(ctx context.Context, opts ...*options.ClientOptions) (Template,
 
 func (t *template) InsertOne(ctx context.Context, document any, opts ...option.InsertOne) error {
 	opt := option.GetInsertOneOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
+	t.startSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.insertOne(sc, document, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
 	})
 }
 
-func (t *template) InsertMany(ctx context.Context, documents []any, opts ...option.InsertMany) error {
+func (t *template) InsertMany(ctx context.Context, documents any, opts ...option.InsertMany) error {
 	opt := option.GetInsertManyOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
+	t.startSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.insertMany(sc, documents, opt)
-		if !opt.DisableAutoCloseSession {
-			errClose := err
-			if !opt.DisableAutoRollbackSession {
-				errClose = nil
-			}
-			t.CloseSession(sc, errClose)
-		}
-		return err
+		return t.closeSession(sc, opt.DisableAutoCloseSession, opt.DisableAutoRollbackSession, err)
 	})
 }
 
-func (t *template) DeleteOne(ctx context.Context, filter, ref any, opts ...option.Delete) (
-	*mongo.DeleteResult, error) {
+func (t *template) DeleteOne(ctx context.Context, filter, ref any, opts ...option.Delete) (*mongo.DeleteResult, error) {
 	var result *mongo.DeleteResult
 	var err error
 	opt := option.GetDeleteOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
+	t.startSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		result, err = t.deleteOne(sc, filter, ref, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
 	})
 	return result, err
 }
 
-func (t *template) DeleteMany(ctx context.Context, filter, ref any, opts ...option.Delete) (
-	*mongo.DeleteResult, error) {
+func (t *template) DeleteOneById(ctx context.Context, id, ref any, opts ...option.Delete) (*mongo.DeleteResult, error) {
 	var result *mongo.DeleteResult
 	var err error
 	opt := option.GetDeleteOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
+	t.startSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-		result, err = t.deleteMany(sc, filter, ref, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
+		result, err = t.deleteOne(sc, bson.D{{"_id", id}}, ref, opt)
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
 	})
 	return result, err
 }
 
-func (t *template) UpdateOneById(ctx context.Context, id, update, ref any, opts ...option.Update) (
-	*mongo.UpdateResult, error) {
+func (t *template) DeleteMany(ctx context.Context, filter, ref any, opts ...option.Delete) (*mongo.DeleteResult, error) {
+	var result *mongo.DeleteResult
+	var err error
+	opt := option.GetDeleteOptionByParams(opts)
+	t.startSession(ctx, opt.ForceRecreateSession)
+	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
+		result, err = t.deleteMany(sc, filter, ref, opt)
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
+	})
+	return result, err
+}
+
+func (t *template) UpdateOneById(ctx context.Context, id, update, ref any, opts ...option.Update) (*mongo.UpdateResult,
+	error) {
 	var result *mongo.UpdateResult
 	var err error
 	opt := option.GetUpdateOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
+	t.startSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		result, err = t.updateOne(sc, bson.D{{"_id", id}}, update, ref, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
 	})
 	return result, err
 }
@@ -506,13 +501,10 @@ func (t *template) UpdateOne(ctx context.Context, filter any, update, ref any, o
 	var result *mongo.UpdateResult
 	var err error
 	opt := option.GetUpdateOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
+	t.startSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		result, err = t.updateOne(sc, filter, update, ref, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
 	})
 	return result, err
 }
@@ -522,13 +514,9 @@ func (t *template) UpdateMany(ctx context.Context, filter any, update, ref any, 
 	var result *mongo.UpdateResult
 	var err error
 	opt := option.GetUpdateOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		result, err = t.updateMany(sc, filter, update, ref, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
 	})
 	return result, err
 }
@@ -538,13 +526,23 @@ func (t *template) ReplaceOne(ctx context.Context, filter any, update, ref any, 
 	var result *mongo.UpdateResult
 	var err error
 	opt := option.GetReplaceOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
+	t.startSession(ctx, opt.ForceRecreateSession)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		result, err = t.replaceOne(sc, filter, update, ref, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
+	})
+	return result, err
+}
+
+func (t *template) ReplaceOneById(ctx context.Context, id, replacement, ref any, opts ...option.Replace) (
+	*mongo.UpdateResult, error) {
+	var result *mongo.UpdateResult
+	var err error
+	opt := option.GetReplaceOptionByParams(opts)
+	t.startSession(ctx, opt.ForceRecreateSession)
+	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
+		result, err = t.replaceOne(sc, bson.D{{"_id", id}}, replacement, ref, opt)
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
 	})
 	return result, err
 }
@@ -576,13 +574,10 @@ func (t *template) FindOneAndDelete(ctx context.Context, filter, dest any, opts 
 		return ErrDestIsNotStruct
 	}
 	opt := option.GetFindOneAndDeleteOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
+	t.startSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.findOneAndDelete(sc, filter, dest, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
 	})
 }
 
@@ -593,13 +588,10 @@ func (t *template) FindOneAndReplace(ctx context.Context, filter, replacement, d
 		return ErrDestIsNotStruct
 	}
 	opt := option.GetFindOneAndReplaceOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
+	t.startSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.findOneAndReplace(sc, filter, replacement, dest, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
 	})
 }
 
@@ -610,13 +602,10 @@ func (t *template) FindOneAndUpdate(ctx context.Context, filter, update, dest an
 		return ErrDestIsNotStruct
 	}
 	opt := option.GetFindOneAndUpdateOptionByParams(opts)
-	t.StartSession(ctx, opt.ForceRecreateSession)
+	t.startSession(ctx, opt.ForceRecreateSession)
 	return mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 		err := t.findOneAndUpdate(sc, filter, update, dest, opt)
-		if !opt.DisableAutoCloseSession {
-			t.CloseSession(sc, err)
-		}
-		return err
+		return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
 	})
 }
 
@@ -746,8 +735,8 @@ func (t *template) CountDocuments(ctx context.Context, filter, ref any, opts ...
 	})
 }
 
-func (t *template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...option.EstimatedDocumentCount) (
-	int64, error) {
+func (t *template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...option.EstimatedDocumentCount) (int64,
+	error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return 0, err
@@ -934,42 +923,36 @@ func (t *template) ListIndexSpecifications(ctx context.Context, ref any, opts ..
 	})
 }
 
-func (t *template) Disconnect() {
-	err := t.client.Disconnect(context.TODO())
-	if err != nil {
-		logger.Error("Error disconnect MongoDB:", err)
-		return
-	}
-	logger.Info("Connection to MongoDB closed.")
+func (t *template) Disconnect(ctx context.Context) error {
+	return t.client.Disconnect(ctx)
 }
 
-func (t *template) StartSession(ctx context.Context, forceSession bool) {
-	if t.session != nil && !forceSession {
-		return
-	} else if t.session != nil {
-		t.CloseSession(ctx, nil)
-	}
-	session, _ := t.client.StartSession()
-	_ = session.StartTransaction()
-	t.session = session
-}
-
-func (t *template) CloseSession(ctx context.Context, err error) {
-	if err != nil {
-		if err = t.abortTransaction(ctx); err != nil {
-			logger.Error("error abort transaction")
-		} else {
-			logger.Info("transaction aborted successfully!")
-		}
-		return
-	}
-	if err = t.commitTransaction(ctx); err != nil {
-		logger.Error("error commit transaction")
+func (t *template) CloseSession(ctx context.Context, abort bool) error {
+	var err error
+	if abort {
+		err = t.AbortTransaction(ctx)
 	} else {
-		logger.Info("transaction commit successfully!")
+		err = t.CommitTransaction(ctx)
+	}
+	if err != nil {
+		return err
 	}
 	t.endSession(ctx)
-	logger.Info("session closed successfully!")
+	return nil
+}
+
+func (t *template) CommitTransaction(ctx context.Context) error {
+	if t.session == nil {
+		return nil
+	}
+	return t.session.CommitTransaction(ctx)
+}
+
+func (t *template) AbortTransaction(ctx context.Context) error {
+	if t.session == nil {
+		return nil
+	}
+	return t.session.AbortTransaction(ctx)
 }
 
 func (t *template) insertOne(sc mongo.SessionContext, document any, opt option.InsertOne) error {
@@ -997,15 +980,18 @@ func (t *template) insertOne(sc mongo.SessionContext, document any, opt option.I
 	return nil
 }
 
-func (t *template) insertMany(sc mongo.SessionContext, documents []any, opt option.InsertMany) error {
-	if len(documents) == 0 {
+func (t *template) insertMany(sc mongo.SessionContext, a any, opt option.InsertMany) error {
+	documents := reflect.ValueOf(a)
+	if documents.Kind() != reflect.Slice {
+		return errors.New("mongo: document on insert many needs be a slice")
+	}
+	if documents.Len() == 0 {
 		return ErrDocumentsIsEmpty
 	}
 	var errs []error
-	for i, document := range documents {
-		if document == nil {
-			continue
-		}
+	for i := 0; i < documents.Len(); i++ {
+		indexValue := documents.Index(i)
+		document := indexValue.Interface()
 		indexStr := strconv.Itoa(i)
 		if util.IsNotPointer(document) {
 			errs = append(errs, errors.New(ErrDocumentIsNotPointer.Error()+" (index: "+indexStr+")"))
@@ -1066,8 +1052,8 @@ func (t *template) deleteMany(sc mongo.SessionContext, filter, ref any, opt opti
 	})
 }
 
-func (t *template) updateOne(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (
-	*mongo.UpdateResult, error) {
+func (t *template) updateOne(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (*mongo.UpdateResult,
+	error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
@@ -1310,18 +1296,33 @@ func (t *template) createManyIndex(ctx context.Context, inputs []IndexInput) ([]
 	return result, nil
 }
 
-func (t *template) commitTransaction(ctx context.Context) error {
-	if t.session == nil {
-		return nil
+func (t *template) startSession(ctx context.Context, forceSession bool) {
+	if t.session != nil && !forceSession {
+		return
+	} else if t.session != nil {
+		_ = t.CloseSession(ctx, false)
 	}
-	return t.session.CommitTransaction(ctx)
+	session, _ := t.client.StartSession()
+	if session != nil {
+		_ = session.StartTransaction()
+		t.session = session
+	}
 }
 
-func (t *template) abortTransaction(ctx context.Context) error {
-	if t.session == nil {
-		return nil
+func (t *template) closeSession(
+	sc mongo.SessionContext,
+	DisableAutoCloseSession,
+	DisableAutoRollbackSession bool,
+	err error,
+) error {
+	abort := err != nil && !DisableAutoRollbackSession
+	if !DisableAutoCloseSession {
+		errClose := t.CloseSession(sc, abort)
+		if errClose != nil {
+			return errClose
+		}
 	}
-	return t.session.AbortTransaction(ctx)
+	return err
 }
 
 func (t *template) endSession(ctx context.Context) {

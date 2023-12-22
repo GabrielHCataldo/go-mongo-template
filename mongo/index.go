@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	"go-mongo/mongo/option"
+	"github.com/GabrielHCataldo/go-mongo/mongo/option"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -9,13 +9,13 @@ import (
 
 // IndexInput represents a new index to be created.
 type IndexInput struct {
-	// A document describing which keys should be used for the index. It cannot be nil. This must be an order-preserving
+	// Keys A document describing which keys should be used for the index. It cannot be nil. This must be an order-preserving
 	// type such as bson.D. Map types such as bson.M are not valid. See https://www.mongodb.com/docs/manual/indexes/#indexes
 	// for examples of valid documents.
 	Keys any
-	// The options to use to create the index.
+	// Options The options to use to create the index.
 	Options option.Index
-	// Struct reference contained database and collection tag
+	// Ref Struct reference contained database and collection tag
 	Ref any
 }
 

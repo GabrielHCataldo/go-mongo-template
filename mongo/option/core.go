@@ -8,15 +8,24 @@ import (
 // Collation allows users to specify language-specific rules for string comparison, such as
 // rules for letter case and accent marks.
 type Collation struct {
-	Locale          string `bson:",omitempty"` // The locale
-	CaseLevel       bool   `bson:",omitempty"` // The case level
-	CaseFirst       string `bson:",omitempty"` // The case ordering
-	Strength        int    `bson:",omitempty"` // The number of comparison levels to use
-	NumericOrdering bool   `bson:",omitempty"` // Whether to order numbers based on numerical order and not collation order
-	Alternate       string `bson:",omitempty"` // Whether spaces and punctuation are considered base characters
-	MaxVariable     string `bson:",omitempty"` // Which characters are affected by alternate: "shifted"
-	Normalization   bool   `bson:",omitempty"` // Causes text to be normalized into Unicode NFD
-	Backwards       bool   `bson:",omitempty"` // Causes secondary differences to be considered in reverse order, as it is done in the French language
+	// Locale The locale
+	Locale string `bson:",omitempty"`
+	// CaseLevel The case level
+	CaseLevel bool `bson:",omitempty"`
+	// CaseFirst The case ordering
+	CaseFirst string `bson:",omitempty"`
+	// Strength The number of comparison levels to use
+	Strength int `bson:",omitempty"`
+	// NumericOrdering Whether to order numbers based on numerical order and not collation order
+	NumericOrdering bool `bson:",omitempty"`
+	// Alternate Whether spaces and punctuation are considered base characters
+	Alternate string `bson:",omitempty"`
+	// MaxVariable Which characters are affected by alternate: "shifted"
+	MaxVariable string `bson:",omitempty"`
+	// Normalization Causes text to be normalized into Unicode NFD
+	Normalization bool `bson:",omitempty"`
+	// Backwards Causes secondary differences to be considered in reverse order, as it is done in the French language
+	Backwards bool `bson:",omitempty"`
 }
 
 // ArrayFilters is used to hold filters for the array filters CRUD option. If a registry is nil, bson.DefaultRegistry
@@ -26,10 +35,11 @@ type ArrayFilters struct {
 	//
 	// Deprecated: Marshaling ArrayFilters to BSON will not be supported in Go Driver 2.0.
 	Registry *bsoncodec.Registry
-	// The filters to apply
-	Filters []interface{}
+	// Filters The filters to apply
+	Filters []any
 }
 
+// ParseCollationMongoOptions convert Collation to mongo options.Collation
 func ParseCollationMongoOptions(c *Collation) *options.Collation {
 	if c == nil {
 		return nil
@@ -47,6 +57,7 @@ func ParseCollationMongoOptions(c *Collation) *options.Collation {
 	}
 }
 
+// ParseArrayFiltersMongoOptions convert ArrayFilters to mongo options.ArrayFilters
 func ParseArrayFiltersMongoOptions(a *ArrayFilters) *options.ArrayFilters {
 	if a == nil {
 		return nil
@@ -57,6 +68,7 @@ func ParseArrayFiltersMongoOptions(a *ArrayFilters) *options.ArrayFilters {
 	}
 }
 
+// ParseCursorType convert CursorType to mongo options.CursorType
 func ParseCursorType(c *CursorType) *options.CursorType {
 	if c == nil {
 		return nil
@@ -65,6 +77,7 @@ func ParseCursorType(c *CursorType) *options.CursorType {
 	return &result
 }
 
+// ParseReturnDocument convert ReturnDocument to mongo options.ReturnDocument
 func ParseReturnDocument(r *ReturnDocument) *options.ReturnDocument {
 	if r == nil {
 		return nil
@@ -73,6 +86,7 @@ func ParseReturnDocument(r *ReturnDocument) *options.ReturnDocument {
 	return &result
 }
 
+// ParseFullDocument convert FullDocument to mongo options.FullDocument
 func ParseFullDocument(f *FullDocument) *options.FullDocument {
 	if f == nil {
 		return nil

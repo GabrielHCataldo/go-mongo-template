@@ -3,7 +3,7 @@ package mongo
 import (
 	"context"
 	"github.com/GabrielHCataldo/go-logger/logger"
-	"go-mongo/mongo/option"
+	"github.com/GabrielHCataldo/go-mongo/mongo/option"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -29,7 +29,6 @@ type testInsertOne struct {
 	value                    any
 	option                   option.InsertOne
 	durationTimeout          time.Duration
-	beforeStartSession       bool
 	beforeCloseMongoClient   bool
 	forceErrCloseMongoClient bool
 	wantErr                  bool
@@ -37,7 +36,7 @@ type testInsertOne struct {
 
 type testInsertMany struct {
 	name            string
-	value           []any
+	value           any
 	option          option.InsertMany
 	durationTimeout time.Duration
 	wantErr         bool
@@ -46,6 +45,15 @@ type testInsertMany struct {
 type testDelete struct {
 	name            string
 	filter          any
+	ref             any
+	option          option.Delete
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testDeleteById struct {
+	name            string
+	id              any
 	ref             any
 	option          option.Delete
 	durationTimeout time.Duration
@@ -72,9 +80,19 @@ type testUpdate struct {
 	wantErr         bool
 }
 
-type testReplace struct {
+type testReplaceOne struct {
 	name            string
 	filter          any
+	replacement     any
+	ref             any
+	option          option.Replace
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testReplaceOneById struct {
+	name            string
+	id              any
 	replacement     any
 	ref             any
 	option          option.Replace
@@ -343,7 +361,12 @@ func disconnectMongoTemplate() {
 	if mongoTemplate == nil {
 		return
 	}
-	mongoTemplate.Disconnect()
+	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+	defer cancel()
+	err := mongoTemplate.Disconnect(ctx)
+	if err != nil {
+		logger.Error("error disconnect mongodb:", err)
+	}
 	mongoTemplate = nil
 }
 
@@ -510,7 +533,6 @@ func initListTestInsertOne() []testInsertOne {
 			option:                 initOptionInsertOne().SetForceRecreateSession(false),
 			durationTimeout:        5 * time.Second,
 			beforeCloseMongoClient: true,
-			beforeStartSession:     true,
 			wantErr:                true,
 		},
 	}
@@ -520,7 +542,7 @@ func initListTestInsertMany() []testInsertMany {
 	return []testInsertMany{
 		{
 			name:            "success",
-			value:           []any{initTestStruct(), initTestStruct(), nil},
+			value:           []*testStruct{initTestStruct(), initTestStruct()},
 			option:          initOptionInsertMany(),
 			durationTimeout: 5 * time.Second,
 		},
@@ -533,6 +555,7 @@ func initListTestInsertMany() []testInsertMany {
 				initTestEmptyStruct(),
 				initTestString(),
 				"test string normal",
+				nil,
 			},
 			option: initOptionInsertMany().
 				SetDisableAutoRollback(true).
@@ -543,6 +566,13 @@ func initListTestInsertMany() []testInsertMany {
 		{
 			name:            "failed empty value",
 			value:           []any{},
+			option:          initOptionInsertMany(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed non slice",
+			value:           "invalid value",
 			option:          initOptionInsertMany(),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
@@ -578,6 +608,43 @@ func initListTestDelete() []testDelete {
 		{
 			name:            "failed type ref",
 			filter:          bson.M{},
+			ref:             initTestString(),
+			option:          initOptionDelete().SetDisableAutoCloseSession(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestDeleteById() []testDeleteById {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testDeleteById{
+		{
+			name:            "success",
+			id:              objectId,
+			ref:             testStruct{},
+			option:          initOptionDelete(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed",
+			id:              objectId,
+			ref:             testStruct{},
+			option:          initOptionDelete(),
+			durationTimeout: 1 * time.Millisecond,
+			wantErr:         true,
+		},
+		{
+			name:            "failed struct ref",
+			id:              objectId,
+			ref:             initTestInvalidStruct(),
+			option:          initOptionDelete(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type ref",
+			id:              objectId,
 			ref:             initTestString(),
 			option:          initOptionDelete().SetDisableAutoCloseSession(true),
 			durationTimeout: 5 * time.Second,
@@ -665,9 +732,9 @@ func initListTestUpdate() []testUpdate {
 	}
 }
 
-func initListTestReplace() []testReplace {
+func initListTestReplaceOne() []testReplaceOne {
 	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
-	return []testReplace{
+	return []testReplaceOne{
 		{
 			name:            "success",
 			filter:          bson.M{"_id": objectId},
@@ -695,6 +762,45 @@ func initListTestReplace() []testReplace {
 		{
 			name:            "failed update param",
 			filter:          bson.M{"_id": objectId},
+			replacement:     nil,
+			ref:             testStruct{},
+			option:          initOptionReplace().SetDisableAutoCloseSession(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestReplaceOneById() []testReplaceOneById {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testReplaceOneById{
+		{
+			name:            "success",
+			id:              objectId,
+			replacement:     *initTestStruct(),
+			ref:             testStruct{},
+			option:          initOptionReplace(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed struct ref",
+			replacement:     nil,
+			ref:             initTestInvalidStruct(),
+			option:          initOptionReplace(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type ref",
+			replacement:     nil,
+			ref:             initTestString(),
+			option:          initOptionReplace(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed update param",
+			id:              objectId,
 			replacement:     nil,
 			ref:             testStruct{},
 			option:          initOptionReplace().SetDisableAutoCloseSession(true),
@@ -1491,6 +1597,8 @@ func initListTestWatchHandler() []testWatchHandler {
 			option: initOptionWatchHandler().
 				SetDatabaseName("test").
 				SetCollectionName("test").
+				SetContextFuncTimeout(5 * time.Second).
+				SetDelayLoop(5 * time.Second).
 				SetShowExpandedEvents(true).
 				SetStartAtOperationTime(primitive.Timestamp{}).
 				SetCollation(&option.Collation{}).
@@ -1957,8 +2065,6 @@ func initOptionWatch() option.Watch {
 
 func initOptionWatchHandler() option.WatchHandler {
 	return option.NewWatchHandler().
-		SetContextFuncTimeout(5 * time.Second).
-		SetDelayLoop(5 * time.Second).
 		SetComment("comment golang unit test").
 		SetFullDocument(option.FullDocumentDefault).
 		SetFullDocumentBeforeChange(option.FullDocumentOff).

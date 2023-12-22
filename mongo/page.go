@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	"go-mongo/internal/util"
+	"github.com/GabrielHCataldo/go-mongo/internal/util"
 	"math"
 	"time"
 )

@@ -2,8 +2,7 @@ package mongo
 
 import (
 	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"go-mongo/mongo/option"
+	"github.com/GabrielHCataldo/go-mongo/mongo/option"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -33,8 +32,8 @@ type updateDescription struct {
 }
 
 type ContextWatch struct {
-	context.Context
-	Event WatchEvent
+	context.Context `json:"-"`
+	Event           WatchEvent
 }
 
 type HandlerWatch func(ctx *ContextWatch)
@@ -46,10 +45,7 @@ func processWatchNext(handler HandlerWatch, event WatchEvent, opt option.WatchHa
 	go processWatchHandler(ctx, handler, event, &signal)
 	select {
 	case <-ctx.Done():
-		logger.Error("Error timeout context func:", ctx.Err())
-		break
 	case <-signal:
-		logger.Info("Handler watch processed!")
 		break
 	}
 }

@@ -16,7 +16,7 @@ func TestNewTemplate(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InsertOne() error = %v, wantErr %v", err, tt.wantErr)
 			} else if temp != nil {
-				temp.Disconnect()
+				_ = temp.Disconnect(ctx)
 			}
 		})
 	}
@@ -29,11 +29,8 @@ func TestTemplateInsertOne(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			initMongoTemplate()
-			if tt.beforeStartSession {
-				mongoTemplate.StartSession(ctx, true)
-			}
 			if tt.beforeCloseMongoClient {
-				mongoTemplate.Disconnect()
+				_ = mongoTemplate.Disconnect(ctx)
 			}
 			err := mongoTemplate.InsertOne(ctx, tt.value, tt.option)
 			if (err != nil) != tt.wantErr {
@@ -42,9 +39,9 @@ func TestTemplateInsertOne(t *testing.T) {
 				t.Log("err expected:", err)
 			}
 			if tt.forceErrCloseMongoClient {
-				mongoTemplate.Disconnect()
+				_ = mongoTemplate.Disconnect(ctx)
 			}
-			mongoTemplate.CloseSession(ctx, err)
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
 			disconnectMongoTemplate()
 		})
 	}
@@ -62,7 +59,7 @@ func TestTemplateInsertMany(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
 		})
 	}
 }
@@ -79,7 +76,24 @@ func TestTemplateDeleteOne(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
+		})
+	}
+}
+
+func TestTemplateDeleteOneById(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestDeleteById() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			_, err := mongoTemplate.DeleteOneById(ctx, tt.id, tt.ref, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("DeleteOneById() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
 		})
 	}
 }
@@ -128,7 +142,7 @@ func TestTemplateUpdateOne(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
 		})
 	}
 }
@@ -145,14 +159,14 @@ func TestTemplateUpdateMany(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
 		})
 	}
 }
 
 func TestTemplateReplaceOne(t *testing.T) {
 	initDocument()
-	for _, tt := range initListTestReplace() {
+	for _, tt := range initListTestReplaceOne() {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
@@ -162,7 +176,24 @@ func TestTemplateReplaceOne(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
+		})
+	}
+}
+
+func TestTemplateReplaceOneById(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestReplaceOneById() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			_, err := mongoTemplate.ReplaceOneById(ctx, tt.id, tt.replacement, tt.ref, tt.option)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("ReplaceOneById() error = %v, wantErr %v", err, tt.wantErr)
+			} else if err != nil {
+				t.Log("err expected:", err)
+			}
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
 		})
 	}
 }
@@ -211,7 +242,7 @@ func TestTemplateFindOneAndDelete(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
 		})
 	}
 }
@@ -228,7 +259,7 @@ func TestTemplateFindOneAndReplace(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
 		})
 	}
 }
@@ -245,7 +276,7 @@ func TestTemplateFindOneAndUpdate(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			mongoTemplate.CloseSession(ctx, err)
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
 		})
 	}
 }
