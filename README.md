@@ -62,13 +62,13 @@ package main
 import "go.mongodb.org/mongo-driver/bson/primitive"
 
 type test struct {
-	Id        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty" database:"test" collection:"test"`
-	Random    int                `json:"random,omitempty" bson:"random,omitempty"`
-	Name      string             `json:"name,omitempty" bson:"name,omitempty"`
-	BirthDate primitive.DateTime `json:"birthDate,omitempty" bson:"birthDate,omitempty"`
-	Emails    []string           `json:"emails,omitempty" bson:"emails,omitempty"`
-	Balance   float64            `json:"balance,omitempty" bson:"balance,omitempty"`
-	CreatedAt primitive.DateTime `json:"createdAt,omitempty" bson:"createdAt,omitempty"`
+    Id        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty" database:"test" collection:"test"`
+    Random    int                `json:"random,omitempty" bson:"random,omitempty"`
+    Name      string             `json:"name,omitempty" bson:"name,omitempty"`
+    BirthDate primitive.DateTime `json:"birthDate,omitempty" bson:"birthDate,omitempty"`
+    Emails    []string           `json:"emails,omitempty" bson:"emails,omitempty"`
+    Balance   float64            `json:"balance,omitempty" bson:"balance,omitempty"`
+    CreatedAt primitive.DateTime `json:"createdAt,omitempty" bson:"createdAt,omitempty"`
 }
 ```
 
@@ -82,47 +82,47 @@ Insert a document into the collection see:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"math/rand"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "math/rand"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	testDocument := test{
-		Random:    rand.Int(),
-		Name:      "Foo Bar",
-		BirthDate: primitive.NewDateTimeFromTime(time.Date(1999, 1, 21, 0, 0, 0, 0, time.Local)),
-		Emails:    []string{"foobar@gmail.com", "foobar3@hotmail.com"},
-		Balance:   190.12,
-		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
-	}
-	//new document need a pointer
-	err = mongoTemplate.InsertOne(ctx, &testDocument)
-	if err != nil {
-		logger.Error("error insert document:", err)
-	} else {
-		logger.Info("document inserted successfully:", testDocument)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    testDocument := test{
+        Random:    rand.Int(),
+        Name:      "Foo Bar",
+        BirthDate: primitive.NewDateTimeFromTime(time.Date(1999, 1, 21, 0, 0, 0, 0, time.Local)),
+        Emails:    []string{"foobar@gmail.com", "foobar3@hotmail.com"},
+        Balance:   190.12,
+        CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
+    }
+    //new document need a pointer
+    err = mongoTemplate.InsertOne(ctx, &testDocument)
+    if err != nil {
+        logger.Error("error insert document:", err)
+    } else {
+        logger.Info("document inserted successfully:", testDocument)
+    }
 }
 
 func disconnect(ctx context.Context, mongoTemplate mongo.Template) {
-	err := mongoTemplate.Disconnect(ctx)
-	if err != nil {
-		logger.Error("error disconnect mongodb:", err)
-	}
+    err := mongoTemplate.Disconnect(ctx)
+    if err != nil {
+        logger.Error("error disconnect mongodb:", err)
+    }
 }
 ```
 
@@ -150,38 +150,38 @@ import (
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	testDocuments := []*test{
-		{
-			Random:    rand.Int(),
-			Name:      "Foo Bar",
-			BirthDate: primitive.NewDateTimeFromTime(time.Date(1999, 1, 21, 0, 0, 0, 0, time.Local)),
-			Emails:    []string{"foobar@gmail.com", "foobar3@hotmail.com"},
-			Balance:   190.12,
-			CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
-		},
-		{
-			Random:    rand.Int(),
-			Name:      "Foo Bar 2",
-			BirthDate: primitive.NewDateTimeFromTime(time.Date(1999, 1, 21, 0, 0, 0, 0, time.Local)),
-			Emails:    []string{"foobar2@gmail.com", "foobar4@hotmail.com"},
-			Balance:   290.12,
-			CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
-		},
-	}
-	//new document need a slice of the pointer
-	err = mongoTemplate.InsertMany(ctx, testDocuments)
-	if err != nil {
-		logger.Error("error insert document:", err)
-	} else {
-		logger.Info("document inserted successfully:", testDocuments)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    testDocuments := []*test{
+        {
+            Random:    rand.Int(),
+            Name:      "Foo Bar",
+            BirthDate: primitive.NewDateTimeFromTime(time.Date(1999, 1, 21, 0, 0, 0, 0, time.Local)),
+            Emails:    []string{"foobar@gmail.com", "foobar3@hotmail.com"},
+            Balance:   190.12,
+            CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
+        },
+        {
+            Random:    rand.Int(),
+            Name:      "Foo Bar 2",
+            BirthDate: primitive.NewDateTimeFromTime(time.Date(1999, 1, 21, 0, 0, 0, 0, time.Local)),
+            Emails:    []string{"foobar2@gmail.com", "foobar4@hotmail.com"},
+            Balance:   290.12,
+            CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
+        },
+    }
+    //new document need a slice of the pointer
+    err = mongoTemplate.InsertMany(ctx, testDocuments)
+    if err != nil {
+        logger.Error("error insert document:", err)
+    } else {
+        logger.Info("document inserted successfully:", testDocuments)
+    }
 }
 ```
 
@@ -199,33 +199,33 @@ We will perform two simple update operations, see below using **UpdateOne**:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	filter := bson.M{"_id": bson.M{"$exists": true}}
-	update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
-	updateResult, err := mongoTemplate.UpdateOne(ctx, filter, update, test{})
-	if err != nil {
-		logger.Error("error update document:", err)
-	} else {
-		logger.Info("document updated successfully:", updateResult)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    filter := bson.M{"_id": bson.M{"$exists": true}}
+    update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
+    updateResult, err := mongoTemplate.UpdateOne(ctx, filter, update, test{})
+    if err != nil {
+        logger.Error("error update document:", err)
+    } else {
+        logger.Info("document updated successfully:", updateResult)
+    }
 }
 ```
 
@@ -239,33 +239,33 @@ If you wanted to filter only with the document id, use the **UpdateOneById** fun
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	objectId, _ := primitive.ObjectIDFromHex("6585f3a8bf2af8ad9bcab912")
-	update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
-	updateResult, err := mongoTemplate.UpdateOneById(ctx, objectId, update, test{})
-	if err != nil {
-		logger.Error("error update document:", err)
-	} else {
-		logger.Info("document updated successfully:", updateResult)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    objectId, _ := primitive.ObjectIDFromHex("6585f3a8bf2af8ad9bcab912")
+    update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
+    updateResult, err := mongoTemplate.UpdateOneById(ctx, objectId, update, test{})
+    if err != nil {
+        logger.Error("error update document:", err)
+    } else {
+        logger.Info("document updated successfully:", updateResult)
+    }
 }
 ```
 
@@ -280,33 +280,33 @@ in the example below:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	filter := bson.M{"_id": bson.M{"$exists": true}}
-	update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
-	updateResult, err := mongoTemplate.UpdateOne(ctx, filter, update, test{})
-	if err != nil {
-		logger.Error("error update documents:", err)
-	} else {
-		logger.Info("document updated successfully:", updateResult)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    filter := bson.M{"_id": bson.M{"$exists": true}}
+    update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
+    updateResult, err := mongoTemplate.UpdateOne(ctx, filter, update, test{})
+    if err != nil {
+        logger.Error("error update documents:", err)
+    } else {
+        logger.Info("document updated successfully:", updateResult)
+    }
 }
 ```
 
@@ -324,41 +324,41 @@ To replace a document, see the example below:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"math/rand"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "math/rand"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	filter := bson.M{"_id": bson.M{"$exists": true}}
-	replacement := test{
-		Random:    rand.Int(),
-		Name:      "Foo Bar",
-		BirthDate: primitive.NewDateTimeFromTime(time.Date(1999, 1, 21, 0, 0, 0, 0, time.Local)),
-		Emails:    []string{"foobar@gmail.com", "foobar3@hotmail.com"},
-		Balance:   190.12,
-		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
-	}
-	updateResult, err := mongoTemplate.ReplaceOne(ctx, filter, replacement, test{})
-	if err != nil {
-		logger.Error("error replace document:", err)
-	} else {
-		logger.Info("document replaced successfully:", updateResult)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    filter := bson.M{"_id": bson.M{"$exists": true}}
+    replacement := test{
+        Random:    rand.Int(),
+        Name:      "Foo Bar",
+        BirthDate: primitive.NewDateTimeFromTime(time.Date(1999, 1, 21, 0, 0, 0, 0, time.Local)),
+        Emails:    []string{"foobar@gmail.com", "foobar3@hotmail.com"},
+        Balance:   190.12,
+        CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
+    }
+    updateResult, err := mongoTemplate.ReplaceOne(ctx, filter, replacement, test{})
+    if err != nil {
+        logger.Error("error replace document:", err)
+    } else {
+        logger.Info("document replaced successfully:", updateResult)
+    }
 }
 ```
 
@@ -376,32 +376,32 @@ Let's start by removing just one document using the simple filter, see below:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	filter := bson.M{"_id": bson.M{"$exists": true}}
-	deleteResult, err := mongoTemplate.DeleteOne(ctx, filter, test{})
-	if err != nil {
-		logger.Error("error delete document:", err)
-	} else {
-		logger.Info("document deleted successfully:", deleteResult)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    filter := bson.M{"_id": bson.M{"$exists": true}}
+    deleteResult, err := mongoTemplate.DeleteOne(ctx, filter, test{})
+    if err != nil {
+        logger.Error("error delete document:", err)
+    } else {
+        logger.Info("document deleted successfully:", deleteResult)
+    }
 }
 ```
 
@@ -415,32 +415,32 @@ Podemos remover um documento pelo id passando como parametro como no exemplo aba
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	objectId, _ := primitive.ObjectIDFromHex("6585f3a8bf2af8ad9bcab912")
-	deleteResult, err := mongoTemplate.DeleteOneById(ctx, objectId, test{})
-	if err != nil {
-		logger.Error("error delete document:", err)
-	} else {
-		logger.Info("document deleted successfully:", deleteResult)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    objectId, _ := primitive.ObjectIDFromHex("6585f3a8bf2af8ad9bcab912")
+    deleteResult, err := mongoTemplate.DeleteOneById(ctx, objectId, test{})
+    if err != nil {
+        logger.Error("error delete document:", err)
+    } else {
+        logger.Info("document deleted successfully:", deleteResult)
+    }
 }
 ```
 
@@ -454,32 +454,32 @@ And finally, we can remove several documents using the indicated filter:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	filter := bson.M{"_id": bson.M{"$exists": true}}
-	deleteResult, err := mongoTemplate.DeleteMany(ctx, filter, test{})
-	if err != nil {
-		logger.Error("error delete documents:", err)
-	} else {
-		logger.Info("documents deleted successfully:", deleteResult)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    filter := bson.M{"_id": bson.M{"$exists": true}}
+    deleteResult, err := mongoTemplate.DeleteMany(ctx, filter, test{})
+    if err != nil {
+        logger.Error("error delete documents:", err)
+    } else {
+        logger.Info("documents deleted successfully:", deleteResult)
+    }
 }
 ```
 
@@ -497,31 +497,31 @@ Obtaining all the documents is very simple, see the example below:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	//dest need a pointer
-	var dest []test
-	err = mongoTemplate.FindAll(ctx, &dest)
-	if err != nil {
-		logger.Error("error find all documents:", err)
-	} else {
-		logger.Info("find all documents successfully:", dest)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    //dest need a pointer
+    var dest []test
+    err = mongoTemplate.FindAll(ctx, &dest)
+    if err != nil {
+        logger.Error("error find all documents:", err)
+    } else {
+        logger.Info("find all documents successfully:", dest)
+    }
 }
 ```
 
@@ -535,37 +535,37 @@ Be able to page in a simple and intuitive way, see:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	filter := bson.M{"_id": bson.M{"$exists": true}}
-	pageOutput, err := mongoTemplate.FindPageable(ctx, filter, mongo.PageInput{
-		Page:     0,
-		PageSize: 10,
-		Ref:      []test{}, //need a slice of the structure
-		Sort:     bson.M{"createdAt": mongo.SortDesc},
-	})
-	if err != nil {
-		logger.Error("error find pageable documents:", err)
-	} else {
-		logger.Info("find pageable documents successfully:", pageOutput)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    filter := bson.M{"_id": bson.M{"$exists": true}}
+    pageOutput, err := mongoTemplate.FindPageable(ctx, filter, mongo.PageInput{
+        Page:     0,
+        PageSize: 10,
+        Ref:      []test{}, //need a slice of the structure
+        Sort:     bson.M{"createdAt": mongo.SortDesc},
+    })
+    if err != nil {
+        logger.Error("error find pageable documents:", err)
+    } else {
+        logger.Info("find pageable documents successfully:", pageOutput)
+    }
 }
 ```
 
@@ -579,33 +579,33 @@ Also obtain a single document by id, see below:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	objectId, _ := primitive.ObjectIDFromHex("6585db26633e225cbeadf553")
-	//dest need a pointer
-	var dest test
-	err = mongoTemplate.FindOneById(ctx, objectId, &dest)
-	if err != nil {
-		logger.Error("error find all documents:", err)
-	} else {
-		logger.Info("find by id document successfully:", dest)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    objectId, _ := primitive.ObjectIDFromHex("6585db26633e225cbeadf553")
+    //dest need a pointer
+    var dest test
+    err = mongoTemplate.FindOneById(ctx, objectId, &dest)
+    if err != nil {
+        logger.Error("error find all documents:", err)
+    } else {
+        logger.Info("find by id document successfully:", dest)
+    }
 }
 ```
 
@@ -623,31 +623,31 @@ Check if the document exists by id:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	objectId, _ := primitive.ObjectIDFromHex("6585f5b8fd8fa97d562419f7")
-	exists, err := mongoTemplate.ExistsById(ctx, objectId, test{})
-	if err != nil {
-		logger.Error("error check exists document:", err)
-	} else {
-		logger.Info("document exists:", exists)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    objectId, _ := primitive.ObjectIDFromHex("6585f5b8fd8fa97d562419f7")
+    exists, err := mongoTemplate.ExistsById(ctx, objectId, test{})
+    if err != nil {
+        logger.Error("error check exists document:", err)
+    } else {
+        logger.Info("document exists:", exists)
+    }
 }
 ```
 
@@ -661,32 +661,32 @@ Check if the document exists using the filter:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	filter := bson.M{"_id": bson.M{"$exists": true}}
-	exists, err := mongoTemplate.Exists(ctx, filter, test{})
-	if err != nil {
-		logger.Error("error check exists document:", err)
-	} else {
-		logger.Info("document exists:", exists)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    filter := bson.M{"_id": bson.M{"$exists": true}}
+    exists, err := mongoTemplate.Exists(ctx, filter, test{})
+    if err != nil {
+        logger.Error("error check exists document:", err)
+    } else {
+        logger.Info("document exists:", exists)
+    }
 }
 ```
 
@@ -704,31 +704,31 @@ We start with the total counter, see:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	countResult, err := mongoTemplate.EstimatedDocumentCount(ctx, test{})
-	if err != nil {
-		logger.Error("error estimated document count:", err)
-	} else {
-		logger.Info("estimated document count successfully:", countResult)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    countResult, err := mongoTemplate.EstimatedDocumentCount(ctx, test{})
+    if err != nil {
+        logger.Error("error estimated document count:", err)
+    } else {
+        logger.Info("estimated document count successfully:", countResult)
+    }
 }
 ```
 
@@ -742,32 +742,32 @@ You can also count the documents using the filter:
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	filter := bson.M{"_id": bson.M{"$exists": true}}
-	countResult, err := mongoTemplate.CountDocuments(ctx, filter, test{})
-	if err != nil {
-		logger.Error("error count documents:", err)
-	} else {
-		logger.Info("count documents successfully:", countResult)
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    filter := bson.M{"_id": bson.M{"$exists": true}}
+    countResult, err := mongoTemplate.CountDocuments(ctx, filter, test{})
+    if err != nil {
+        logger.Error("error count documents:", err)
+    } else {
+        logger.Info("count documents successfully:", countResult)
+    }
 }
 ```
 
@@ -785,39 +785,39 @@ After the conversion, we call the function informed in the function parameter, s
 package main
 
 import (
-	"context"
-	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
-	"github.com/GabrielHCataldo/go-mongo/mongo/option"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"os"
-	"time"
+    "context"
+    "github.com/GabrielHCataldo/go-logger/logger"
+    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo/mongo/option"
+    "go.mongodb.org/mongo-driver/bson"
+    "go.mongodb.org/mongo-driver/bson/primitive"
+    "go.mongodb.org/mongo-driver/mongo/options"
+    "os"
+    "time"
 )
 
 func main() {
-	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
-	defer cancel()
-	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
-		logger.Error("error to init mongo template:", err)
-		return
-	}
-	defer disconnect(ctx, mongoTemplate)
-	pipeline := mongo.Pipeline{bson.D{{"$match", bson.D{
-		{"operationType", bson.M{"$in": []string{"insert", "update", "delete", "replace"}}},
-	}}}}
-	err = mongoTemplate.WatchHandler(context.TODO(), pipeline, handler, option.NewWatchHandler().SetDatabaseName("test"))
-	if err != nil {
-		logger.Error("error watch handler:", err)
-	} else {
-		logger.Info("watch handler complete successfully")
-	}
+    ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+    defer cancel()
+    mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+    if err != nil {
+        logger.Error("error to init mongo template:", err)
+        return
+    }
+    defer disconnect(ctx, mongoTemplate)
+    pipeline := mongo.Pipeline{bson.D{{"$match", bson.D{
+        {"operationType", bson.M{"$in": []string{"insert", "update", "delete", "replace"}}},
+    }}}}
+    err = mongoTemplate.WatchHandler(context.TODO(), pipeline, handler, option.NewWatchHandler().SetDatabaseName("test"))
+    if err != nil {
+        logger.Error("error watch handler:", err)
+    } else {
+        logger.Info("watch handler complete successfully")
+    }
 }
 
 func handler(ctx *mongo.ContextWatch) {
-	logger.Info("handler watch called:", ctx)
+    logger.Info("handler watch called:", ctx)
 }
 ```
 
