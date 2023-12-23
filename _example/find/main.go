@@ -22,10 +22,30 @@ type test struct {
 }
 
 func main() {
+	findOne()
 	findOneById()
 	find()
 	findPageable()
 	findAll()
+}
+
+func findOne() {
+	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+	defer cancel()
+	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+	if err != nil {
+		logger.Error("error to init mongo template:", err)
+		return
+	}
+	defer mongoTemplate.Disconnect(ctx)
+	filter := bson.M{"_id": bson.M{"$exists": true}}
+	var dest test
+	err = mongoTemplate.FindOne(ctx, filter, &dest)
+	if err != nil {
+		logger.Error("error find document:", err)
+	} else {
+		logger.Info("find document successfully:", dest)
+	}
 }
 
 func findOneById() {
@@ -36,7 +56,7 @@ func findOneById() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	objectId, _ := primitive.ObjectIDFromHex("6585db26633e225cbeadf553")
 	//dest need a pointer
 	var dest test
@@ -56,7 +76,7 @@ func find() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	//dest need a pointer
 	var dest []test
@@ -76,7 +96,7 @@ func findPageable() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	pageOutput, err := mongoTemplate.FindPageable(ctx, filter, mongo.PageInput{
 		Page:     0,
@@ -99,20 +119,12 @@ func findAll() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
-	//dest need a pointer
+	defer mongoTemplate.Disconnect(ctx)
 	var dest []test
 	err = mongoTemplate.FindAll(ctx, &dest)
 	if err != nil {
 		logger.Error("error find all documents:", err)
 	} else {
 		logger.Info("find all documents successfully:", dest)
-	}
-}
-
-func disconnect(ctx context.Context, mongoTemplate mongo.Template) {
-	err := mongoTemplate.Disconnect(ctx)
-	if err != nil {
-		logger.Error("error disconnect mongodb:", err)
 	}
 }

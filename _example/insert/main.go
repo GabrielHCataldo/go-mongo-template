@@ -36,7 +36,7 @@ func insertOne() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	testDocument := test{
 		Random:    rand.Int(),
 		Name:      "Foo Bar",
@@ -62,6 +62,7 @@ func insertMany() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
+	defer mongoTemplate.Disconnect(ctx)
 	testDocuments := []*test{
 		{
 			Random:    rand.Int(),
@@ -97,7 +98,7 @@ func insertOneManualCloseSession() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	testDocument := test{
 		Random:    rand.Int(),
 		Name:      "Foo Bar",
@@ -119,12 +120,5 @@ func insertOneManualCloseSession() {
 	err = mongoTemplate.CloseSession(ctx, abort)
 	if err != nil {
 		logger.Error("error close session:", err)
-	}
-}
-
-func disconnect(ctx context.Context, mongoTemplate mongo.Template) {
-	err := mongoTemplate.Disconnect(ctx)
-	if err != nil {
-		logger.Error("error disconnect mongodb:", err)
 	}
 }

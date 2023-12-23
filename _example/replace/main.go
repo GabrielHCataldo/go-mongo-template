@@ -24,6 +24,7 @@ type test struct {
 
 func main() {
 	replaceOne()
+	replaceOneById()
 }
 
 func replaceOne() {
@@ -34,7 +35,7 @@ func replaceOne() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	replacement := test{
 		Random:    rand.Int(),
@@ -52,9 +53,28 @@ func replaceOne() {
 	}
 }
 
-func disconnect(ctx context.Context, mongoTemplate mongo.Template) {
-	err := mongoTemplate.Disconnect(ctx)
+func replaceOneById() {
+	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
+	defer cancel()
+	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
 	if err != nil {
-		logger.Error("error disconnect mongodb:", err)
+		logger.Error("error to init mongo template:", err)
+		return
+	}
+	defer mongoTemplate.Disconnect(ctx)
+	objectId, _ := primitive.ObjectIDFromHex("6585db26633e225cbeadf553")
+	replacement := test{
+		Random:    rand.Int(),
+		Name:      "Foo Bar",
+		BirthDate: primitive.NewDateTimeFromTime(time.Date(1999, 1, 21, 0, 0, 0, 0, time.Local)),
+		Emails:    []string{"foobar@gmail.com", "foobar3@hotmail.com"},
+		Balance:   190.12,
+		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
+	}
+	updateResult, err := mongoTemplate.ReplaceOneById(ctx, objectId, replacement, test{})
+	if err != nil {
+		logger.Error("error replace document:", err)
+	} else {
+		logger.Info("document replaced successfully:", updateResult)
 	}
 }

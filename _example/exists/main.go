@@ -34,7 +34,7 @@ func exists() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	existsResult, err := mongoTemplate.Exists(ctx, filter, test{})
 	if err != nil {
@@ -52,19 +52,12 @@ func existsById() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	objectId, _ := primitive.ObjectIDFromHex("6585f5b8fd8fa97d562419f7")
 	existsResult, err := mongoTemplate.ExistsById(ctx, objectId, test{})
 	if err != nil {
 		logger.Error("error check exists document:", err)
 	} else {
 		logger.Info("document exists:", existsResult)
-	}
-}
-
-func disconnect(ctx context.Context, mongoTemplate mongo.Template) {
-	err := mongoTemplate.Disconnect(ctx)
-	if err != nil {
-		logger.Error("error disconnect mongodb:", err)
 	}
 }

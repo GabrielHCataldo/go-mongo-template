@@ -35,7 +35,7 @@ func updateOne() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
 	updateResult, err := mongoTemplate.UpdateOne(ctx, filter, update, test{})
@@ -54,7 +54,7 @@ func updateOneById() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	objectId, _ := primitive.ObjectIDFromHex("6585f3a8bf2af8ad9bcab911")
 	update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
 	updateResult, err := mongoTemplate.UpdateOneById(ctx, objectId, update, test{})
@@ -73,7 +73,7 @@ func updateMany() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
 	updateResult, err := mongoTemplate.UpdateOne(ctx, filter, update, test{})
@@ -81,12 +81,5 @@ func updateMany() {
 		logger.Error("error update documents:", err)
 	} else {
 		logger.Info("document updated successfully:", updateResult)
-	}
-}
-
-func disconnect(ctx context.Context, mongoTemplate mongo.Template) {
-	err := mongoTemplate.Disconnect(ctx)
-	if err != nil {
-		logger.Error("error disconnect mongodb:", err)
 	}
 }

@@ -64,7 +64,17 @@ type Template interface {
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/delete/.
 	DeleteOne(ctx context.Context, filter, ref any, opts ...option.Delete) (*mongo.DeleteResult, error)
-	// DeleteOneById todo -> finalizar documentacao
+	// DeleteOneById executes an update command to update the document whose _id value matches the provided ID in the collection.
+	// This is equivalent to running DeleteOne(ctx, bson.D{{"_id", id}}, ref, opts...).
+	//
+	// The id parameter is the _id of the document to be updated. It cannot be nil. If the ID does not match any documents,
+	// the operation will succeed and an UpdateResult with a MatchedCount of 0 will be returned.
+	//
+	// The ref parameter must be the collection structure with database and collection tags configured.
+	//
+	// The opts parameter can be used to specify options for the operation (see the option.Delete documentation).
+	//
+	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/delete/.
 	DeleteOneById(ctx context.Context, id, ref any, opts ...option.Delete) (*mongo.DeleteResult, error)
 	// DeleteMany executes a delete command to delete documents from the collection.
 	//
@@ -144,7 +154,15 @@ type Template interface {
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
 	ReplaceOne(ctx context.Context, filter, replacement, ref any, opts ...option.Replace) (*mongo.UpdateResult, error)
-	// ReplaceOneById todo -> finalizar documentacao
+	// ReplaceOneById executes an update command to update the document whose _id value matches the provided ID in the collection.
+	// This is equivalent to running ReplaceOne(ctx, bson.D{{"_id", id}}, replacement, ref, opts...).
+	//
+	// The id parameter is the _id of the document to be updated. It cannot be nil. If the ID does not match any documents,
+	// the operation will succeed and an UpdateResult with a MatchedCount of 0 will be returned.
+	//
+	// The opts parameter can be used to specify options for the operation (see the option.Replace documentation).
+	//
+	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
 	ReplaceOneById(ctx context.Context, id, replacement, ref any, opts ...option.Replace) (*mongo.UpdateResult, error)
 	// FindOne executes a find command, if successful it returns the corresponding documents in the collection in the dest
 	// parameter with return error nil. Otherwise, it returns corresponding error.
@@ -411,8 +429,11 @@ type Template interface {
 	// AbortTransaction abort all transactions on session
 	AbortTransaction(ctx context.Context) error
 	// Disconnect
-	// closes the mongodb connection client
-	Disconnect(ctx context.Context) error
+	// closes the mongodb connection client without return error
+	Disconnect(ctx context.Context)
+	// DisconnectWithErr
+	// closes the mongodb connection client with return error
+	DisconnectWithErr(ctx context.Context) error
 }
 
 func NewTemplate(ctx context.Context, opts ...*options.ClientOptions) (Template, error) {
@@ -923,7 +944,11 @@ func (t *template) ListIndexSpecifications(ctx context.Context, ref any, opts ..
 	})
 }
 
-func (t *template) Disconnect(ctx context.Context) error {
+func (t *template) Disconnect(ctx context.Context) {
+	_ = t.client.Disconnect(ctx)
+}
+
+func (t *template) DisconnectWithErr(ctx context.Context) error {
 	return t.client.Disconnect(ctx)
 }
 

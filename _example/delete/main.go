@@ -35,7 +35,7 @@ func deleteOne() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	deleteResult, err := mongoTemplate.DeleteOne(ctx, filter, test{})
 	if err != nil {
@@ -53,7 +53,7 @@ func deleteOneById() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	objectId, _ := primitive.ObjectIDFromHex("6585f3a8bf2af8ad9bcab912")
 	deleteResult, err := mongoTemplate.DeleteOneById(ctx, objectId, test{})
 	if err != nil {
@@ -71,19 +71,12 @@ func deleteMany() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer disconnect(ctx, mongoTemplate)
+	defer mongoTemplate.Disconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	deleteResult, err := mongoTemplate.DeleteMany(ctx, filter, test{})
 	if err != nil {
 		logger.Error("error delete documents:", err)
 	} else {
 		logger.Info("documents deleted successfully:", deleteResult)
-	}
-}
-
-func disconnect(ctx context.Context, mongoTemplate mongo.Template) {
-	err := mongoTemplate.Disconnect(ctx)
-	if err != nil {
-		logger.Error("error disconnect mongodb:", err)
 	}
 }
