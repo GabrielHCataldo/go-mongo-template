@@ -830,7 +830,7 @@ Output:
 
 For more watch examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/watch/main).
 
-## Outros Exemplos
+## Other Examples
 
 Below are some examples that were not shown or cited:
 
