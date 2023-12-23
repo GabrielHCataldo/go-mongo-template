@@ -363,7 +363,7 @@ func disconnectMongoTemplate() {
 	}
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
-	err := mongoTemplate.Disconnect(ctx)
+	err := mongoTemplate.DisconnectWithErr(ctx)
 	if err != nil {
 		logger.Error("error disconnect mongodb:", err)
 	}

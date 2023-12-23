@@ -945,7 +945,7 @@ func (t *template) ListIndexSpecifications(ctx context.Context, ref any, opts ..
 }
 
 func (t *template) Disconnect(ctx context.Context) {
-	_ = t.client.Disconnect(ctx)
+	_ = t.DisconnectWithErr(ctx)
 }
 
 func (t *template) DisconnectWithErr(ctx context.Context) error {
