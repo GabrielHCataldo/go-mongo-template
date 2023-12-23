@@ -46,12 +46,21 @@ import "github.com/GabrielHCataldo/go-mongo/mongo"
 
 Usability and documentation
 ------------
+Below we will show some basic examples:
+
+- [Insert](#insert)
+- [Update](#update)
+- [Replace](#replace)
+- [Delete](#delete)
+- [Find](#find)
+- [Exists](#exists)
+- [Count](#count)
+- [Watch](#watch)
+
 **IMPORTANT**: Always check the documentation in the structures and functions fields.
 For more details on the examples, visit [All examples link](https://github/GabrielHCataldo/go-mongo/blob/main/_example).
 
-Below we will show some basic examples.
-
-### Insert
+## Insert
 
 To insert a document, it's very simple, first let's configure a structure
 To be able to work with go-mongo, see:
@@ -185,7 +194,7 @@ Output:
 
 For more insert examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/insert/main).
 
-### Update
+## Update
 
 We will perform two simple update operations, see below using **UpdateOne**:
 
@@ -310,7 +319,7 @@ Output:
 
 For more update examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/update/main).
 
-### Replace
+## Replace
 
 To replace a document, see the example below:
 
@@ -362,7 +371,7 @@ Output:
 
 For more replace examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/replace/main).
 
-### Delete
+## Delete
 
 Let's start by removing just one document using the simple filter, see below:
 
@@ -483,7 +492,7 @@ Output
 
 For more delete examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/delete/main).
 
-### Find
+## Find
 
 Obtaining all the documents is very simple, see the example below:
 
@@ -609,7 +618,7 @@ Output:
 
 For more find examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/find/main).
 
-### Exists
+## Exists
 
 Check if the document exists by id:
 
@@ -690,7 +699,7 @@ Output:
 
 For more examples of exists visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/exists/main).
 
-### Count
+## Count
 
 We start with the total counter, see:
 
@@ -769,7 +778,7 @@ Output:
 
     [INFO 2023/12/22 18:23:47] main.go:28: count documents successfully: 10
 
-### Watch
+## Watch
 
 To watch the operations we highlight the **WatchHandler**, where it will persist the searches and
 will convert the received data, transforming it into a **ContextWatch** where it will have all the necessary data, then
@@ -823,7 +832,7 @@ Output:
 
 For more watch examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/watch/main).
 
-### Outros Exemplos
+## Outros Exemplos
 
 Below are some examples that were not shown or cited:
 
