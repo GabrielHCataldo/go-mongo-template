@@ -211,7 +211,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-	defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.Disconnect(ctx)
     filter := bson.M{"_id": bson.M{"$exists": true}}
     update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
     updateResult, err := mongoTemplate.UpdateOne(ctx, filter, update, test{})
