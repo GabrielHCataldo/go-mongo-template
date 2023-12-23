@@ -13,9 +13,7 @@ MongoDB Template
 ![License](https://img.shields.io/dub/l/vibe-d.svg)
 
 [//]: # ([![build workflow]&#40;https://github.com/GabrielHCataldo/go-mongo/actions/workflows/go.yml/badge.svg&#41;]&#40;https://github.com/GabrielHCataldo/go-mongo/actions&#41;)
-
 [//]: # ([![Source graph]&#40;https://sourcegraph.com/github.com/go-mongo/mongo/-/badge.svg&#41;]&#40;https://sourcegraph.com/github.com/go-mongo/mongo?badge&#41;)
-
 [//]: # ([![TODOs]&#40;https://badgen.net/https/api.tickgit.com/badgen/github.com/GabrielHCataldo/go-mongo/mongo&#41;]&#40;https://www.tickgit.com/browse?repo=github.com/GabrielHCataldo/go-mongo&#41;)
 
 The go-mongo project came to facilitate the use of the mongo driver in your go project,
