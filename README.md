@@ -834,4 +834,11 @@ Below are some examples that were not shown or cited:
 - [Indexes](https://github/GabrielHCataldo/go-mongo/blob/main/_example/indexes/main)
 - [Handler Session and Transaction](https://github/GabrielHCataldo/go-mongo/blob/main/_example/session/main)
 
-    
+How to contribute
+------
+Make a pull request, or if you find a bug, open it
+an Issues.
+
+License
+-------
+Distributed under MIT license, see the license file within the code for more details.
