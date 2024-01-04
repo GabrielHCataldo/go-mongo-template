@@ -1079,6 +1079,15 @@ func initListTestFindOneAndUpdate() []testFindOneAndUpdate {
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
+		{
+			name:            "failed update",
+			filter:          bson.D{{"_id", objectId}},
+			update:          bson.M{"name": "Updated Test Name"},
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndUpdate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
 	}
 }
 
@@ -1865,7 +1874,7 @@ func initOptionInsertMany() option.InsertMany {
 		SetBypassDocumentValidation(true).
 		SetForceRecreateSession(true).
 		SetComment("comment insert golang unit test").
-		SetDisableAutoCloseSession(false).
+		SetDisableAutoCloseSession(true).
 		SetDisableAutoRollback(false)
 }
 

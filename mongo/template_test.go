@@ -59,7 +59,6 @@ func TestTemplateInsertMany(t *testing.T) {
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}
-			_ = mongoTemplate.CloseSession(ctx, err != nil)
 		})
 	}
 }
