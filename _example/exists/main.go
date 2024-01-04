@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"github.com/GabrielHCataldo/go-logger/logger"
-	"github.com/GabrielHCataldo/go-mongo/mongo"
+	"github.com/GabrielHCataldo/go-mongo-template/mongo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"

@@ -2,7 +2,7 @@ package mongo
 
 import (
 	"context"
-	"github.com/GabrielHCataldo/go-mongo/mongo/option"
+	"github.com/GabrielHCataldo/go-mongo-template/mongo/option"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )

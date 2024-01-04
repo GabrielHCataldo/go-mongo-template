@@ -3,18 +3,18 @@ MongoDB Template
 <!--suppress ALL -->
 <img align="right" src="gopher-mongo.png" alt="">
 
-[![Project status](https://img.shields.io/badge/version-v1.0.0-vividgreen.svg)](https://github.com/GabrielHCataldo/go-mongo/releases/tag/v1.0.0)
-[![Go Report Card](https://goreportcard.com/badge/github.com/GabrielHCataldo/go-mongo)](https://goreportcard.com/report/github.com/GabrielHCataldo/go-mongo)
-[![Coverage Status](https://coveralls.io/repos/GabrielHCataldo/go-mongo/badge.svg?branch=main&service=github)](https://coveralls.io/github/GabrielHCataldo/go-mongo?branch=main)
+[![Project status](https://img.shields.io/badge/version-v1.0.0-vividgreen.svg)](https://github.com/GabrielHCataldo/go-mongo-template/releases/tag/v1.0.0)
+[![Go Report Card](https://goreportcard.com/badge/github.com/GabrielHCataldo/go-mongo-template)](https://goreportcard.com/report/github.com/GabrielHCataldo/go-mongo-template)
+[![Coverage Status](https://coveralls.io/repos/GabrielHCataldo/go-mongo-template/badge.svg?branch=main&service=github)](https://coveralls.io/github/GabrielHCataldo/go-mongo?branch=main)
 [![Open Source Helpers](https://www.codetriage.com/gabrielhcataldo/go-mongo/badges/users.svg)](https://www.codetriage.com/gabrielhcataldo/go-mongo)
 [![MongoDoc](https://badgen.net/badge/Mongo/doc/green?icon=MongoDB)](https://mongodb.com/docs/drivers/go/current/)
 [![MongoDriver](https://badgen.net/badge/Mongo/driver/green)](https://github.com/mongodb/mongo-go-driver)
-[![GoDoc](https://godoc.org/github/GabrielHCataldo/go-mongo?status.svg)](https://pkg.go.dev/github.com/GabrielHCataldo/go-mongo/mongo)
+[![GoDoc](https://godoc.org/github/GabrielHCataldo/go-mongo?status.svg)](https://pkg.go.dev/github.com/GabrielHCataldo/go-mongo-template/mongo)
 ![License](https://img.shields.io/dub/l/vibe-d.svg)
 
-[//]: # ([![build workflow]&#40;https://github.com/GabrielHCataldo/go-mongo/actions/workflows/go.yml/badge.svg&#41;]&#40;https://github.com/GabrielHCataldo/go-mongo/actions&#41;)
+[//]: # ([![build workflow]&#40;https://github.com/GabrielHCataldo/go-mongo-template/actions/workflows/go.yml/badge.svg&#41;]&#40;https://github.com/GabrielHCataldo/go-mongo-template/actions&#41;)
 [//]: # ([![Source graph]&#40;https://sourcegraph.com/github.com/go-mongo/mongo/-/badge.svg&#41;]&#40;https://sourcegraph.com/github.com/go-mongo/mongo?badge&#41;)
-[//]: # ([![TODOs]&#40;https://badgen.net/https/api.tickgit.com/badgen/github.com/GabrielHCataldo/go-mongo/mongo&#41;]&#40;https://www.tickgit.com/browse?repo=github.com/GabrielHCataldo/go-mongo&#41;)
+[//]: # ([![TODOs]&#40;https://badgen.net/https/api.tickgit.com/badgen/github.com/GabrielHCataldo/go-mongo-template/mongo&#41;]&#40;https://www.tickgit.com/browse?repo=github.com/GabrielHCataldo/go-mongo-template&#41;)
 
 The go-mongo project came to facilitate the use of the mongo driver in your go project,
 with self-management of sessions, simplicity in configuring the database and collection directly in the structure and
@@ -34,12 +34,12 @@ Installation
 
 Use go get.
 
-	go get github.com/GabrielHCataldo/go-mongo
+	go get github.com/GabrielHCataldo/go-mongo-template
 
 Then import the go-mongo package into your own code.
 
 ```go
-import "github.com/GabrielHCataldo/go-mongo/mongo"
+import "github.com/GabrielHCataldo/go-mongo-template/mongo"
 ```
 
 Usability and documentation
@@ -56,7 +56,7 @@ Below we will show some basic examples:
 - [Watch](#watch)
 
 **IMPORTANT**: Always check the documentation in the structures and functions fields.
-For more details on the examples, visit [All examples link](https://github/GabrielHCataldo/go-mongo/blob/main/_example).
+For more details on the examples, visit [All examples link](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example).
 
 ## Insert
 
@@ -91,7 +91,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
     "math/rand"
@@ -140,8 +140,8 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
-    "github.com/GabrielHCataldo/go-mongo/mongo/option"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo/option"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
     "math/rand"
@@ -190,7 +190,7 @@ Output:
 
     [INFO 2023/12/22 16:11:33] main.go:46: document inserted successfully: [{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T19:11:33.206Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":[101,133,223,101,71,229,174,223,115,181,143,210],"name":"Foo Bar","random":8094092400336225232},{"balance":290.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T19:11:33.206Z","emails":["foobar2@gmail.com","foobar4@hotmail.com"],"id":[101,133,223,101,71,229,174,223,115,181,143,211],"name":"Foo Bar 2","random":4318945546650338065}]
 
-For more insert examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/insert/main).
+For more insert examples visit [link](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/insert/main).
 
 ## Update
 
@@ -202,7 +202,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -242,7 +242,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -283,7 +283,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -315,7 +315,7 @@ Output:
 
     [INFO 2023/12/22 16:31:41] main.go:29: document updated successfully: {"MatchedCount":13,"ModifiedCount":13,"UpsertedCount":0,"UpsertedID":null}
 
-For more update examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/update/main).
+For more update examples visit [link](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/update/main).
 
 ## Replace
 
@@ -327,7 +327,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -367,7 +367,7 @@ Output:
 
     [INFO 2023/12/22 17:21:49] main.go:37: document replaced successfully: {"MatchedCount":1,"ModifiedCount":1,"UpsertedCount":0,"UpsertedID":null}
 
-For more replace examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/replace/main).
+For more replace examples visit [link](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/replace/main).
 
 ## Delete
 
@@ -379,7 +379,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -418,7 +418,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -457,7 +457,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -488,7 +488,7 @@ Output
 
     [INFO 2023/12/22 17:50:01] main.go:28: documents deleted successfully: {"DeletedCount":8}
 
-For more delete examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/delete/main).
+For more delete examples visit [link](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/delete/main).
 
 ## Find
 
@@ -500,7 +500,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "os"
     "time"
@@ -538,7 +538,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -582,7 +582,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
     "os"
@@ -614,7 +614,7 @@ Output:
 
     [INFO 2023/12/22 17:14:47] main.go:29: find by id document successfully: {"id":[101,133,219,38,99,62,34,92,190,173,245,83],"random":2576121145493409319,"name":"Foo Bar Updated","birthDate":"1999-01-21T02:00:00Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"balance":190.12,"createdAt":"2023-12-22T18:53:26.695Z"}
 
-For more find examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/find/main).
+For more find examples visit [link](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/find/main).
 
 ## Exists
 
@@ -626,7 +626,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
     "os"
@@ -664,7 +664,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -695,7 +695,7 @@ Output:
 
     [INFO 2023/12/22 17:57:46] main.go:28: document exists: true
 
-For more examples of exists visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/exists/main).
+For more examples of exists visit [link](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/exists/main).
 
 ## Count
 
@@ -707,7 +707,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -745,7 +745,7 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -788,8 +788,8 @@ package main
 import (
     "context"
     "github.com/GabrielHCataldo/go-logger/logger"
-    "github.com/GabrielHCataldo/go-mongo/mongo"
-    "github.com/GabrielHCataldo/go-mongo/mongo/option"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo"
+    "github.com/GabrielHCataldo/go-mongo-template/mongo/option"
     "go.mongodb.org/mongo-driver/bson"
     "go.mongodb.org/mongo-driver/bson/primitive"
     "go.mongodb.org/mongo-driver/mongo/options"
@@ -828,18 +828,18 @@ Output:
     [INFO 2023/12/22 18:42:51] main.go:36: handler watch called: {"Event":{"ClusterTime":{"I":9,"T":1703281182},"DocumentKey":{"ID":[101,134,2,30,136,59,150,210,55,170,55,137]},"FullDocument":{"_id":[101,134,2,30,136,59,150,210,55,170,55,137],"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:39:42.627Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"name":"Foo Bar","random":2251712412936242638},"NS":{"Coll":"test","DB":"test"},"OperationType":"insert","UpdateDescription":{"RemovedFields":null,"TruncatedArrays":null,"UpdatedFields":null}}}
     Process finished with the exit code 130 (interrupted by signal 2:SIGINT)
 
-For more watch examples visit [link](https://github/GabrielHCataldo/go-mongo/blob/main/_example/watch/main).
+For more watch examples visit [link](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/watch/main).
 
 ## Other Examples
 
 Below are some examples that were not shown or cited:
 
-- [Aggregate](https://github/GabrielHCataldo/go-mongo/blob/main/_example/aggregate/main)
-- [Distinct](https://github/GabrielHCataldo/go-mongo/blob/main/_example/distinct/main)
-- [Watch](https://github/GabrielHCataldo/go-mongo/blob/main/_example/watch/main)
-- [Drop](https://github/GabrielHCataldo/go-mongo/blob/main/_example/drop/main)
-- [Indexes](https://github/GabrielHCataldo/go-mongo/blob/main/_example/indexes/main)
-- [Handler Session and Transaction](https://github/GabrielHCataldo/go-mongo/blob/main/_example/session/main)
+- [Aggregate](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/aggregate/main)
+- [Distinct](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/distinct/main)
+- [Watch](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/watch/main)
+- [Drop](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/drop/main)
+- [Indexes](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/indexes/main)
+- [Handler Session and Transaction](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/session/main)
 
 How to contribute
 ------

@@ -3,8 +3,8 @@ package mongo
 import (
 	"context"
 	"errors"
-	"github.com/GabrielHCataldo/go-mongo/internal/util"
-	"github.com/GabrielHCataldo/go-mongo/mongo/option"
+	"github.com/GabrielHCataldo/go-mongo-template/internal/util"
+	"github.com/GabrielHCataldo/go-mongo-template/mongo/option"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
