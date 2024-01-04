@@ -6,14 +6,14 @@ MongoDB Template
 [![Project status](https://img.shields.io/badge/version-v1.0.0-vividgreen.svg)](https://github.com/GabrielHCataldo/go-mongo-template/releases/tag/v1.0.0)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GabrielHCataldo/go-mongo-template)](https://goreportcard.com/report/github.com/GabrielHCataldo/go-mongo-template)
 [![Coverage Status](https://coveralls.io/repos/GabrielHCataldo/go-mongo-template/badge.svg?branch=main&service=github)](https://coveralls.io/github/GabrielHCataldo/go-mongo?branch=main)
-[![Open Source Helpers](https://www.codetriage.com/gabrielhcataldo/go-mongo/badges/users.svg)](https://www.codetriage.com/gabrielhcataldo/go-mongo)
+[![Open Source Helpers](https://www.codetriage.com/gabrielhcataldo/go-mongo-template/badges/users.svg)](https://www.codetriage.com/gabrielhcataldo/go-mongo)
 [![MongoDoc](https://badgen.net/badge/Mongo/doc/green?icon=MongoDB)](https://mongodb.com/docs/drivers/go/current/)
 [![MongoDriver](https://badgen.net/badge/Mongo/driver/green)](https://github.com/mongodb/mongo-go-driver)
 [![GoDoc](https://godoc.org/github/GabrielHCataldo/go-mongo?status.svg)](https://pkg.go.dev/github.com/GabrielHCataldo/go-mongo-template/mongo)
 ![License](https://img.shields.io/dub/l/vibe-d.svg)
 
 [//]: # ([![build workflow]&#40;https://github.com/GabrielHCataldo/go-mongo-template/actions/workflows/go.yml/badge.svg&#41;]&#40;https://github.com/GabrielHCataldo/go-mongo-template/actions&#41;)
-[//]: # ([![Source graph]&#40;https://sourcegraph.com/github.com/go-mongo/mongo/-/badge.svg&#41;]&#40;https://sourcegraph.com/github.com/go-mongo/mongo?badge&#41;)
+[//]: # ([![Source graph]&#40;https://sourcegraph.com/github.com/go-mongo-template/mongo/-/badge.svg&#41;]&#40;https://sourcegraph.com/github.com/go-mongo-template/mongo?badge&#41;)
 [//]: # ([![TODOs]&#40;https://badgen.net/https/api.tickgit.com/badgen/github.com/GabrielHCataldo/go-mongo-template/mongo&#41;]&#40;https://www.tickgit.com/browse?repo=github.com/GabrielHCataldo/go-mongo-template&#41;)
 
 The go-mongo project came to facilitate the use of the mongo driver in your go project,
