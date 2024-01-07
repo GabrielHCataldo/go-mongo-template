@@ -16,7 +16,7 @@ MongoDB Template
 [//]: # ([![Source graph]&#40;https://sourcegraph.com/github.com/go-mongo-template/mongo/-/badge.svg&#41;]&#40;https://sourcegraph.com/github.com/go-mongo-template/mongo?badge&#41;)
 [//]: # ([![TODOs]&#40;https://badgen.net/https/api.tickgit.com/badgen/github.com/GabrielHCataldo/go-mongo-template/mongo&#41;]&#40;https://www.tickgit.com/browse?repo=github.com/GabrielHCataldo/go-mongo-template&#41;)
 
-The go-mongo project came to facilitate the use of the mongo driver in your go project,
+The go-mongo-template project came to facilitate the use of the mongo driver in your go project,
 with self-management of sessions, simplicity in configuring the database and collection directly in the structure and
 much more. See below some implemented features:
 
