@@ -7,8 +7,8 @@ MongoDB Template
 [![Go Report Card](https://goreportcard.com/badge/github.com/GabrielHCataldo/go-mongo-template)](https://goreportcard.com/report/github.com/GabrielHCataldo/go-mongo-template)
 [![Coverage Status](https://coveralls.io/repos/GabrielHCataldo/go-mongo-template/badge.svg?branch=main&service=github)](https://coveralls.io/github/GabrielHCataldo/go-mongo?branch=main)
 [![Open Source Helpers](https://www.codetriage.com/gabrielhcataldo/go-mongo-template/badges/users.svg)](https://www.codetriage.com/gabrielhcataldo/go-mongo)
-[![MongoDoc](https://badgen.net/badge/Mongo/doc/green?icon=MongoDB)](https://mongodb.com/docs/drivers/go/current/)
-[![MongoDriver](https://badgen.net/badge/Mongo/driver/green)](https://github.com/mongodb/mongo-go-driver)
+[![MongoDoc](https://badgen.net/badge/mongo/doc/green)](https://mongodb.com/docs/drivers/go/current/)
+[![MongoDriver](https://badgen.net/badge/mongo/driver/green)](https://github.com/mongodb/mongo-go-driver)
 [![GoDoc](https://godoc.org/github/GabrielHCataldo/go-mongo?status.svg)](https://pkg.go.dev/github.com/GabrielHCataldo/go-mongo-template/mongo)
 ![License](https://img.shields.io/dub/l/vibe-d.svg)
 
