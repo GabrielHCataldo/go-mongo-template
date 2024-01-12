@@ -19,7 +19,7 @@ type IndexInput struct {
 	Ref any
 }
 
-type IndexOutput struct {
+type IndexResult struct {
 	Id         any             `bson:"id,omitempty"`
 	Ns         string          `bson:"ns,omitempty"`
 	FirstBatch FirstBatchIndex `bson:"firstBatch,omitempty"`

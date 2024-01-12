@@ -13,7 +13,7 @@ type PageInput struct {
 	Sort     any
 }
 
-type PageOutput struct {
+type PageResult struct {
 	Page          int64     `json:"page"`
 	PageSize      int64     `json:"pageSize"`
 	PageTotal     int64     `json:"pageTotal"`
@@ -22,14 +22,14 @@ type PageOutput struct {
 	LastQueryAt   time.Time `json:"lastQueryAt,omitempty"`
 }
 
-func NewPageOutput(pageInput PageInput, result any, countTotal int64) *PageOutput {
+func newPageResult(pageInput PageInput, result any, countTotal int64) *PageResult {
 	minPageTotal := 1
 	if util.IsZero(result) {
 		minPageTotal = 0
 	}
 	pageTotal := util.MinInt64(int64(math.Ceil(float64(countTotal)/float64(pageInput.PageSize))), int64(minPageTotal))
 	lastQueryAt := time.Now().UTC()
-	return &PageOutput{
+	return &PageResult{
 		Page:          pageInput.Page,
 		PageSize:      pageInput.PageSize,
 		PageTotal:     pageTotal,

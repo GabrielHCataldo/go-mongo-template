@@ -24,6 +24,48 @@ import (
 //	}
 type Pipeline []bson.D
 
+// DeleteResult is the result type returned by DeleteOne and DeleteMany operations.
+type DeleteResult struct {
+	// The number of documents deleted.
+	DeletedCount int64
+}
+
+// UpdateResult is the result type returned from UpdateOne, UpdateMany, and ReplaceOne operations.
+type UpdateResult struct {
+	// The number of documents matched by the filter.
+	MatchedCount int64
+	// The number of documents modified by the operation.
+	ModifiedCount int64
+	// The number of documents upserted by the operation.
+	UpsertedCount int64
+	// The _id field of the upserted document, or nil if no upsert was done.
+	UpsertedID any
+}
+
+// IndexSpecification represents an index in a database. This type is returned by the IndexView.ListSpecifications
+// function and is also used in the CollectionSpecification type.
+type IndexSpecification struct {
+	// The index name.
+	Name string
+	// The namespace for the index. This is a string in the format "databaseName.collectionName".
+	Namespace string
+	// The keys specification document for the index.
+	KeysDocument bson.Raw
+	// The index version.
+	Version int32
+	// The length of time, in seconds, for documents to remain in the collection. The default value is 0, which means
+	// that documents will remain in the collection until they're explicitly deleted or the collection is dropped.
+	ExpireAfterSeconds *int32
+	// If true, the index will only reference documents that contain the fields specified in the index. The default is
+	// false.
+	Sparse *bool
+	// If true, the collection will not accept insertion or update of documents where the index key value matches an
+	// existing value in the index. The default is false.
+	Unique *bool
+	// The clustered index.
+	Clustered *bool
+}
+
 type template struct {
 	client  *mongo.Client
 	session mongo.Session
@@ -63,7 +105,7 @@ type Template interface {
 	// The opts parameter can be used to specify options for the operation (see the option.Delete documentation).
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/delete/.
-	DeleteOne(ctx context.Context, filter, ref any, opts ...option.Delete) (*mongo.DeleteResult, error)
+	DeleteOne(ctx context.Context, filter, ref any, opts ...option.Delete) (*DeleteResult, error)
 	// DeleteOneById executes an update command to update the document whose _id value matches the provided ID in the collection.
 	// This is equivalent to running DeleteOne(ctx, bson.D{{"_id", id}}, ref, opts...).
 	//
@@ -75,7 +117,7 @@ type Template interface {
 	// The opts parameter can be used to specify options for the operation (see the option.Delete documentation).
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/delete/.
-	DeleteOneById(ctx context.Context, id, ref any, opts ...option.Delete) (*mongo.DeleteResult, error)
+	DeleteOneById(ctx context.Context, id, ref any, opts ...option.Delete) (*DeleteResult, error)
 	// DeleteMany executes a delete command to delete documents from the collection.
 	//
 	// The filter parameter must be a document containing query operators and can be used to select the documents to
@@ -88,7 +130,7 @@ type Template interface {
 	// The opts parameter can be used to specify options for the operation (see the option.Delete documentation).
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/delete/.
-	DeleteMany(ctx context.Context, filter, ref any, opts ...option.Delete) (*mongo.DeleteResult, error)
+	DeleteMany(ctx context.Context, filter, ref any, opts ...option.Delete) (*DeleteResult, error)
 	// UpdateOneById executes an update command to update the document whose _id value matches the provided ID in the collection.
 	// This is equivalent to running UpdateOne(ctx, bson.D{{"_id", id}}, update, ref, opts...).
 	//
@@ -104,7 +146,7 @@ type Template interface {
 	// The opts parameter can be used to specify options for the operation (see the option.Update documentation).
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
-	UpdateOneById(ctx context.Context, id, update, ref any, opts ...option.Update) (*mongo.UpdateResult, error)
+	UpdateOneById(ctx context.Context, id, update, ref any, opts ...option.Update) (*UpdateResult, error)
 	// UpdateOne executes an update command to update at most one document in the collection.
 	//
 	// The filter parameter must be a document containing query operators and can be used to select the document to be
@@ -121,7 +163,7 @@ type Template interface {
 	// The opts parameter can be used to specify options for the operation (see the option.Update documentation).
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
-	UpdateOne(ctx context.Context, filter, update, ref any, opts ...option.Update) (*mongo.UpdateResult, error)
+	UpdateOne(ctx context.Context, filter, update, ref any, opts ...option.Update) (*UpdateResult, error)
 	// UpdateMany executes an update command to update documents in the collection.
 	//
 	// The filter parameter must be a document containing query operators and can be used to select the documents to be
@@ -137,7 +179,7 @@ type Template interface {
 	// The opts parameter can be used to specify options for the operation (see the option.Update documentation).
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
-	UpdateMany(ctx context.Context, filter, update, ref any, opts ...option.Update) (*mongo.UpdateResult, error)
+	UpdateMany(ctx context.Context, filter, update, ref any, opts ...option.Update) (*UpdateResult, error)
 	// ReplaceOne executes an update command to replace at most one document in the collection.
 	//
 	// The filter parameter must be a document containing query operators and can be used to select the document to be
@@ -153,7 +195,7 @@ type Template interface {
 	// The opts parameter can be used to specify options for the operation (see the option.Replace documentation).
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
-	ReplaceOne(ctx context.Context, filter, replacement, ref any, opts ...option.Replace) (*mongo.UpdateResult, error)
+	ReplaceOne(ctx context.Context, filter, replacement, ref any, opts ...option.Replace) (*UpdateResult, error)
 	// ReplaceOneById executes an update command to update the document whose _id value matches the provided ID in the collection.
 	// This is equivalent to running ReplaceOne(ctx, bson.D{{"_id", id}}, replacement, ref, opts...).
 	//
@@ -163,7 +205,7 @@ type Template interface {
 	// The opts parameter can be used to specify options for the operation (see the option.Replace documentation).
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
-	ReplaceOneById(ctx context.Context, id, replacement, ref any, opts ...option.Replace) (*mongo.UpdateResult, error)
+	ReplaceOneById(ctx context.Context, id, replacement, ref any, opts ...option.Replace) (*UpdateResult, error)
 	// FindOne executes a find command, if successful it returns the corresponding documents in the collection in the dest
 	// parameter with return error nil. Otherwise, it returns corresponding error.
 	//
@@ -260,7 +302,7 @@ type Template interface {
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/find/.
 	FindAll(ctx context.Context, dest any, opts ...option.Find) error
 	// FindPageable executes a find command, if successful, returns the paginated documents in the
-	// corresponding PageOutput structure in the collection on the target parameter with null return error.
+	// corresponding PageResult structure in the collection on the target parameter with null return error.
 	// Otherwise, it will return the corresponding error.
 	//
 	// The filter parameter must be a document containing query operators and can be used to select which documents are
@@ -270,7 +312,7 @@ type Template interface {
 	// The opts parameter can be used to specify options for the operation (see the option.FindPageable documentation).
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/find/.
-	FindPageable(ctx context.Context, filter any, input PageInput, opts ...option.FindPageable) (*PageOutput, error)
+	FindPageable(ctx context.Context, filter any, input PageInput, opts ...option.FindPageable) (*PageResult, error)
 	// Exists executes the count command, if the quantity is greater than 0 with a limit of 1, true is returned,
 	// otherwise false is returned.
 	//
@@ -416,11 +458,11 @@ type Template interface {
 	// The ref parameter must be the collection structure with database and collection tags configured.
 	//
 	// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/listIndexes/.
-	ListIndexes(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexOutput, error)
+	ListIndexes(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexResult, error)
 	// ListIndexSpecifications executes a List command and returns a slice of returned IndexSpecifications.
 	//
 	// The ref parameter must be the collection structure with database and collection tags configured.
-	ListIndexSpecifications(ctx context.Context, ref any, opts ...option.ListIndexes) ([]*mongo.IndexSpecification, error)
+	ListIndexSpecifications(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexSpecification, error)
 	// CloseSession closes session and transaction, if param abort is false it will commit the changes,
 	// otherwise it will abort all transactions.
 	CloseSession(ctx context.Context, abort bool) error
@@ -468,8 +510,8 @@ func (t *template) InsertMany(ctx context.Context, documents any, opts ...option
 	})
 }
 
-func (t *template) DeleteOne(ctx context.Context, filter, ref any, opts ...option.Delete) (*mongo.DeleteResult, error) {
-	var result *mongo.DeleteResult
+func (t *template) DeleteOne(ctx context.Context, filter, ref any, opts ...option.Delete) (*DeleteResult, error) {
+	var result *DeleteResult
 	var err error
 	opt := option.GetDeleteOptionByParams(opts)
 	t.startSession(ctx, opt.ForceRecreateSession)
@@ -480,8 +522,8 @@ func (t *template) DeleteOne(ctx context.Context, filter, ref any, opts ...optio
 	return result, err
 }
 
-func (t *template) DeleteOneById(ctx context.Context, id, ref any, opts ...option.Delete) (*mongo.DeleteResult, error) {
-	var result *mongo.DeleteResult
+func (t *template) DeleteOneById(ctx context.Context, id, ref any, opts ...option.Delete) (*DeleteResult, error) {
+	var result *DeleteResult
 	var err error
 	opt := option.GetDeleteOptionByParams(opts)
 	t.startSession(ctx, opt.ForceRecreateSession)
@@ -492,8 +534,8 @@ func (t *template) DeleteOneById(ctx context.Context, id, ref any, opts ...optio
 	return result, err
 }
 
-func (t *template) DeleteMany(ctx context.Context, filter, ref any, opts ...option.Delete) (*mongo.DeleteResult, error) {
-	var result *mongo.DeleteResult
+func (t *template) DeleteMany(ctx context.Context, filter, ref any, opts ...option.Delete) (*DeleteResult, error) {
+	var result *DeleteResult
 	var err error
 	opt := option.GetDeleteOptionByParams(opts)
 	t.startSession(ctx, opt.ForceRecreateSession)
@@ -504,9 +546,8 @@ func (t *template) DeleteMany(ctx context.Context, filter, ref any, opts ...opti
 	return result, err
 }
 
-func (t *template) UpdateOneById(ctx context.Context, id, update, ref any, opts ...option.Update) (*mongo.UpdateResult,
-	error) {
-	var result *mongo.UpdateResult
+func (t *template) UpdateOneById(ctx context.Context, id, update, ref any, opts ...option.Update) (*UpdateResult, error) {
+	var result *UpdateResult
 	var err error
 	opt := option.GetUpdateOptionByParams(opts)
 	t.startSession(ctx, opt.ForceRecreateSession)
@@ -517,9 +558,9 @@ func (t *template) UpdateOneById(ctx context.Context, id, update, ref any, opts 
 	return result, err
 }
 
-func (t *template) UpdateOne(ctx context.Context, filter any, update, ref any, opts ...option.Update) (
-	*mongo.UpdateResult, error) {
-	var result *mongo.UpdateResult
+func (t *template) UpdateOne(ctx context.Context, filter any, update, ref any, opts ...option.Update) (*UpdateResult,
+	error) {
+	var result *UpdateResult
 	var err error
 	opt := option.GetUpdateOptionByParams(opts)
 	t.startSession(ctx, opt.ForceRecreateSession)
@@ -530,9 +571,9 @@ func (t *template) UpdateOne(ctx context.Context, filter any, update, ref any, o
 	return result, err
 }
 
-func (t *template) UpdateMany(ctx context.Context, filter any, update, ref any, opts ...option.Update) (
-	*mongo.UpdateResult, error) {
-	var result *mongo.UpdateResult
+func (t *template) UpdateMany(ctx context.Context, filter any, update, ref any, opts ...option.Update) (*UpdateResult,
+	error) {
+	var result *UpdateResult
 	var err error
 	opt := option.GetUpdateOptionByParams(opts)
 	err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
@@ -542,9 +583,9 @@ func (t *template) UpdateMany(ctx context.Context, filter any, update, ref any, 
 	return result, err
 }
 
-func (t *template) ReplaceOne(ctx context.Context, filter any, update, ref any, opts ...option.Replace) (
-	*mongo.UpdateResult, error) {
-	var result *mongo.UpdateResult
+func (t *template) ReplaceOne(ctx context.Context, filter any, update, ref any, opts ...option.Replace) (*UpdateResult,
+	error) {
+	var result *UpdateResult
 	var err error
 	opt := option.GetReplaceOptionByParams(opts)
 	t.startSession(ctx, opt.ForceRecreateSession)
@@ -555,9 +596,9 @@ func (t *template) ReplaceOne(ctx context.Context, filter any, update, ref any, 
 	return result, err
 }
 
-func (t *template) ReplaceOneById(ctx context.Context, id, replacement, ref any, opts ...option.Replace) (
-	*mongo.UpdateResult, error) {
-	var result *mongo.UpdateResult
+func (t *template) ReplaceOneById(ctx context.Context, id, replacement, ref any, opts ...option.Replace) (*UpdateResult,
+	error) {
+	var result *UpdateResult
 	var err error
 	opt := option.GetReplaceOptionByParams(opts)
 	t.startSession(ctx, opt.ForceRecreateSession)
@@ -639,7 +680,7 @@ func (t *template) FindAll(ctx context.Context, dest any, opts ...option.Find) e
 }
 
 func (t *template) FindPageable(ctx context.Context, filter any, input PageInput, opts ...option.FindPageable) (
-	*PageOutput, error) {
+	*PageResult, error) {
 	if util.IsPointer(input.Ref) {
 		return nil, errors.New("mongo: input.Ref cannot be a pointer")
 	} else if util.IsInvalid(input.Ref) {
@@ -682,7 +723,7 @@ func (t *template) FindPageable(ctx context.Context, filter any, input PageInput
 		return nil, err
 	}
 	countTotal, _ := collection.CountDocuments(ctx, filter)
-	return NewPageOutput(input, dest, countTotal), nil
+	return newPageResult(input, dest, countTotal), nil
 }
 
 func (t *template) Exists(ctx context.Context, filter, ref any, opts ...option.Exists) (bool, error) {
@@ -909,7 +950,7 @@ func (t *template) DropAllIndexes(ctx context.Context, ref any, opts ...option.D
 	return err
 }
 
-func (t *template) ListIndexes(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexOutput, error) {
+func (t *template) ListIndexes(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexResult, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
@@ -924,13 +965,13 @@ func (t *template) ListIndexes(ctx context.Context, ref any, opts ...option.List
 	if err != nil {
 		return nil, err
 	}
-	var results []IndexOutput
+	var results []IndexResult
 	err = cursor.All(ctx, &results)
 	return results, err
 }
 
 func (t *template) ListIndexSpecifications(ctx context.Context, ref any, opts ...option.ListIndexes) (
-	[]*mongo.IndexSpecification, error) {
+	[]IndexSpecification, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
@@ -938,10 +979,26 @@ func (t *template) ListIndexSpecifications(ctx context.Context, ref any, opts ..
 	opt := option.GetListIndexesOptionByParams(opts)
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName).Indexes()
-	return collection.ListSpecifications(ctx, &options.ListIndexesOptions{
+	mongoResult, err := collection.ListSpecifications(ctx, &options.ListIndexesOptions{
 		BatchSize: opt.BatchSize,
 		MaxTime:   opt.MaxTime,
 	})
+	var result []IndexSpecification
+	for _, v := range mongoResult {
+		if v != nil {
+			result = append(result, IndexSpecification{
+				Name:               v.Name,
+				Namespace:          v.Namespace,
+				KeysDocument:       v.KeysDocument,
+				Version:            v.Version,
+				ExpireAfterSeconds: v.ExpireAfterSeconds,
+				Sparse:             v.Sparse,
+				Unique:             v.Unique,
+				Clustered:          v.Clustered,
+			})
+		}
+	}
+	return result, err
 }
 
 func (t *template) Disconnect(ctx context.Context) {
@@ -1047,45 +1104,58 @@ func (t *template) insertMany(sc mongo.SessionContext, a any, opt option.InsertM
 	return nil
 }
 
-func (t *template) deleteOne(sc mongo.SessionContext, filter, ref any, opt option.Delete) (*mongo.DeleteResult, error) {
+func (t *template) deleteOne(sc mongo.SessionContext, filter, ref any, opt option.Delete) (*DeleteResult, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
 	}
 	database := t.client.Database(databaseName)
 	coll := database.Collection(collectionName)
-	return coll.DeleteOne(sc, filter, &options.DeleteOptions{
+	mongoResult, err := coll.DeleteOne(sc, filter, &options.DeleteOptions{
 		Collation: option.ParseCollationMongoOptions(opt.Collation),
 		Comment:   opt.Comment,
 		Hint:      opt.Hint,
 		Let:       opt.Let,
 	})
+	var result *DeleteResult
+	if mongoResult != nil {
+		result = &DeleteResult{
+			DeletedCount: mongoResult.DeletedCount,
+		}
+	}
+	return result, err
 }
 
-func (t *template) deleteMany(sc mongo.SessionContext, filter, ref any, opt option.Delete) (*mongo.DeleteResult, error) {
+func (t *template) deleteMany(sc mongo.SessionContext, filter, ref any, opt option.Delete) (*DeleteResult, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
 	}
 	database := t.client.Database(databaseName)
 	coll := database.Collection(collectionName)
-	return coll.DeleteMany(sc, filter, &options.DeleteOptions{
+	mongoResult, err := coll.DeleteMany(sc, filter, &options.DeleteOptions{
 		Collation: option.ParseCollationMongoOptions(opt.Collation),
 		Comment:   opt.Comment,
 		Hint:      opt.Hint,
 		Let:       opt.Let,
 	})
+	var result *DeleteResult
+	if mongoResult != nil {
+		result = &DeleteResult{
+			DeletedCount: mongoResult.DeletedCount,
+		}
+	}
+	return result, err
 }
 
-func (t *template) updateOne(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (*mongo.UpdateResult,
-	error) {
+func (t *template) updateOne(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (*UpdateResult, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
 	}
 	database := t.client.Database(databaseName)
 	coll := database.Collection(collectionName)
-	return coll.UpdateOne(sc, filter, update, &options.UpdateOptions{
+	mongoResult, err := coll.UpdateOne(sc, filter, update, &options.UpdateOptions{
 		ArrayFilters:             option.ParseArrayFiltersMongoOptions(opt.ArrayFilters),
 		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
@@ -1094,17 +1164,26 @@ func (t *template) updateOne(sc mongo.SessionContext, filter, update, ref any, o
 		Upsert:                   opt.Upsert,
 		Let:                      opt.Let,
 	})
+	var result *UpdateResult
+	if mongoResult != nil {
+		result = &UpdateResult{
+			MatchedCount:  mongoResult.MatchedCount,
+			ModifiedCount: mongoResult.ModifiedCount,
+			UpsertedCount: mongoResult.UpsertedCount,
+			UpsertedID:    mongoResult.UpsertedID,
+		}
+	}
+	return result, err
 }
 
-func (t *template) updateMany(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (*mongo.UpdateResult,
-	error) {
+func (t *template) updateMany(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (*UpdateResult, error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
 	}
 	database := t.client.Database(databaseName)
 	coll := database.Collection(collectionName)
-	return coll.UpdateMany(sc, filter, update, &options.UpdateOptions{
+	mongoResult, err := coll.UpdateMany(sc, filter, update, &options.UpdateOptions{
 		ArrayFilters:             option.ParseArrayFiltersMongoOptions(opt.ArrayFilters),
 		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
@@ -1113,9 +1192,19 @@ func (t *template) updateMany(sc mongo.SessionContext, filter, update, ref any, 
 		Upsert:                   opt.Upsert,
 		Let:                      opt.Let,
 	})
+	var result *UpdateResult
+	if mongoResult != nil {
+		result = &UpdateResult{
+			MatchedCount:  mongoResult.MatchedCount,
+			ModifiedCount: mongoResult.ModifiedCount,
+			UpsertedCount: mongoResult.UpsertedCount,
+			UpsertedID:    mongoResult.UpsertedID,
+		}
+	}
+	return result, err
 }
 
-func (t *template) replaceOne(sc mongo.SessionContext, filter, update, ref any, opt option.Replace) (*mongo.UpdateResult,
+func (t *template) replaceOne(sc mongo.SessionContext, filter, update, ref any, opt option.Replace) (*UpdateResult,
 	error) {
 	databaseName, collectionName, err := getMongoInfosByAny(ref)
 	if err != nil {
@@ -1123,7 +1212,7 @@ func (t *template) replaceOne(sc mongo.SessionContext, filter, update, ref any, 
 	}
 	database := t.client.Database(databaseName)
 	coll := database.Collection(collectionName)
-	return coll.ReplaceOne(sc, filter, update, &options.ReplaceOptions{
+	mongoResult, err := coll.ReplaceOne(sc, filter, update, &options.ReplaceOptions{
 		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
 		Comment:                  opt.Comment,
@@ -1131,6 +1220,16 @@ func (t *template) replaceOne(sc mongo.SessionContext, filter, update, ref any, 
 		Upsert:                   opt.Upsert,
 		Let:                      opt.Let,
 	})
+	var result *UpdateResult
+	if mongoResult != nil {
+		result = &UpdateResult{
+			MatchedCount:  mongoResult.MatchedCount,
+			ModifiedCount: mongoResult.ModifiedCount,
+			UpsertedCount: mongoResult.UpsertedCount,
+			UpsertedID:    mongoResult.UpsertedID,
+		}
+	}
+	return result, err
 }
 
 func (t *template) find(ctx context.Context, filter, dest any, opts ...option.Find) error {
