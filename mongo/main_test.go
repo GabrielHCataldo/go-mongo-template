@@ -275,7 +275,7 @@ type testListIndexes struct {
 	wantErr         bool
 }
 
-var mongoTemplate Template
+var mongoTemplate *Template
 
 type testStruct struct {
 	Id        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty" database:"test" collection:"test"`
@@ -319,7 +319,7 @@ func initMongoTemplate() {
 	}
 	nMongoTemplate, err := NewTemplate(context.TODO(), options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
 	if err != nil {
-		logger.Error("error new template:", err)
+		logger.Error("error new Template:", err)
 		return
 	}
 	mongoTemplate = nMongoTemplate
@@ -363,7 +363,7 @@ func disconnectMongoTemplate() {
 	}
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
-	err := mongoTemplate.DisconnectWithErr(ctx)
+	err := mongoTemplate.Disconnect(ctx)
 	if err != nil {
 		logger.Error("error disconnect mongodb:", err)
 	}

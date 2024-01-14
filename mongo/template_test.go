@@ -16,7 +16,7 @@ func TestNewTemplate(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InsertOne() error = %v, wantErr %v", err, tt.wantErr)
 			} else if temp != nil {
-				temp.Disconnect(ctx)
+				_ = temp.Disconnect(ctx)
 			}
 		})
 	}
@@ -29,8 +29,9 @@ func TestTemplateInsertOne(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			initMongoTemplate()
+			_ = mongoTemplate.StartSession(ctx)
 			if tt.beforeCloseMongoClient {
-				mongoTemplate.Disconnect(ctx)
+				_ = mongoTemplate.Disconnect(ctx)
 			}
 			err := mongoTemplate.InsertOne(ctx, tt.value, tt.option)
 			if (err != nil) != tt.wantErr {
@@ -39,7 +40,7 @@ func TestTemplateInsertOne(t *testing.T) {
 				t.Log("err expected:", err)
 			}
 			if tt.forceErrCloseMongoClient {
-				mongoTemplate.Disconnect(ctx)
+				_ = mongoTemplate.Disconnect(ctx)
 			}
 			_ = mongoTemplate.CloseSession(ctx, err != nil)
 			disconnectMongoTemplate()

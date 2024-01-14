@@ -14,7 +14,7 @@ type InsertOne struct {
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
 	DisableAutoCloseSession bool
 	// ForceRecreateSession Force the creation of the session, if any session is still open, we close it automatically,
-	// committing the transactions, and continue creating a new session.
+	// aborting all open transactions, and continue creating a new session.
 	ForceRecreateSession bool
 }
 
