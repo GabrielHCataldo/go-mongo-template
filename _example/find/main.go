@@ -37,7 +37,7 @@ func findOne() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer mongoTemplate.Disconnect(ctx)
+	defer mongoTemplate.SimpleDisconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	var dest test
 	err = mongoTemplate.FindOne(ctx, filter, &dest)
@@ -56,7 +56,7 @@ func findOneById() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer mongoTemplate.Disconnect(ctx)
+	defer mongoTemplate.SimpleDisconnect(ctx)
 	objectId, _ := primitive.ObjectIDFromHex("6585db26633e225cbeadf553")
 	//dest need a pointer
 	var dest test
@@ -76,7 +76,7 @@ func find() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer mongoTemplate.Disconnect(ctx)
+	defer mongoTemplate.SimpleDisconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	//dest need a pointer
 	var dest []test
@@ -96,7 +96,7 @@ func findPageable() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer mongoTemplate.Disconnect(ctx)
+	defer mongoTemplate.SimpleDisconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	pageOutput, err := mongoTemplate.FindPageable(ctx, filter, mongo.PageInput{
 		Page:     0,
@@ -119,7 +119,7 @@ func findAll() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer mongoTemplate.Disconnect(ctx)
+	defer mongoTemplate.SimpleDisconnect(ctx)
 	var dest []test
 	err = mongoTemplate.FindAll(ctx, &dest)
 	if err != nil {

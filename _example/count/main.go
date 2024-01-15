@@ -34,7 +34,7 @@ func estimatedDocumentCount() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer mongoTemplate.Disconnect(ctx)
+	defer mongoTemplate.SimpleDisconnect(ctx)
 	countResult, err := mongoTemplate.EstimatedDocumentCount(ctx, test{})
 	if err != nil {
 		logger.Error("error estimated document count:", err)
@@ -51,7 +51,7 @@ func countDocuments() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer mongoTemplate.Disconnect(ctx)
+	defer mongoTemplate.SimpleDisconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	countResult, err := mongoTemplate.CountDocuments(ctx, filter, test{})
 	if err != nil {

@@ -35,7 +35,7 @@ func replaceOne() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer mongoTemplate.Disconnect(ctx)
+	defer mongoTemplate.SimpleDisconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	replacement := test{
 		Random:    rand.Int(),
@@ -61,7 +61,7 @@ func replaceOneById() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer mongoTemplate.Disconnect(ctx)
+	defer mongoTemplate.SimpleDisconnect(ctx)
 	objectId, _ := primitive.ObjectIDFromHex("6585db26633e225cbeadf553")
 	replacement := test{
 		Random:    rand.Int(),

@@ -3,6 +3,7 @@ package mongo
 import (
 	"context"
 	"errors"
+	"github.com/GabrielHCataldo/go-logger/logger"
 	"github.com/GabrielHCataldo/go-mongo-template/internal/util"
 	"github.com/GabrielHCataldo/go-mongo-template/mongo/option"
 	"go.mongodb.org/mongo-driver/bson"
@@ -1026,6 +1027,16 @@ func (t *Template) Disconnect(ctx context.Context) error {
 	return t.client.Disconnect(ctx)
 }
 
+// SimpleDisconnect closes the mongodb connection client without return error
+func (t *Template) SimpleDisconnect(ctx context.Context) {
+	err := t.Disconnect(ctx)
+	if err != nil {
+		logger.Error("error close connection to mongoDB:", err)
+		return
+	}
+	logger.Info("connection to mongoDB closed.")
+}
+
 func (t *Template) insertOne(sc mongo.SessionContext, document any, opt option.InsertOne) error {
 	if util.IsNotPointer(document) {
 		return ErrDocumentIsNotPointer
@@ -1442,11 +1453,10 @@ func (t *Template) closeSession(
 }
 
 func (t *Template) endSession(ctx context.Context) {
-	if t.session == nil {
-		return
+	if t.session != nil {
+		t.session.EndSession(ctx)
+		t.session = nil
 	}
-	t.session.EndSession(ctx)
-	t.session = nil
 }
 
 func getMongoInfosByAny(a any) (databaseName string, collectionName string, err error) {

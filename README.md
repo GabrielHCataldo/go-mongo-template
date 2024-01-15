@@ -3,7 +3,7 @@ MongoDB Template
 <!--suppress ALL -->
 <img align="right" src="gopher-mongo.png" alt="">
 
-[![Project status](https://img.shields.io/badge/version-v1.0.3-vividgreen.svg)](https://github.com/GabrielHCataldo/go-mongo-template/releases/tag/v1.0.3)
+[![Project status](https://img.shields.io/badge/version-v1.0.4-vividgreen.svg)](https://github.com/GabrielHCataldo/go-mongo-template/releases/tag/v1.0.4)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GabrielHCataldo/go-mongo-template)](https://goreportcard.com/report/github.com/GabrielHCataldo/go-mongo-template)
 [![Coverage Status](https://coveralls.io/repos/GabrielHCataldo/go-mongo-template/badge.svg?branch=main&service=github)](https://coveralls.io/github/GabrielHCataldo/go-mongo?branch=main)
 [![Open Source Helpers](https://www.codetriage.com/gabrielhcataldo/go-mongo-template/badges/users.svg)](https://www.codetriage.com/gabrielhcataldo/go-mongo)
@@ -107,7 +107,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     testDocument := test{
         Random:    rand.Int(),
         Name:      "Foo Bar",
@@ -157,7 +157,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     testDocuments := []*test{
         {
             Random:    rand.Int(),
@@ -218,7 +218,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     filter := bson.M{"_id": bson.M{"$exists": true}}
     update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
     updateResult, err := mongoTemplate.UpdateOne(ctx, filter, update, test{})
@@ -258,7 +258,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     objectId, _ := primitive.ObjectIDFromHex("6585f3a8bf2af8ad9bcab912")
     update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
     updateResult, err := mongoTemplate.UpdateOneById(ctx, objectId, update, test{})
@@ -299,7 +299,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     filter := bson.M{"_id": bson.M{"$exists": true}}
     update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
     updateResult, err := mongoTemplate.UpdateOne(ctx, filter, update, test{})
@@ -344,7 +344,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     filter := bson.M{"_id": bson.M{"$exists": true}}
     replacement := test{
         Random:    rand.Int(),
@@ -395,7 +395,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     filter := bson.M{"_id": bson.M{"$exists": true}}
     deleteResult, err := mongoTemplate.DeleteOne(ctx, filter, test{})
     if err != nil {
@@ -434,7 +434,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     objectId, _ := primitive.ObjectIDFromHex("6585f3a8bf2af8ad9bcab912")
     deleteResult, err := mongoTemplate.DeleteOneById(ctx, objectId, test{})
     if err != nil {
@@ -473,7 +473,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     filter := bson.M{"_id": bson.M{"$exists": true}}
     deleteResult, err := mongoTemplate.DeleteMany(ctx, filter, test{})
     if err != nil {
@@ -514,7 +514,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     //dest need a pointer
     var dest []test
     err = mongoTemplate.FindAll(ctx, &dest)
@@ -554,7 +554,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     filter := bson.M{"_id": bson.M{"$exists": true}}
     pageOutput, err := mongoTemplate.FindPageable(ctx, filter, mongo.PageInput{
         Page:     0,
@@ -597,7 +597,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     objectId, _ := primitive.ObjectIDFromHex("6585db26633e225cbeadf553")
     //dest need a pointer
     var dest test
@@ -641,7 +641,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     objectId, _ := primitive.ObjectIDFromHex("6585f5b8fd8fa97d562419f7")
     exists, err := mongoTemplate.ExistsById(ctx, objectId, test{})
     if err != nil {
@@ -680,7 +680,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     filter := bson.M{"_id": bson.M{"$exists": true}}
     exists, err := mongoTemplate.Exists(ctx, filter, test{})
     if err != nil {
@@ -723,7 +723,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     countResult, err := mongoTemplate.EstimatedDocumentCount(ctx, test{})
     if err != nil {
         logger.Error("error estimated document count:", err)
@@ -761,7 +761,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     filter := bson.M{"_id": bson.M{"$exists": true}}
     countResult, err := mongoTemplate.CountDocuments(ctx, filter, test{})
     if err != nil {
@@ -805,7 +805,7 @@ func main() {
         logger.Error("error to init mongo template:", err)
         return
     }
-    defer mongoTemplate.Disconnect(ctx)
+    defer mongoTemplate.SimpleDisconnect(ctx)
     pipeline := mongo.Pipeline{bson.D{{"$match", bson.D{
         {"operationType", bson.M{"$in": []string{"insert", "update", "delete", "replace"}}},
     }}}}

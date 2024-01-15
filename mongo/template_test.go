@@ -40,8 +40,10 @@ func TestTemplateInsertOne(t *testing.T) {
 				t.Log("err expected:", err)
 			}
 			if tt.forceErrCloseMongoClient {
-				_ = mongoTemplate.Disconnect(ctx)
+				mongoTemplate.SimpleDisconnect(ctx)
+				mongoTemplate.SimpleDisconnect(ctx)
 			}
+			_ = mongoTemplate.CloseSession(ctx, err != nil)
 			_ = mongoTemplate.CloseSession(ctx, err != nil)
 			disconnectMongoTemplate()
 		})

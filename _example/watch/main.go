@@ -24,7 +24,7 @@ func watch() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer mongoTemplate.Disconnect(ctx)
+	defer mongoTemplate.SimpleDisconnect(ctx)
 	pipeline := mongo.Pipeline{bson.D{{"$match", bson.D{
 		{"operationType", bson.M{"$in": []string{"insert", "update", "delete", "replace"}}},
 	}}}}
@@ -52,7 +52,7 @@ func watchHandler() {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
-	defer mongoTemplate.Disconnect(ctx)
+	defer mongoTemplate.SimpleDisconnect(ctx)
 	pipeline := mongo.Pipeline{bson.D{{"$match", bson.D{
 		{"operationType", bson.M{"$in": []string{"insert", "update", "delete", "replace"}}},
 	}}}}

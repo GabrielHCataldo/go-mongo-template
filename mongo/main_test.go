@@ -1880,6 +1880,7 @@ func initOptionInsertMany() option.InsertMany {
 
 func initOptionDelete() option.Delete {
 	return option.NewDelete().
+		SetDisableAutoRollbackSession(true).
 		SetForceRecreateSession(true).
 		SetDisableAutoCloseSession(false).
 		SetComment("comment delete golang unit test").
