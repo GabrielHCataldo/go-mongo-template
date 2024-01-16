@@ -24,8 +24,6 @@ type Delete struct {
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
 	DisableAutoCloseSession bool
-	// DisableAutoRollbackSession disable auto rollback if an error occurs.
-	DisableAutoRollbackSession bool
 	// ForceRecreateSession Force the creation of the session, if any session is still open, we close it automatically,
 	// committing the transactions, and continue creating a new session.
 	ForceRecreateSession bool
@@ -72,12 +70,6 @@ func (d Delete) SetForceRecreateSession(b bool) Delete {
 	return d
 }
 
-// SetDisableAutoRollbackSession sets value for the DisableAutoRollbackSession field.
-func (d Delete) SetDisableAutoRollbackSession(b bool) Delete {
-	d.DisableAutoRollbackSession = b
-	return d
-}
-
 // GetDeleteOptionByParams assembles the Delete object from optional parameters.
 func GetDeleteOptionByParams(opts []Delete) Delete {
 	result := Delete{}
@@ -99,9 +91,6 @@ func GetDeleteOptionByParams(opts []Delete) Delete {
 		}
 		if opt.ForceRecreateSession {
 			result.ForceRecreateSession = opt.ForceRecreateSession
-		}
-		if opt.DisableAutoRollbackSession {
-			result.DisableAutoRollbackSession = opt.DisableAutoRollbackSession
 		}
 	}
 	return result

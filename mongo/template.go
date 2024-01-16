@@ -201,7 +201,7 @@ func (t *Template) DeleteMany(ctx context.Context, filter, ref any, opts ...opti
 	if err == nil {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			result, err = t.deleteMany(sc, filter, ref, opt)
-			return t.closeSession(sc, opt.DisableAutoCloseSession, opt.DisableAutoRollbackSession, err)
+			return t.closeSession(sc, opt.DisableAutoCloseSession, false, err)
 		})
 	}
 	return result, err
@@ -1078,9 +1078,9 @@ func (t *Template) insertMany(sc mongo.SessionContext, a any, opt option.InsertM
 		if util.IsNotPointer(document) {
 			errs = append(errs, errors.New(ErrDocumentIsNotPointer.Error()+" (index: "+indexStr+")"))
 		} else if util.IsNotStruct(document) {
-			errs = append(errs, errors.New(ErrDocumentIsNotStruct.Error()+"(index: "+indexStr+")"))
+			errs = append(errs, errors.New(ErrDocumentIsNotStruct.Error()+" (index: "+indexStr+")"))
 		} else if util.IsZero(document) {
-			errs = append(errs, errors.New(ErrDocumentIsEmpty.Error()+"(index: "+indexStr+")"))
+			errs = append(errs, errors.New(ErrDocumentIsEmpty.Error()+" (index: "+indexStr+")"))
 		} else {
 			err := t.insertOne(sc, document, option.InsertOne{
 				BypassDocumentValidation: opt.BypassDocumentValidation,
@@ -1445,7 +1445,7 @@ func (t *Template) closeSession(
 	abort := err != nil && !disableAutoRollbackSession
 	if !disableAutoCloseSession {
 		errClose := t.CloseSession(sc, abort)
-		if errClose != nil {
+		if err == nil && errClose != nil {
 			return errClose
 		}
 	}
