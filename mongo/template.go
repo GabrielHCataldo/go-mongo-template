@@ -1013,6 +1013,11 @@ func (t *Template) SimpleDisconnect(ctx context.Context) {
 	logger.Info("connection to mongoDB closed.")
 }
 
+// GetClient get mongo client used on template
+func (t *Template) GetClient() mongo.Client {
+	return *t.client
+}
+
 func (t *Template) insertOne(sc mongo.SessionContext, document any, opt option.InsertOne) error {
 	if util.IsNotPointer(document) {
 		return ErrDocumentIsNotPointer

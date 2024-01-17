@@ -606,3 +606,8 @@ func TestTemplateListIndexSpecifications(t *testing.T) {
 		})
 	}
 }
+
+func TestTemplateGetClient(t *testing.T) {
+	initMongoTemplate()
+	logger.Info("result:", mongoTemplate.GetClient())
+}
