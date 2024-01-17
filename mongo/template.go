@@ -536,13 +536,11 @@ func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput
 	} else if util.IsInvalid(input.Ref) {
 		return nil, errors.New("mongo: invalid type input.Ref")
 	}
-	databaseName, collectionName, err := getMongoInfosByAny(input.Ref)
+	_, collection, err := t.getMongoInfosByAny(input.Ref)
 	if err != nil {
 		return nil, err
 	}
 	opt := option.GetFindPageableOptionByParams(opts)
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName)
 	cursor, err := collection.Find(ctx, filter, &options.FindOptions{
 		AllowDiskUse:        opt.AllowDiskUse,
 		AllowPartialResults: opt.AllowPartialResults,
@@ -627,13 +625,11 @@ func (t *Template) Aggregate(ctx context.Context, pipeline any, dest any, opts .
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	}
-	databaseName, collectionName, err := getMongoInfosByAny(dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if err != nil {
 		return err
 	}
 	opt := option.GetAggregateOptionByParams(opts)
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName)
 	cursor, err := collection.Aggregate(ctx, pipeline, &options.AggregateOptions{
 		AllowDiskUse:             opt.AllowDiskUse,
 		BatchSize:                opt.BatchSize,
@@ -667,13 +663,11 @@ func (t *Template) Aggregate(ctx context.Context, pipeline any, dest any, opts .
 //
 // The opts parameter can be used to specify options for the operation (see the option.Count documentation).
 func (t *Template) CountDocuments(ctx context.Context, filter, ref any, opts ...option.Count) (int64, error) {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return 0, err
 	}
 	opt := option.GetCountOptionByParams(opts)
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName)
 	return collection.CountDocuments(ctx, filter, &options.CountOptions{
 		Collation: option.ParseCollationMongoOptions(opt.Collation),
 		Comment:   opt.Comment,
@@ -695,13 +689,11 @@ func (t *Template) CountDocuments(ctx context.Context, filter, ref any, opts ...
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/count/.
 func (t *Template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...option.EstimatedDocumentCount) (int64,
 	error) {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return 0, err
 	}
 	opt := option.GetEstimatedDocumentCountOptionByParams(opts)
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName)
 	return collection.EstimatedDocumentCount(ctx, &options.EstimatedDocumentCountOptions{
 		Comment: opt.Comment,
 		MaxTime: opt.MaxTime,
@@ -727,12 +719,10 @@ func (t *Template) Distinct(ctx context.Context, fieldName string, filter, dest,
 		return ErrDestIsNotPointer
 	}
 	opt := option.GetDistinctOptionByParams(opts)
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return err
 	}
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName)
 	result, err := collection.Distinct(ctx, fieldName, filter, &options.DistinctOptions{
 		Collation: option.ParseCollationMongoOptions(opt.Collation),
 		Comment:   opt.Comment,
@@ -832,11 +822,11 @@ func (t *Template) WatchHandler(ctx context.Context, pipeline any, handler Handl
 //
 // The ref parameter must be the collection structure with database and collection tags configured.
 func (t *Template) DropCollection(ctx context.Context, ref any) error {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return err
 	}
-	return t.client.Database(databaseName).Collection(collectionName).Drop(ctx)
+	return collection.Drop(ctx)
 }
 
 // DropDatabase drops the database on the server. This method ignores "namespace not found" errors,
@@ -844,11 +834,11 @@ func (t *Template) DropCollection(ctx context.Context, ref any) error {
 //
 // The ref parameter must be the collection structure with database and collection tags configured.
 func (t *Template) DropDatabase(ctx context.Context, ref any) error {
-	databaseName, _, err := getMongoInfosByAny(ref)
+	database, _, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return err
 	}
-	return t.client.Database(databaseName).Drop(ctx)
+	return database.Drop(ctx)
 }
 
 // CreateOneIndex executes a createIndexes command to create an index on the collection and returns the name of the new
@@ -889,15 +879,10 @@ func (t *Template) CreateManyIndex(ctx context.Context, inputs []IndexInput) ([]
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/dropIndexes/.
 func (t *Template) DropOneIndex(ctx context.Context, name string, ref any, opts ...option.DropIndex) error {
 	opt := option.GetDropIndexOptionByParams(opts)
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
-	if err != nil {
-		return err
+	_, collection, err := t.getMongoInfosByAny(ref)
+	if err == nil {
+		_, err = collection.Indexes().DropOne(ctx, name, &options.DropIndexesOptions{MaxTime: opt.MaxTime})
 	}
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName).Indexes()
-	_, err = collection.DropOne(ctx, name, &options.DropIndexesOptions{
-		MaxTime: opt.MaxTime,
-	})
 	return err
 }
 
@@ -912,15 +897,10 @@ func (t *Template) DropOneIndex(ctx context.Context, name string, ref any, opts 
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/dropIndexes/.
 func (t *Template) DropAllIndexes(ctx context.Context, ref any, opts ...option.DropIndex) error {
 	opt := option.GetDropIndexOptionByParams(opts)
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
-	if err != nil {
-		return err
+	_, collection, err := t.getMongoInfosByAny(ref)
+	if err == nil {
+		_, err = collection.Indexes().DropAll(ctx, &options.DropIndexesOptions{MaxTime: opt.MaxTime})
 	}
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName).Indexes()
-	_, err = collection.DropAll(ctx, &options.DropIndexesOptions{
-		MaxTime: opt.MaxTime,
-	})
 	return err
 }
 
@@ -932,14 +912,12 @@ func (t *Template) DropAllIndexes(ctx context.Context, ref any, opts ...option.D
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/listIndexes/.
 func (t *Template) ListIndexes(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexResult, error) {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
 	}
 	opt := option.GetListIndexesOptionByParams(opts)
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName).Indexes()
-	cursor, err := collection.List(ctx, &options.ListIndexesOptions{
+	cursor, err := collection.Indexes().List(ctx, &options.ListIndexesOptions{
 		BatchSize: opt.BatchSize,
 		MaxTime:   opt.MaxTime,
 	})
@@ -956,14 +934,12 @@ func (t *Template) ListIndexes(ctx context.Context, ref any, opts ...option.List
 // The ref parameter must be the collection structure with database and collection tags configured.
 func (t *Template) ListIndexSpecifications(ctx context.Context, ref any, opts ...option.ListIndexes) (
 	[]IndexSpecification, error) {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
 	}
 	opt := option.GetListIndexesOptionByParams(opts)
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName).Indexes()
-	mongoResult, err := collection.ListSpecifications(ctx, &options.ListIndexesOptions{
+	mongoResult, err := collection.Indexes().ListSpecifications(ctx, &options.ListIndexesOptions{
 		BatchSize: opt.BatchSize,
 		MaxTime:   opt.MaxTime,
 	})
@@ -1045,13 +1021,11 @@ func (t *Template) insertOne(sc mongo.SessionContext, document any, opt option.I
 	} else if util.IsZero(document) {
 		return ErrDocumentIsEmpty
 	}
-	databaseName, collectionName, err := getMongoInfosByAny(document)
+	_, collection, err := t.getMongoInfosByAny(document)
 	if err != nil {
 		return err
 	}
-	database := t.client.Database(databaseName)
-	coll := database.Collection(collectionName)
-	result, err := coll.InsertOne(sc, document, &options.InsertOneOptions{
+	result, err := collection.InsertOne(sc, document, &options.InsertOneOptions{
 		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Comment:                  opt.Comment,
 	})
@@ -1105,13 +1079,11 @@ func (t *Template) insertMany(sc mongo.SessionContext, a any, opt option.InsertM
 }
 
 func (t *Template) deleteOne(sc mongo.SessionContext, filter, ref any, opt option.Delete) (*DeleteResult, error) {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
 	}
-	database := t.client.Database(databaseName)
-	coll := database.Collection(collectionName)
-	mongoResult, err := coll.DeleteOne(sc, filter, &options.DeleteOptions{
+	mongoResult, err := collection.DeleteOne(sc, filter, &options.DeleteOptions{
 		Collation: option.ParseCollationMongoOptions(opt.Collation),
 		Comment:   opt.Comment,
 		Hint:      opt.Hint,
@@ -1127,13 +1099,11 @@ func (t *Template) deleteOne(sc mongo.SessionContext, filter, ref any, opt optio
 }
 
 func (t *Template) deleteMany(sc mongo.SessionContext, filter, ref any, opt option.Delete) (*DeleteResult, error) {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
 	}
-	database := t.client.Database(databaseName)
-	coll := database.Collection(collectionName)
-	mongoResult, err := coll.DeleteMany(sc, filter, &options.DeleteOptions{
+	mongoResult, err := collection.DeleteMany(sc, filter, &options.DeleteOptions{
 		Collation: option.ParseCollationMongoOptions(opt.Collation),
 		Comment:   opt.Comment,
 		Hint:      opt.Hint,
@@ -1149,13 +1119,11 @@ func (t *Template) deleteMany(sc mongo.SessionContext, filter, ref any, opt opti
 }
 
 func (t *Template) updateOne(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (*UpdateResult, error) {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
 	}
-	database := t.client.Database(databaseName)
-	coll := database.Collection(collectionName)
-	mongoResult, err := coll.UpdateOne(sc, filter, update, &options.UpdateOptions{
+	mongoResult, err := collection.UpdateOne(sc, filter, update, &options.UpdateOptions{
 		ArrayFilters:             option.ParseArrayFiltersMongoOptions(opt.ArrayFilters),
 		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
@@ -1177,13 +1145,11 @@ func (t *Template) updateOne(sc mongo.SessionContext, filter, update, ref any, o
 }
 
 func (t *Template) updateMany(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (*UpdateResult, error) {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
 	}
-	database := t.client.Database(databaseName)
-	coll := database.Collection(collectionName)
-	mongoResult, err := coll.UpdateMany(sc, filter, update, &options.UpdateOptions{
+	mongoResult, err := collection.UpdateMany(sc, filter, update, &options.UpdateOptions{
 		ArrayFilters:             option.ParseArrayFiltersMongoOptions(opt.ArrayFilters),
 		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
@@ -1206,13 +1172,11 @@ func (t *Template) updateMany(sc mongo.SessionContext, filter, update, ref any, 
 
 func (t *Template) replaceOne(sc mongo.SessionContext, filter, update, ref any, opt option.Replace) (*UpdateResult,
 	error) {
-	databaseName, collectionName, err := getMongoInfosByAny(ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
 	}
-	database := t.client.Database(databaseName)
-	coll := database.Collection(collectionName)
-	mongoResult, err := coll.ReplaceOne(sc, filter, update, &options.ReplaceOptions{
+	mongoResult, err := collection.ReplaceOne(sc, filter, update, &options.ReplaceOptions{
 		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
 		Comment:                  opt.Comment,
@@ -1236,13 +1200,11 @@ func (t *Template) find(ctx context.Context, filter, dest any, opts ...option.Fi
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	}
-	databaseName, collectionName, err := getMongoInfosByAny(dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if err != nil {
 		return err
 	}
 	opt := option.GetFindOptionByParams(opts)
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName)
 	cursor, err := collection.Find(ctx, filter, &options.FindOptions{
 		AllowDiskUse:        opt.AllowDiskUse,
 		AllowPartialResults: opt.AllowPartialResults,
@@ -1276,13 +1238,11 @@ func (t *Template) findOne(ctx context.Context, filter, dest any, opts ...option
 	} else if util.IsNotStruct(dest) {
 		return ErrDestIsNotStruct
 	}
-	databaseName, collectionName, err := getMongoInfosByAny(dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if err != nil {
 		return err
 	}
 	opt := option.GetFindOneOptionByParams(opts)
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName)
 	err = collection.FindOne(ctx, filter, &options.FindOneOptions{
 		AllowPartialResults: opt.AllowPartialResults,
 		Collation:           option.ParseCollationMongoOptions(opt.Collation),
@@ -1304,13 +1264,11 @@ func (t *Template) findOne(ctx context.Context, filter, dest any, opts ...option
 }
 
 func (t *Template) findOneAndDelete(sc mongo.SessionContext, filter, dest any, opt option.FindOneAndDelete) error {
-	databaseName, collectionName, err := getMongoInfosByAny(dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if err != nil {
 		return err
 	}
-	database := t.client.Database(databaseName)
-	coll := database.Collection(collectionName)
-	err = coll.FindOneAndDelete(sc, filter, &options.FindOneAndDeleteOptions{
+	err = collection.FindOneAndDelete(sc, filter, &options.FindOneAndDeleteOptions{
 		Collation:  option.ParseCollationMongoOptions(opt.Collation),
 		Comment:    opt.Comment,
 		MaxTime:    opt.MaxTime,
@@ -1328,13 +1286,11 @@ func (t *Template) findOneAndDelete(sc mongo.SessionContext, filter, dest any, o
 }
 
 func (t *Template) findOneAndReplace(sc mongo.SessionContext, filter, replacement, dest any, opt option.FindOneAndReplace) error {
-	databaseName, collectionName, err := getMongoInfosByAny(dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if err != nil {
 		return err
 	}
-	database := t.client.Database(databaseName)
-	coll := database.Collection(collectionName)
-	err = coll.FindOneAndReplace(sc, filter, replacement, &options.FindOneAndReplaceOptions{
+	err = collection.FindOneAndReplace(sc, filter, replacement, &options.FindOneAndReplaceOptions{
 		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
 		Comment:                  opt.Comment,
@@ -1355,13 +1311,11 @@ func (t *Template) findOneAndReplace(sc mongo.SessionContext, filter, replacemen
 }
 
 func (t *Template) findOneAndUpdate(sc mongo.SessionContext, filter, update, dest any, opt option.FindOneAndUpdate) error {
-	databaseName, collectionName, err := getMongoInfosByAny(dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if err != nil {
 		return err
 	}
-	database := t.client.Database(databaseName)
-	coll := database.Collection(collectionName)
-	err = coll.FindOneAndUpdate(sc, filter, update, &options.FindOneAndUpdateOptions{
+	err = collection.FindOneAndUpdate(sc, filter, update, &options.FindOneAndUpdateOptions{
 		ArrayFilters:             option.ParseArrayFiltersMongoOptions(opt.ArrayFilters),
 		BypassDocumentValidation: opt.BypassDocumentValidation,
 		Collation:                option.ParseCollationMongoOptions(opt.Collation),
@@ -1383,13 +1337,11 @@ func (t *Template) findOneAndUpdate(sc mongo.SessionContext, filter, update, des
 }
 
 func (t *Template) createOneIndex(ctx context.Context, input IndexInput) (string, error) {
-	databaseName, collectionName, err := getMongoInfosByAny(input.Ref)
+	_, collection, err := t.getMongoInfosByAny(input.Ref)
 	if err != nil {
 		return "", err
 	}
-	database := t.client.Database(databaseName)
-	collection := database.Collection(collectionName).Indexes()
-	return collection.CreateOne(ctx, parseIndexInputToModel(input))
+	return collection.Indexes().CreateOne(ctx, parseIndexInputToModel(input))
 }
 
 func (t *Template) createManyIndex(ctx context.Context, inputs []IndexInput) ([]string, error) {
@@ -1459,7 +1411,9 @@ func (t *Template) endSession(ctx context.Context) {
 	}
 }
 
-func getMongoInfosByAny(a any) (databaseName string, collectionName string, err error) {
+func (t *Template) getMongoInfosByAny(a any) (*mongo.Database, *mongo.Collection, error) {
+	var databaseName string
+	var collectionName string
 	v := reflect.ValueOf(a)
 	if v.Kind() == reflect.Pointer || v.Kind() == reflect.Interface {
 		v = v.Elem()
@@ -1470,7 +1424,7 @@ func getMongoInfosByAny(a any) (databaseName string, collectionName string, err 
 			databaseName = util.GetDatabaseNameBySlice(a)
 			collectionName = util.GetCollectionNameBySlice(a)
 		} else {
-			return "", "", ErrRefDocument
+			return nil, nil, ErrRefDocument
 		}
 		break
 	case reflect.Struct:
@@ -1478,13 +1432,15 @@ func getMongoInfosByAny(a any) (databaseName string, collectionName string, err 
 		collectionName = util.GetCollectionNameByStruct(a)
 		break
 	default:
-		return "", "", ErrRefDocument
+		return nil, nil, ErrRefDocument
 	}
 	if len(databaseName) == 0 {
-		return "", "", ErrDatabaseNotConfigured
+		return nil, nil, ErrDatabaseNotConfigured
+	} else if len(collectionName) == 0 {
+		return nil, nil, ErrCollectionNotConfigured
+	} else {
+		database := t.client.Database(databaseName)
+		collection := database.Collection(collectionName)
+		return database, collection, nil
 	}
-	if len(collectionName) == 0 {
-		return "", "", ErrCollectionNotConfigured
-	}
-	return collectionName, databaseName, nil
 }
