@@ -1007,10 +1007,10 @@ func (t *Template) Disconnect(ctx context.Context) error {
 func (t *Template) SimpleDisconnect(ctx context.Context) {
 	err := t.Disconnect(ctx)
 	if err != nil {
-		logger.Error("error close connection to mongoDB:", err)
+		logger.ErrorSkipCaller(2, "error close connection to mongoDB:", err)
 		return
 	}
-	logger.Info("connection to mongoDB closed.")
+	logger.InfoSkipCaller(2, "connection to mongoDB closed.")
 }
 
 // GetClient get mongo client used on template

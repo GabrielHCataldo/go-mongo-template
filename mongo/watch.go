@@ -32,8 +32,8 @@ type updateDescription struct {
 }
 
 type EventContext struct {
-	context.Context `json:"-"`
-	Event           EventInfo
+	context.Context
+	Event EventInfo
 }
 
 type EventHandler func(ctx *EventContext)
