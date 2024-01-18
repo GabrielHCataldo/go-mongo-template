@@ -449,7 +449,7 @@ func TestTemplateWatch(t *testing.T) {
 	}
 }
 
-func TestTemplateWatchHandler(t *testing.T) {
+func TestTemplateWatchWithHandler(t *testing.T) {
 	initMongoTemplate()
 	for _, tt := range initListTestWatchHandler() {
 		t.Run(tt.name, func(t *testing.T) {
@@ -459,9 +459,9 @@ func TestTemplateWatchHandler(t *testing.T) {
 				time.Sleep(2 * time.Second)
 				initDocument()
 			}()
-			err := mongoTemplate.WatchHandler(ctx, tt.pipeline, tt.handler, tt.option)
+			err := mongoTemplate.WatchWithHandler(ctx, tt.pipeline, tt.handler, tt.option)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("WatchHandler() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("WatchWithHandler() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
 				t.Log("err expected:", err)
 			}

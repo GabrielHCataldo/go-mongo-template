@@ -231,8 +231,8 @@ type testWatch struct {
 type testWatchHandler struct {
 	name            string
 	pipeline        any
-	handler         HandlerWatch
-	option          option.WatchHandler
+	handler         Handler
+	option          option.WatchWithHandler
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -2072,8 +2072,8 @@ func initOptionWatch() option.Watch {
 		SetShowExpandedEvents(true)
 }
 
-func initOptionWatchHandler() option.WatchHandler {
-	return option.NewWatchHandler().
+func initOptionWatchHandler() option.WatchWithHandler {
+	return option.NewWatchWithHandler().
 		SetComment("comment golang unit test").
 		SetFullDocument(option.FullDocumentDefault).
 		SetFullDocumentBeforeChange(option.FullDocumentOff).

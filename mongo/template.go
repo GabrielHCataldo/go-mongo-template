@@ -777,14 +777,14 @@ func (t *Template) Watch(ctx context.Context, pipeline any, opts ...option.Watch
 	return watchChangeEvents, err
 }
 
-// WatchHandler is a function that facilitates the reading of watch events, it triggers the Watch function and
+// WatchWithHandler is a function that facilitates the reading of watch events, it triggers the Watch function and
 // when an event occurs it reads this event transforming all the data obtained by mongoDB into a Context, right
 // after this conversion, we call the handler parameter passing the context with all the information, so you can
 // process it in the way you see fit.
 //
-// The opts parameter can be used to specify options for change stream creation (see the option.WatchHandler
+// The opts parameter can be used to specify options for change stream creation (see the option.WatchWithHandler
 // documentation).
-func (t *Template) WatchHandler(ctx context.Context, pipeline any, handler HandlerWatch, opts ...option.WatchHandler) error {
+func (t *Template) WatchWithHandler(ctx context.Context, pipeline any, handler Handler, opts ...option.WatchWithHandler) error {
 	if handler == nil {
 		return ErrWatchHandlerIsNil
 	}
@@ -811,7 +811,7 @@ func (t *Template) WatchHandler(ctx context.Context, pipeline any, handler Handl
 	for watchChangeEvents.Next(ctx) {
 		var event WatchEvent
 		_ = watchChangeEvents.Decode(&event)
-		processWatchNext(handler, event, opt)
+		processToWatchNext(handler, event, opt)
 	}
 	_ = watchChangeEvents.Close(ctx)
 	return nil

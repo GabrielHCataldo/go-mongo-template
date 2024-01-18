@@ -59,8 +59,8 @@ type Watch struct {
 	CustomPipeline bson.M
 }
 
-// WatchHandler represents options that can be used to configure a 'WatchHandler'  operation.
-type WatchHandler struct {
+// WatchWithHandler represents options that can be used to configure a 'WatchWithHandler'  operation.
+type WatchWithHandler struct {
 	// DatabaseName database name to watch
 	DatabaseName string
 	// CollectionName collection name to watch
@@ -125,9 +125,9 @@ func NewWatch() Watch {
 	return Watch{}
 }
 
-// NewWatchHandler creates a new WatchHandler instance.
-func NewWatchHandler() WatchHandler {
-	return WatchHandler{}
+// NewWatchWithHandler creates a new WatchWithHandler instance.
+func NewWatchWithHandler() WatchWithHandler {
+	return WatchWithHandler{}
 }
 
 // SetDatabaseName creates a new DatabaseName instance.
@@ -215,95 +215,95 @@ func (w Watch) SetCustomPipeline(b bson.M) Watch {
 }
 
 // SetDatabaseName sets value for the DatabaseName field.
-func (w WatchHandler) SetDatabaseName(s string) WatchHandler {
+func (w WatchWithHandler) SetDatabaseName(s string) WatchWithHandler {
 	w.DatabaseName = s
 	return w
 }
 
-// SetCollectionName sets value for the WatchHandler field.
-func (w WatchHandler) SetCollectionName(s string) WatchHandler {
+// SetCollectionName sets value for the WatchWithHandler field.
+func (w WatchWithHandler) SetCollectionName(s string) WatchWithHandler {
 	w.CollectionName = s
 	return w
 }
 
-func (w WatchHandler) SetContextFuncTimeout(d time.Duration) WatchHandler {
+func (w WatchWithHandler) SetContextFuncTimeout(d time.Duration) WatchWithHandler {
 	w.ContextFuncTimeout = d
 	return w
 }
 
-func (w WatchHandler) SetDelayLoop(d time.Duration) WatchHandler {
+func (w WatchWithHandler) SetDelayLoop(d time.Duration) WatchWithHandler {
 	w.DelayLoop = d
 	return w
 }
 
 // SetBatchSize creates a new BatchSize instance.
-func (w WatchHandler) SetBatchSize(i int32) WatchHandler {
+func (w WatchWithHandler) SetBatchSize(i int32) WatchWithHandler {
 	w.BatchSize = &i
 	return w
 }
 
 // SetCollation sets value for the Collation field.
-func (w WatchHandler) SetCollation(c *Collation) WatchHandler {
+func (w WatchWithHandler) SetCollation(c *Collation) WatchWithHandler {
 	w.Collation = c
 	return w
 }
 
 // SetComment sets value for the Comment field.
-func (w WatchHandler) SetComment(s string) WatchHandler {
+func (w WatchWithHandler) SetComment(s string) WatchWithHandler {
 	w.Comment = &s
 	return w
 }
 
 // SetFullDocument sets value for the FullDocument field.
-func (w WatchHandler) SetFullDocument(f FullDocument) WatchHandler {
+func (w WatchWithHandler) SetFullDocument(f FullDocument) WatchWithHandler {
 	w.FullDocument = &f
 	return w
 }
 
 // SetFullDocumentBeforeChange sets value for the FullDocumentBeforeChange field.
-func (w WatchHandler) SetFullDocumentBeforeChange(f FullDocument) WatchHandler {
+func (w WatchWithHandler) SetFullDocumentBeforeChange(f FullDocument) WatchWithHandler {
 	w.FullDocumentBeforeChange = &f
 	return w
 }
 
 // SetMaxAwaitTime sets value for the MaxAwaitTime field.
-func (w WatchHandler) SetMaxAwaitTime(d time.Duration) WatchHandler {
+func (w WatchWithHandler) SetMaxAwaitTime(d time.Duration) WatchWithHandler {
 	w.MaxAwaitTime = &d
 	return w
 }
 
 // SetResumeAfter sets value for the ResumeAfter field.
-func (w WatchHandler) SetResumeAfter(a any) WatchHandler {
+func (w WatchWithHandler) SetResumeAfter(a any) WatchWithHandler {
 	w.ResumeAfter = a
 	return w
 }
 
 // SetShowExpandedEvents sets value for the ShowExpandedEvents field.
-func (w WatchHandler) SetShowExpandedEvents(b bool) WatchHandler {
+func (w WatchWithHandler) SetShowExpandedEvents(b bool) WatchWithHandler {
 	w.ShowExpandedEvents = &b
 	return w
 }
 
 // SetStartAtOperationTime sets value for the StartAtOperationTime field.
-func (w WatchHandler) SetStartAtOperationTime(t primitive.Timestamp) WatchHandler {
+func (w WatchWithHandler) SetStartAtOperationTime(t primitive.Timestamp) WatchWithHandler {
 	w.StartAtOperationTime = &t
 	return w
 }
 
 // SetStartAfter sets value for the StartAfter field.
-func (w WatchHandler) SetStartAfter(a any) WatchHandler {
+func (w WatchWithHandler) SetStartAfter(a any) WatchWithHandler {
 	w.StartAfter = a
 	return w
 }
 
 // SetCustom sets value for the Custom field.
-func (w WatchHandler) SetCustom(b bson.M) WatchHandler {
+func (w WatchWithHandler) SetCustom(b bson.M) WatchWithHandler {
 	w.Custom = b
 	return w
 }
 
 // SetCustomPipeline sets value for the CustomPipeline field.
-func (w WatchHandler) SetCustomPipeline(b bson.M) WatchHandler {
+func (w WatchWithHandler) SetCustomPipeline(b bson.M) WatchWithHandler {
 	w.CustomPipeline = b
 	return w
 }
@@ -361,9 +361,9 @@ func GetWatchOptionByParams(opts []Watch) Watch {
 	return result
 }
 
-// GetWatchHandlerOptionByParams assembles the WatchHandler object from optional parameters.
-func GetWatchHandlerOptionByParams(opts []WatchHandler) WatchHandler {
-	result := WatchHandler{}
+// GetWatchHandlerOptionByParams assembles the WatchWithHandler object from optional parameters.
+func GetWatchHandlerOptionByParams(opts []WatchWithHandler) WatchWithHandler {
+	result := WatchWithHandler{}
 	for _, opt := range opts {
 		if opt.ContextFuncTimeout > 0 {
 			result.ContextFuncTimeout = opt.ContextFuncTimeout

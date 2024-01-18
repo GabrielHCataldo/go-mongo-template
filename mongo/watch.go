@@ -36,13 +36,13 @@ type ContextWatch struct {
 	Event           WatchEvent
 }
 
-type HandlerWatch func(ctx *ContextWatch)
+type Handler func(ctx *ContextWatch)
 
-func processWatchNext(handler HandlerWatch, event WatchEvent, opt option.WatchHandler) {
+func processToWatchNext(handler Handler, event WatchEvent, opt option.WatchWithHandler) {
 	ctx, cancel := context.WithTimeout(context.TODO(), opt.ContextFuncTimeout)
 	defer cancel()
 	signal := make(chan struct{}, 1)
-	go processWatchHandler(ctx, handler, event, &signal)
+	go executeWatchHandler(ctx, handler, event, &signal)
 	select {
 	case <-ctx.Done():
 	case <-signal:
@@ -50,7 +50,7 @@ func processWatchNext(handler HandlerWatch, event WatchEvent, opt option.WatchHa
 	}
 }
 
-func processWatchHandler(ctx context.Context, handler HandlerWatch, event WatchEvent, signal *chan struct{}) {
+func executeWatchHandler(ctx context.Context, handler Handler, event WatchEvent, signal *chan struct{}) {
 	handler(&ContextWatch{
 		Context: ctx,
 		Event:   event,
