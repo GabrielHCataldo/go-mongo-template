@@ -410,7 +410,7 @@ Output:
 
     [INFO 2023/12/22 17:38:06] main.go:53: document deleted successfully: {"DeletedCount":1}
 
-Podemos remover um documento pelo id passando como parametro como no exemplo abaixo:
+We can remove a document by passing it as a parameter as in the example below:
 
 ```go
 package main
