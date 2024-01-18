@@ -38,56 +38,59 @@ type Replace struct {
 }
 
 // NewReplace creates a new Replace instance.
-func NewReplace() Replace {
-	return Replace{}
+func NewReplace() *Replace {
+	return &Replace{}
 }
 
 // SetBypassDocumentValidation sets value for the BypassDocumentValidation field.
-func (r Replace) SetBypassDocumentValidation(b bool) Replace {
+func (r *Replace) SetBypassDocumentValidation(b bool) *Replace {
 	r.BypassDocumentValidation = &b
 	return r
 }
 
 // SetCollation sets value for the Collation field.
-func (r Replace) SetCollation(c *Collation) Replace {
+func (r *Replace) SetCollation(c *Collation) *Replace {
 	r.Collation = c
 	return r
 }
 
 // SetComment sets value for the Comment field.
-func (r Replace) SetComment(a any) Replace {
+func (r *Replace) SetComment(a any) *Replace {
 	r.Comment = a
 	return r
 }
 
 // SetHint sets value for the Hint field.
-func (r Replace) SetHint(a any) Replace {
+func (r *Replace) SetHint(a any) *Replace {
 	r.Hint = a
 	return r
 }
 
 // SetLet sets value for the Let field.
-func (r Replace) SetLet(a any) Replace {
+func (r *Replace) SetLet(a any) *Replace {
 	r.Let = a
 	return r
 }
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
-func (r Replace) SetDisableAutoCloseSession(b bool) Replace {
+func (r *Replace) SetDisableAutoCloseSession(b bool) *Replace {
 	r.DisableAutoCloseSession = b
 	return r
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
-func (r Replace) SetForceRecreateSession(b bool) Replace {
+func (r *Replace) SetForceRecreateSession(b bool) *Replace {
 	r.ForceRecreateSession = b
 	return r
 }
 
 // GetReplaceOptionByParams assembles the Replace object from optional parameters.
-func GetReplaceOptionByParams(opts []Replace) Replace {
-	result := Replace{}
+func GetReplaceOptionByParams(opts []*Replace) *Replace {
+	result := &Replace{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
 		}

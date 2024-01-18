@@ -94,157 +94,157 @@ type ListIndexes struct {
 }
 
 // NewIndex creates a new Index instance.
-func NewIndex() Index {
-	return Index{}
+func NewIndex() *Index {
+	return &Index{}
 }
 
 // NewDropIndex creates a new DropIndex instance.
-func NewDropIndex() DropIndex {
-	return DropIndex{}
+func NewDropIndex() *DropIndex {
+	return &DropIndex{}
 }
 
 // NewListIndexes creates a new ListIndexes instance.
-func NewListIndexes() ListIndexes {
-	return ListIndexes{}
+func NewListIndexes() *ListIndexes {
+	return &ListIndexes{}
 }
 
 // SetExpireAfterSeconds sets value for the ExpireAfterSeconds field.
-func (i Index) SetExpireAfterSeconds(seconds int32) Index {
+func (i *Index) SetExpireAfterSeconds(seconds int32) *Index {
 	i.ExpireAfterSeconds = &seconds
 	return i
 }
 
 // SetName sets the value for the Name field.
-func (i Index) SetName(name string) Index {
+func (i *Index) SetName(name string) *Index {
 	i.Name = &name
 	return i
 }
 
 // SetSparse sets the value of the Sparse field.
-func (i Index) SetSparse(sparse bool) Index {
+func (i *Index) SetSparse(sparse bool) *Index {
 	i.Sparse = &sparse
 	return i
 }
 
 // SetStorageEngine sets the value for the StorageEngine field.
-func (i Index) SetStorageEngine(engine any) Index {
+func (i *Index) SetStorageEngine(engine any) *Index {
 	i.StorageEngine = engine
 	return i
 }
 
 // SetUnique sets the value for the Unique field.
-func (i Index) SetUnique(unique bool) Index {
+func (i *Index) SetUnique(unique bool) *Index {
 	i.Unique = &unique
 	return i
 }
 
 // SetVersion sets the value for the Version field.
-func (i Index) SetVersion(version int32) Index {
+func (i *Index) SetVersion(version int32) *Index {
 	i.Version = &version
 	return i
 }
 
 // SetDefaultLanguage sets the value for the DefaultLanguage field.
-func (i Index) SetDefaultLanguage(language string) Index {
+func (i *Index) SetDefaultLanguage(language string) *Index {
 	i.DefaultLanguage = &language
 	return i
 }
 
 // SetLanguageOverride sets the value of the LanguageOverride field.
-func (i Index) SetLanguageOverride(override string) Index {
+func (i *Index) SetLanguageOverride(override string) *Index {
 	i.LanguageOverride = &override
 	return i
 }
 
 // SetTextVersion sets the value for the TextVersion field.
-func (i Index) SetTextVersion(version int32) Index {
+func (i *Index) SetTextVersion(version int32) *Index {
 	i.TextVersion = &version
 	return i
 }
 
 // SetWeights sets the value for the Weights field.
-func (i Index) SetWeights(weights any) Index {
+func (i *Index) SetWeights(weights any) *Index {
 	i.Weights = weights
 	return i
 }
 
 // SetSphereVersion sets the value for the SphereVersion field.
-func (i Index) SetSphereVersion(version int32) Index {
+func (i *Index) SetSphereVersion(version int32) *Index {
 	i.SphereVersion = &version
 	return i
 }
 
 // SetBits sets the value for the Bits field.
-func (i Index) SetBits(bits int32) Index {
+func (i *Index) SetBits(bits int32) *Index {
 	i.Bits = &bits
 	return i
 }
 
 // SetMax sets the value for the Max field.
-func (i Index) SetMax(max float64) Index {
+func (i *Index) SetMax(max float64) *Index {
 	i.Max = &max
 	return i
 }
 
 // SetMin sets the value for the Min field.
-func (i Index) SetMin(min float64) Index {
+func (i *Index) SetMin(min float64) *Index {
 	i.Min = &min
 	return i
 }
 
 // SetBucketSize sets the value for the BucketSize field
-func (i Index) SetBucketSize(bucketSize int32) Index {
+func (i *Index) SetBucketSize(bucketSize int32) *Index {
 	i.BucketSize = &bucketSize
 	return i
 }
 
 // SetPartialFilterExpression sets the value for the PartialFilterExpression field.
-func (i Index) SetPartialFilterExpression(expression any) Index {
+func (i *Index) SetPartialFilterExpression(expression any) *Index {
 	i.PartialFilterExpression = expression
 	return i
 }
 
 // SetCollation sets the value for the Collation field.
-func (i Index) SetCollation(collation *Collation) Index {
+func (i *Index) SetCollation(collation *Collation) *Index {
 	i.Collation = collation
 	return i
 }
 
 // SetWildcardProjection sets the value for the WildcardProjection field.
-func (i Index) SetWildcardProjection(wildcardProjection any) Index {
+func (i *Index) SetWildcardProjection(wildcardProjection any) *Index {
 	i.WildcardProjection = wildcardProjection
 	return i
 }
 
 // SetHidden sets the value for the Hidden field.
-func (i Index) SetHidden(hidden bool) Index {
+func (i *Index) SetHidden(hidden bool) *Index {
 	i.Hidden = &hidden
 	return i
 }
 
 // SetMaxTime creates a new MaxTime instance.
-func (d DropIndex) SetMaxTime(duration time.Duration) DropIndex {
+func (d *DropIndex) SetMaxTime(duration time.Duration) *DropIndex {
 	d.MaxTime = &duration
 	return d
 }
 
 // SetMaxTime creates a new MaxTime instance.
-func (l ListIndexes) SetMaxTime(duration time.Duration) ListIndexes {
+func (l *ListIndexes) SetMaxTime(duration time.Duration) *ListIndexes {
 	l.MaxTime = &duration
 	return l
 }
 
 // SetBatchSize creates a new BatchSize instance.
-func (l ListIndexes) SetBatchSize(i int32) ListIndexes {
+func (l *ListIndexes) SetBatchSize(i int32) *ListIndexes {
 	l.BatchSize = &i
 	return l
 }
 
 // GetDropIndexOptionByParams assembles the DropIndex object from optional parameters.
-func GetDropIndexOptionByParams(opts []DropIndex) DropIndex {
-	result := DropIndex{}
+func GetDropIndexOptionByParams(opts []*DropIndex) *DropIndex {
+	result := &DropIndex{}
 	for _, opt := range opts {
-		if opt.MaxTime != nil {
+		if opt != nil && opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}
 	}
@@ -252,9 +252,12 @@ func GetDropIndexOptionByParams(opts []DropIndex) DropIndex {
 }
 
 // GetListIndexesOptionByParams assembles the ListIndexes object from optional parameters.
-func GetListIndexesOptionByParams(opts []ListIndexes) ListIndexes {
-	result := ListIndexes{}
+func GetListIndexesOptionByParams(opts []*ListIndexes) *ListIndexes {
+	result := &ListIndexes{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.MaxTime != nil {
 			result.MaxTime = opt.MaxTime
 		}

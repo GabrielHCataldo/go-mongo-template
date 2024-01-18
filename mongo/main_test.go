@@ -27,7 +27,7 @@ type testNewTemplate struct {
 type testInsertOne struct {
 	name                     string
 	value                    any
-	option                   option.InsertOne
+	option                   *option.InsertOne
 	durationTimeout          time.Duration
 	beforeCloseMongoClient   bool
 	forceErrCloseMongoClient bool
@@ -37,7 +37,7 @@ type testInsertOne struct {
 type testInsertMany struct {
 	name            string
 	value           any
-	option          option.InsertMany
+	option          *option.InsertMany
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -46,7 +46,7 @@ type testDelete struct {
 	name            string
 	filter          any
 	ref             any
-	option          option.Delete
+	option          *option.Delete
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -55,7 +55,7 @@ type testDeleteById struct {
 	name            string
 	id              any
 	ref             any
-	option          option.Delete
+	option          *option.Delete
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -65,7 +65,7 @@ type testUpdateOneById struct {
 	id              any
 	update          any
 	ref             any
-	option          option.Update
+	option          *option.Update
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -75,7 +75,7 @@ type testUpdate struct {
 	filter          any
 	update          any
 	ref             any
-	option          option.Update
+	option          *option.Update
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -85,7 +85,7 @@ type testReplaceOne struct {
 	filter          any
 	replacement     any
 	ref             any
-	option          option.Replace
+	option          *option.Replace
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -95,7 +95,7 @@ type testReplaceOneById struct {
 	id              any
 	replacement     any
 	ref             any
-	option          option.Replace
+	option          *option.Replace
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -104,7 +104,7 @@ type testFindOneById struct {
 	name            string
 	id              any
 	dest            any
-	option          option.FindOneById
+	option          *option.FindOneById
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -113,7 +113,7 @@ type testFindOne struct {
 	name            string
 	filter          any
 	dest            any
-	option          option.FindOne
+	option          *option.FindOne
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -122,7 +122,7 @@ type testFindOneAndDelete struct {
 	name            string
 	filter          any
 	dest            any
-	option          option.FindOneAndDelete
+	option          *option.FindOneAndDelete
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -132,7 +132,7 @@ type testFindOneAndReplace struct {
 	filter          any
 	replacement     any
 	dest            any
-	option          option.FindOneAndReplace
+	option          *option.FindOneAndReplace
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -142,7 +142,7 @@ type testFindOneAndUpdate struct {
 	filter          any
 	update          any
 	dest            any
-	option          option.FindOneAndUpdate
+	option          *option.FindOneAndUpdate
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -151,7 +151,7 @@ type testFind struct {
 	name            string
 	filter          any
 	dest            any
-	option          option.Find
+	option          *option.Find
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -160,7 +160,7 @@ type testFindPageable struct {
 	name            string
 	filter          any
 	pageInput       PageInput
-	option          option.FindPageable
+	option          *option.FindPageable
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -169,7 +169,7 @@ type testExists struct {
 	name            string
 	filter          any
 	ref             any
-	option          option.Exists
+	option          *option.Exists
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -178,7 +178,7 @@ type testExistsById struct {
 	name            string
 	id              any
 	ref             any
-	option          option.Exists
+	option          *option.Exists
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -187,7 +187,7 @@ type testAggregate struct {
 	name            string
 	pipeline        any
 	dest            any
-	option          option.Aggregate
+	option          *option.Aggregate
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -196,7 +196,7 @@ type testCountDocuments struct {
 	name            string
 	filter          any
 	ref             any
-	option          option.Count
+	option          *option.Count
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -204,7 +204,7 @@ type testCountDocuments struct {
 type testEstimatedDocumentCount struct {
 	name            string
 	ref             any
-	option          option.EstimatedDocumentCount
+	option          *option.EstimatedDocumentCount
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -215,7 +215,7 @@ type testDistinct struct {
 	filter          any
 	dest            any
 	ref             any
-	option          option.Distinct
+	option          *option.Distinct
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -223,7 +223,7 @@ type testDistinct struct {
 type testWatch struct {
 	name            string
 	pipeline        any
-	option          option.Watch
+	option          *option.Watch
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -232,7 +232,7 @@ type testWatchHandler struct {
 	name            string
 	pipeline        any
 	handler         EventHandler
-	option          option.WatchWithHandler
+	option          *option.WatchWithHandler
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -262,7 +262,7 @@ type testDropIndex struct {
 	name            string
 	nameIndex       string
 	ref             any
-	option          option.DropIndex
+	option          *option.DropIndex
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -270,7 +270,7 @@ type testDropIndex struct {
 type testListIndexes struct {
 	name            string
 	ref             any
-	option          option.ListIndexes
+	option          *option.ListIndexes
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -1861,7 +1861,7 @@ func initListTestDropIndex() []testDropIndex {
 	}
 }
 
-func initOptionInsertOne() option.InsertOne {
+func initOptionInsertOne() *option.InsertOne {
 	return option.NewInsertOne().
 		SetBypassDocumentValidation(true).
 		SetForceRecreateSession(true).
@@ -1869,7 +1869,7 @@ func initOptionInsertOne() option.InsertOne {
 		SetDisableAutoCloseSession(false)
 }
 
-func initOptionInsertMany() option.InsertMany {
+func initOptionInsertMany() *option.InsertMany {
 	return option.NewInsertMany().
 		SetBypassDocumentValidation(true).
 		SetForceRecreateSession(true).
@@ -1878,7 +1878,7 @@ func initOptionInsertMany() option.InsertMany {
 		SetDisableAutoRollback(false)
 }
 
-func initOptionDelete() option.Delete {
+func initOptionDelete() *option.Delete {
 	return option.NewDelete().
 		SetForceRecreateSession(true).
 		SetDisableAutoCloseSession(false).
@@ -1888,7 +1888,7 @@ func initOptionDelete() option.Delete {
 		SetLet(bson.M{})
 }
 
-func initOptionUpdate() option.Update {
+func initOptionUpdate() *option.Update {
 	return option.NewUpdate().
 		SetDisableAutoCloseSession(false).
 		SetForceRecreateSession(true).
@@ -1901,7 +1901,7 @@ func initOptionUpdate() option.Update {
 		SetUpsert(true)
 }
 
-func initOptionReplace() option.Replace {
+func initOptionReplace() *option.Replace {
 	return option.NewReplace().
 		SetForceRecreateSession(true).
 		SetDisableAutoCloseSession(false).
@@ -1912,7 +1912,7 @@ func initOptionReplace() option.Replace {
 		SetBypassDocumentValidation(true)
 }
 
-func initOptionFindOne() option.FindOne {
+func initOptionFindOne() *option.FindOne {
 	return option.NewFindOne().
 		SetAllowPartialResults(true).
 		SetCollation(nil).
@@ -1929,7 +1929,7 @@ func initOptionFindOne() option.FindOne {
 
 }
 
-func initOptionFindOneById() option.FindOneById {
+func initOptionFindOneById() *option.FindOneById {
 	return option.NewFindOneById().
 		SetAllowPartialResults(true).
 		SetCollation(nil).
@@ -1944,7 +1944,7 @@ func initOptionFindOneById() option.FindOneById {
 
 }
 
-func initOptionFindOneAndDelete() option.FindOneAndDelete {
+func initOptionFindOneAndDelete() *option.FindOneAndDelete {
 	return option.NewFindOneAndDelete().
 		SetForceRecreateSession(true).
 		SetCollation(nil).
@@ -1957,7 +1957,7 @@ func initOptionFindOneAndDelete() option.FindOneAndDelete {
 		SetDisableAutoCloseSession(false)
 }
 
-func initOptionFindOneAndReplace() option.FindOneAndReplace {
+func initOptionFindOneAndReplace() *option.FindOneAndReplace {
 	return option.NewFindOneAndReplace().
 		SetForceRecreateSession(true).
 		SetCollation(nil).
@@ -1971,7 +1971,7 @@ func initOptionFindOneAndReplace() option.FindOneAndReplace {
 		SetUpsert(true)
 }
 
-func initOptionFindOneAndUpdate() option.FindOneAndUpdate {
+func initOptionFindOneAndUpdate() *option.FindOneAndUpdate {
 	return option.NewFindOneAndUpdate().
 		SetForceRecreateSession(true).
 		SetCollation(nil).
@@ -1985,7 +1985,7 @@ func initOptionFindOneAndUpdate() option.FindOneAndUpdate {
 		SetUpsert(true)
 }
 
-func initOptionFind() option.Find {
+func initOptionFind() *option.Find {
 	return option.NewFind().
 		SetCollation(nil).
 		SetComment("comment golang unit test").
@@ -2003,7 +2003,7 @@ func initOptionFind() option.Find {
 		SetMax(bson.M{})
 }
 
-func initOptionFindPageable() option.FindPageable {
+func initOptionFindPageable() *option.FindPageable {
 	return option.NewFindPageable().
 		SetCollation(nil).
 		SetComment("comment golang unit test").
@@ -2020,7 +2020,7 @@ func initOptionFindPageable() option.FindPageable {
 		SetMax(bson.M{})
 }
 
-func initOptionExists() option.Exists {
+func initOptionExists() *option.Exists {
 	return option.NewExists().
 		SetCollation(nil).
 		SetComment("comment count golang unit test").
@@ -2028,7 +2028,7 @@ func initOptionExists() option.Exists {
 		SetMaxTime(5 * time.Second)
 }
 
-func initOptionAggregate() option.Aggregate {
+func initOptionAggregate() *option.Aggregate {
 	return option.NewAggregate().
 		SetAllowDiskUse(false).
 		SetBatchSize(0).
@@ -2042,7 +2042,7 @@ func initOptionAggregate() option.Aggregate {
 		SetCustom(bson.M{})
 }
 
-func initOptionCount() option.Count {
+func initOptionCount() *option.Count {
 	return option.NewCount().
 		SetCollation(nil).
 		SetComment("comment count golang unit test").
@@ -2050,20 +2050,20 @@ func initOptionCount() option.Count {
 		SetMaxTime(5 * time.Second)
 }
 
-func initOptionEstimatedDocumentCount() option.EstimatedDocumentCount {
+func initOptionEstimatedDocumentCount() *option.EstimatedDocumentCount {
 	return option.NewEstimatedDocumentCount().
 		SetComment("comment estimated document count golang unit test").
 		SetMaxTime(5 * time.Second)
 }
 
-func initOptionDistinct() option.Distinct {
+func initOptionDistinct() *option.Distinct {
 	return option.NewDistinct().
 		SetCollation(nil).
 		SetComment("comment golang unit test").
 		SetMaxTime(5 * time.Second)
 }
 
-func initOptionWatch() option.Watch {
+func initOptionWatch() *option.Watch {
 	return option.NewWatch().
 		SetBatchSize(0).
 		SetCollation(nil).
@@ -2072,24 +2072,23 @@ func initOptionWatch() option.Watch {
 		SetShowExpandedEvents(true)
 }
 
-func initOptionWatchHandler() option.WatchWithHandler {
+func initOptionWatchHandler() *option.WatchWithHandler {
 	return option.NewWatchWithHandler().
 		SetComment("comment golang unit test").
-		SetFullDocument(option.FullDocumentDefault).
-		SetFullDocumentBeforeChange(option.FullDocumentOff).
+		SetFullDocument(option.FullDocumentUpdateLookup).
 		SetMaxAwaitTime(2 * time.Second)
 }
 
-func initOptionIndex() option.Index {
+func initOptionIndex() *option.Index {
 	return option.NewIndex()
 }
 
-func initOptionDropIndex() option.DropIndex {
+func initOptionDropIndex() *option.DropIndex {
 	return option.NewDropIndex().
 		SetMaxTime(5 * time.Second)
 }
 
-func initOptionListIndexes() option.ListIndexes {
+func initOptionListIndexes() *option.ListIndexes {
 	return option.NewListIndexes().
 		SetMaxTime(5 * time.Second)
 }

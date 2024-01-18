@@ -33,7 +33,7 @@ func TestTemplateInsertOne(t *testing.T) {
 			if tt.beforeCloseMongoClient {
 				_ = mongoTemplate.Disconnect(ctx)
 			}
-			err := mongoTemplate.InsertOne(ctx, tt.value, tt.option)
+			err := mongoTemplate.InsertOne(ctx, tt.value, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InsertOne() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -56,7 +56,7 @@ func TestTemplateInsertMany(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.InsertMany(ctx, tt.value, tt.option)
+			err := mongoTemplate.InsertMany(ctx, tt.value, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InsertMany() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -72,7 +72,7 @@ func TestTemplateDeleteOne(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			_, err := mongoTemplate.DeleteOne(ctx, tt.filter, tt.ref, tt.option)
+			_, err := mongoTemplate.DeleteOne(ctx, tt.filter, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DeleteOne() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -89,7 +89,7 @@ func TestTemplateDeleteOneById(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			_, err := mongoTemplate.DeleteOneById(ctx, tt.id, tt.ref, tt.option)
+			_, err := mongoTemplate.DeleteOneById(ctx, tt.id, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DeleteOneById() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -106,7 +106,7 @@ func TestTemplateDeleteMany(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			_, err := mongoTemplate.DeleteMany(ctx, tt.filter, tt.ref, tt.option)
+			_, err := mongoTemplate.DeleteMany(ctx, tt.filter, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DeleteMany() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -122,7 +122,7 @@ func TestTemplateUpdateOneById(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			_, err := mongoTemplate.UpdateOneById(ctx, tt.id, tt.update, tt.ref, tt.option)
+			_, err := mongoTemplate.UpdateOneById(ctx, tt.id, tt.update, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UpdateOneById() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -138,7 +138,7 @@ func TestTemplateUpdateOne(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			_, err := mongoTemplate.UpdateOne(ctx, tt.filter, tt.update, tt.ref, tt.option)
+			_, err := mongoTemplate.UpdateOne(ctx, tt.filter, tt.update, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UpdateOneById() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -155,7 +155,7 @@ func TestTemplateUpdateMany(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			_, err := mongoTemplate.UpdateMany(ctx, tt.filter, tt.update, tt.ref, tt.option)
+			_, err := mongoTemplate.UpdateMany(ctx, tt.filter, tt.update, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UpdateMany() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -172,7 +172,7 @@ func TestTemplateReplaceOne(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			_, err := mongoTemplate.ReplaceOne(ctx, tt.filter, tt.replacement, tt.ref, tt.option)
+			_, err := mongoTemplate.ReplaceOne(ctx, tt.filter, tt.replacement, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ReplaceOne() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -189,7 +189,7 @@ func TestTemplateReplaceOneById(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			_, err := mongoTemplate.ReplaceOneById(ctx, tt.id, tt.replacement, tt.ref, tt.option)
+			_, err := mongoTemplate.ReplaceOneById(ctx, tt.id, tt.replacement, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ReplaceOneById() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -206,7 +206,7 @@ func TestTemplateFindOneById(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.FindOneById(ctx, tt.id, tt.dest, tt.option)
+			err := mongoTemplate.FindOneById(ctx, tt.id, tt.dest, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FindOneById() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -222,7 +222,7 @@ func TestTemplateFindOne(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.FindOne(ctx, tt.filter, tt.dest, tt.option)
+			err := mongoTemplate.FindOne(ctx, tt.filter, tt.dest, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FindOne() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -238,7 +238,7 @@ func TestTemplateFindOneAndDelete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.FindOneAndDelete(ctx, tt.filter, tt.dest, tt.option)
+			err := mongoTemplate.FindOneAndDelete(ctx, tt.filter, tt.dest, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FindOneAndDelete() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -255,7 +255,7 @@ func TestTemplateFindOneAndReplace(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.FindOneAndReplace(ctx, tt.filter, tt.replacement, tt.dest, tt.option)
+			err := mongoTemplate.FindOneAndReplace(ctx, tt.filter, tt.replacement, tt.dest, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FindOneAndReplace() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -272,7 +272,7 @@ func TestTemplateFindOneAndUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.FindOneAndUpdate(ctx, tt.filter, tt.update, tt.dest, tt.option)
+			err := mongoTemplate.FindOneAndUpdate(ctx, tt.filter, tt.update, tt.dest, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FindOneAndUpdate() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -289,7 +289,7 @@ func TestTemplateFind(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.Find(ctx, tt.filter, tt.dest, tt.option)
+			err := mongoTemplate.Find(ctx, tt.filter, tt.dest, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Find() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -305,7 +305,7 @@ func TestTemplateFindAll(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.FindAll(ctx, tt.dest, tt.option)
+			err := mongoTemplate.FindAll(ctx, tt.dest, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FindAll() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -321,7 +321,7 @@ func TestTemplateFindPageable(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			v, err := mongoTemplate.FindPageable(ctx, tt.filter, tt.pageInput, tt.option)
+			v, err := mongoTemplate.FindPageable(ctx, tt.filter, tt.pageInput, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("FindPageable() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -339,7 +339,7 @@ func TestTemplateExists(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			v, err := mongoTemplate.Exists(ctx, tt.filter, tt.ref, tt.option)
+			v, err := mongoTemplate.Exists(ctx, tt.filter, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Exists() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -357,7 +357,7 @@ func TestTemplateExistsById(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			v, err := mongoTemplate.ExistsById(ctx, tt.id, tt.ref, tt.option)
+			v, err := mongoTemplate.ExistsById(ctx, tt.id, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ExistsById() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -375,7 +375,7 @@ func TestTemplateAggregate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.Aggregate(ctx, tt.pipeline, tt.dest, tt.option)
+			err := mongoTemplate.Aggregate(ctx, tt.pipeline, tt.dest, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Aggregate() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -391,7 +391,7 @@ func TestTemplateCountDocuments(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			_, err := mongoTemplate.CountDocuments(ctx, tt.filter, tt.ref, tt.option)
+			_, err := mongoTemplate.CountDocuments(ctx, tt.filter, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CountDocuments() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -407,7 +407,7 @@ func TestTemplateEstimatedDocumentCount(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			_, err := mongoTemplate.EstimatedDocumentCount(ctx, tt.ref, tt.option)
+			_, err := mongoTemplate.EstimatedDocumentCount(ctx, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("EstimatedDocumentCount() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -423,7 +423,7 @@ func TestTemplateDistinct(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.Distinct(ctx, tt.fieldName, tt.filter, tt.dest, tt.ref, tt.option)
+			err := mongoTemplate.Distinct(ctx, tt.fieldName, tt.filter, tt.dest, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Distinct() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -439,7 +439,7 @@ func TestTemplateWatch(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			_, err := mongoTemplate.Watch(ctx, tt.pipeline, tt.option)
+			_, err := mongoTemplate.Watch(ctx, tt.pipeline, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Watch() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -459,7 +459,7 @@ func TestTemplateWatchWithHandler(t *testing.T) {
 				time.Sleep(2 * time.Second)
 				initDocument()
 			}()
-			err := mongoTemplate.WatchWithHandler(ctx, tt.pipeline, tt.handler, tt.option)
+			err := mongoTemplate.WatchWithHandler(ctx, tt.pipeline, tt.handler, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("WatchWithHandler() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -545,7 +545,7 @@ func TestTemplateDropOneIndex(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.DropOneIndex(ctx, tt.nameIndex, tt.ref, tt.option)
+			err := mongoTemplate.DropOneIndex(ctx, tt.nameIndex, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DropOneIndex() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -561,7 +561,7 @@ func TestTemplateDropAllIndexes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			err := mongoTemplate.DropAllIndexes(ctx, tt.ref, tt.option)
+			err := mongoTemplate.DropAllIndexes(ctx, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DropAllIndexes() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -577,7 +577,7 @@ func TestTemplateListIndexes(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			result, err := mongoTemplate.ListIndexes(ctx, tt.ref, tt.option)
+			result, err := mongoTemplate.ListIndexes(ctx, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ListIndexes() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {
@@ -595,7 +595,7 @@ func TestTemplateListIndexSpecifications(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
-			result, err := mongoTemplate.ListIndexSpecifications(ctx, tt.ref, tt.option)
+			result, err := mongoTemplate.ListIndexSpecifications(ctx, tt.ref, tt.option, nil)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ListIndexSpecifications() error = %v, wantErr %v", err, tt.wantErr)
 			} else if err != nil {

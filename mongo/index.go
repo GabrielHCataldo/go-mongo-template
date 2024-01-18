@@ -14,7 +14,7 @@ type IndexInput struct {
 	// for examples of valid documents.
 	Keys any
 	// Options The options to use to create the index.
-	Options option.Index
+	Options *option.Index
 	// Ref Struct reference contained database and collection tag
 	Ref any
 }

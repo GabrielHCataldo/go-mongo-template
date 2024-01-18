@@ -21,32 +21,35 @@ type Distinct struct {
 }
 
 // NewDistinct creates a new Distinct instance.
-func NewDistinct() Distinct {
-	return Distinct{}
+func NewDistinct() *Distinct {
+	return &Distinct{}
 }
 
 // SetCollation sets value for the Collation field.
-func (d Distinct) SetCollation(c *Collation) Distinct {
+func (d *Distinct) SetCollation(c *Collation) *Distinct {
 	d.Collation = c
 	return d
 }
 
 // SetMaxTime sets value for the MaxTime field.
-func (d Distinct) SetMaxTime(duration time.Duration) Distinct {
+func (d *Distinct) SetMaxTime(duration time.Duration) *Distinct {
 	d.MaxTime = &duration
 	return d
 }
 
 // SetComment sets value for the Comment field.
-func (d Distinct) SetComment(comment any) Distinct {
+func (d *Distinct) SetComment(comment any) *Distinct {
 	d.Comment = comment
 	return d
 }
 
 // GetDistinctOptionByParams assembles the Distinct object from optional parameters.
-func GetDistinctOptionByParams(opts []Distinct) Distinct {
-	result := Distinct{}
+func GetDistinctOptionByParams(opts []*Distinct) *Distinct {
+	result := &Distinct{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
 		}

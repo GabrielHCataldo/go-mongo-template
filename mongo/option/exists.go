@@ -25,38 +25,41 @@ type Exists struct {
 }
 
 // NewExists creates a new Exists instance.
-func NewExists() Exists {
-	return Exists{}
+func NewExists() *Exists {
+	return &Exists{}
 }
 
 // SetCollation creates a new Collation instance.
-func (e Exists) SetCollation(collation *Collation) Exists {
+func (e *Exists) SetCollation(collation *Collation) *Exists {
 	e.Collation = collation
 	return e
 }
 
 // SetComment creates a new Comment instance.
-func (e Exists) SetComment(comment string) Exists {
+func (e *Exists) SetComment(comment string) *Exists {
 	e.Comment = &comment
 	return e
 }
 
 // SetHint creates a new Hint instance.
-func (e Exists) SetHint(a any) Exists {
+func (e *Exists) SetHint(a any) *Exists {
 	e.Hint = a
 	return e
 }
 
 // SetMaxTime creates a new MaxTime instance.
-func (e Exists) SetMaxTime(d time.Duration) Exists {
+func (e *Exists) SetMaxTime(d time.Duration) *Exists {
 	e.MaxTime = &d
 	return e
 }
 
 // GetExistsOptionByParams assembles the Exists object from optional parameters.
-func GetExistsOptionByParams(opts []Exists) Exists {
-	result := Exists{}
+func GetExistsOptionByParams(opts []*Exists) *Exists {
+	result := &Exists{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
 		}

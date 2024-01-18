@@ -30,50 +30,53 @@ type Delete struct {
 }
 
 // NewDelete creates a new Delete instance.
-func NewDelete() Delete {
-	return Delete{}
+func NewDelete() *Delete {
+	return &Delete{}
 }
 
 // SetCollation sets value for the Collation field.
-func (d Delete) SetCollation(c *Collation) Delete {
+func (d *Delete) SetCollation(c *Collation) *Delete {
 	d.Collation = c
 	return d
 }
 
 // SetComment sets value for the Comment field.
-func (d Delete) SetComment(a any) Delete {
+func (d *Delete) SetComment(a any) *Delete {
 	d.Comment = a
 	return d
 }
 
 // SetHint sets value for the Hint field.
-func (d Delete) SetHint(a any) Delete {
+func (d *Delete) SetHint(a any) *Delete {
 	d.Hint = a
 	return d
 }
 
 // SetLet sets value for the Let field.
-func (d Delete) SetLet(a any) Delete {
+func (d *Delete) SetLet(a any) *Delete {
 	d.Let = a
 	return d
 }
 
 // SetDisableAutoCloseSession sets value for the DisableAutoCloseSession field.
-func (d Delete) SetDisableAutoCloseSession(b bool) Delete {
+func (d *Delete) SetDisableAutoCloseSession(b bool) *Delete {
 	d.DisableAutoCloseSession = b
 	return d
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
-func (d Delete) SetForceRecreateSession(b bool) Delete {
+func (d *Delete) SetForceRecreateSession(b bool) *Delete {
 	d.ForceRecreateSession = b
 	return d
 }
 
 // GetDeleteOptionByParams assembles the Delete object from optional parameters.
-func GetDeleteOptionByParams(opts []Delete) Delete {
-	result := Delete{}
+func GetDeleteOptionByParams(opts []*Delete) *Delete {
+	result := &Delete{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
 		}

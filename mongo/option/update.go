@@ -42,68 +42,71 @@ type Update struct {
 }
 
 // NewUpdate creates a new Update instance.
-func NewUpdate() Update {
-	return Update{}
+func NewUpdate() *Update {
+	return &Update{}
 }
 
 // SetBypassDocumentValidation sets value for the BypassDocumentValidation field.
-func (u Update) SetBypassDocumentValidation(b bool) Update {
+func (u *Update) SetBypassDocumentValidation(b bool) *Update {
 	u.BypassDocumentValidation = &b
 	return u
 }
 
 // SetArrayFilters sets value for the ArrayFilters field.
-func (u Update) SetArrayFilters(a *ArrayFilters) Update {
+func (u *Update) SetArrayFilters(a *ArrayFilters) *Update {
 	u.ArrayFilters = a
 	return u
 }
 
 // SetCollation sets value for the Collation field.
-func (u Update) SetCollation(c *Collation) Update {
+func (u *Update) SetCollation(c *Collation) *Update {
 	u.Collation = c
 	return u
 }
 
 // SetComment sets value for the Comment field.
-func (u Update) SetComment(a any) Update {
+func (u *Update) SetComment(a any) *Update {
 	u.Comment = a
 	return u
 }
 
 // SetHint sets value for the Hint field.
-func (u Update) SetHint(a any) Update {
+func (u *Update) SetHint(a any) *Update {
 	u.Hint = a
 	return u
 }
 
 // SetLet sets value for the Let field.
-func (u Update) SetLet(a any) Update {
+func (u *Update) SetLet(a any) *Update {
 	u.Let = a
 	return u
 }
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
-func (u Update) SetDisableAutoCloseSession(b bool) Update {
+func (u *Update) SetDisableAutoCloseSession(b bool) *Update {
 	u.DisableAutoCloseSession = b
 	return u
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
-func (u Update) SetForceRecreateSession(b bool) Update {
+func (u *Update) SetForceRecreateSession(b bool) *Update {
 	u.ForceRecreateSession = b
 	return u
 }
 
 // SetUpsert creates a new Upsert instance.
-func (u Update) SetUpsert(b bool) Update {
+func (u *Update) SetUpsert(b bool) *Update {
 	u.Upsert = &b
 	return u
 }
 
 // GetUpdateOptionByParams assembles the Update object from optional parameters.
-func GetUpdateOptionByParams(opts []Update) Update {
-	result := Update{}
+func GetUpdateOptionByParams(opts []*Update) *Update {
+	result := &Update{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.ArrayFilters != nil {
 			result.ArrayFilters = opt.ArrayFilters
 		}

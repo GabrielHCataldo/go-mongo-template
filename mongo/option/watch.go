@@ -121,197 +121,200 @@ type WatchWithHandler struct {
 }
 
 // NewWatch creates a new Watch instance.
-func NewWatch() Watch {
-	return Watch{}
+func NewWatch() *Watch {
+	return &Watch{}
 }
 
 // NewWatchWithHandler creates a new WatchWithHandler instance.
-func NewWatchWithHandler() WatchWithHandler {
-	return WatchWithHandler{}
+func NewWatchWithHandler() *WatchWithHandler {
+	return &WatchWithHandler{}
 }
 
 // SetDatabaseName creates a new DatabaseName instance.
-func (w Watch) SetDatabaseName(s string) Watch {
+func (w *Watch) SetDatabaseName(s string) *Watch {
 	w.DatabaseName = s
 	return w
 }
 
 // SetCollectionName creates a new CollectionName instance.
-func (w Watch) SetCollectionName(s string) Watch {
+func (w *Watch) SetCollectionName(s string) *Watch {
 	w.CollectionName = s
 	return w
 }
 
 // SetBatchSize creates a new BatchSize instance.
-func (w Watch) SetBatchSize(i int32) Watch {
+func (w *Watch) SetBatchSize(i int32) *Watch {
 	w.BatchSize = &i
 	return w
 }
 
 // SetCollation sets value for the Collation field.
-func (w Watch) SetCollation(c *Collation) Watch {
+func (w *Watch) SetCollation(c *Collation) *Watch {
 	w.Collation = c
 	return w
 }
 
 // SetComment sets value for the Comment field.
-func (w Watch) SetComment(s string) Watch {
+func (w *Watch) SetComment(s string) *Watch {
 	w.Comment = &s
 	return w
 }
 
 // SetFullDocument sets value for the FullDocument field.
-func (w Watch) SetFullDocument(f FullDocument) Watch {
+func (w *Watch) SetFullDocument(f FullDocument) *Watch {
 	w.FullDocument = &f
 	return w
 }
 
 // SetFullDocumentBeforeChange sets value for the FullDocumentBeforeChange field.
-func (w Watch) SetFullDocumentBeforeChange(f FullDocument) Watch {
+func (w *Watch) SetFullDocumentBeforeChange(f FullDocument) *Watch {
 	w.FullDocumentBeforeChange = &f
 	return w
 }
 
 // SetMaxAwaitTime sets value for the MaxAwaitTime field.
-func (w Watch) SetMaxAwaitTime(d time.Duration) Watch {
+func (w *Watch) SetMaxAwaitTime(d time.Duration) *Watch {
 	w.MaxAwaitTime = &d
 	return w
 }
 
 // SetResumeAfter sets value for the ResumeAfter field.
-func (w Watch) SetResumeAfter(a any) Watch {
+func (w *Watch) SetResumeAfter(a any) *Watch {
 	w.ResumeAfter = a
 	return w
 }
 
 // SetShowExpandedEvents sets value for the ShowExpandedEvents field.
-func (w Watch) SetShowExpandedEvents(b bool) Watch {
+func (w *Watch) SetShowExpandedEvents(b bool) *Watch {
 	w.ShowExpandedEvents = &b
 	return w
 }
 
 // SetStartAtOperationTime sets value for the StartAtOperationTime field.
-func (w Watch) SetStartAtOperationTime(t primitive.Timestamp) Watch {
+func (w *Watch) SetStartAtOperationTime(t primitive.Timestamp) *Watch {
 	w.StartAtOperationTime = &t
 	return w
 }
 
 // SetStartAfter sets value for the StartAfter field.
-func (w Watch) SetStartAfter(a any) Watch {
+func (w *Watch) SetStartAfter(a any) *Watch {
 	w.StartAfter = a
 	return w
 }
 
 // SetCustom sets value for the Custom field.
-func (w Watch) SetCustom(b bson.M) Watch {
+func (w *Watch) SetCustom(b bson.M) *Watch {
 	w.Custom = b
 	return w
 }
 
 // SetCustomPipeline sets value for the CustomPipeline field.
-func (w Watch) SetCustomPipeline(b bson.M) Watch {
+func (w *Watch) SetCustomPipeline(b bson.M) *Watch {
 	w.CustomPipeline = b
 	return w
 }
 
 // SetDatabaseName sets value for the DatabaseName field.
-func (w WatchWithHandler) SetDatabaseName(s string) WatchWithHandler {
+func (w *WatchWithHandler) SetDatabaseName(s string) *WatchWithHandler {
 	w.DatabaseName = s
 	return w
 }
 
 // SetCollectionName sets value for the WatchWithHandler field.
-func (w WatchWithHandler) SetCollectionName(s string) WatchWithHandler {
+func (w *WatchWithHandler) SetCollectionName(s string) *WatchWithHandler {
 	w.CollectionName = s
 	return w
 }
 
-func (w WatchWithHandler) SetContextFuncTimeout(d time.Duration) WatchWithHandler {
+func (w *WatchWithHandler) SetContextFuncTimeout(d time.Duration) *WatchWithHandler {
 	w.ContextFuncTimeout = d
 	return w
 }
 
-func (w WatchWithHandler) SetDelayLoop(d time.Duration) WatchWithHandler {
+func (w *WatchWithHandler) SetDelayLoop(d time.Duration) *WatchWithHandler {
 	w.DelayLoop = d
 	return w
 }
 
 // SetBatchSize creates a new BatchSize instance.
-func (w WatchWithHandler) SetBatchSize(i int32) WatchWithHandler {
+func (w *WatchWithHandler) SetBatchSize(i int32) *WatchWithHandler {
 	w.BatchSize = &i
 	return w
 }
 
 // SetCollation sets value for the Collation field.
-func (w WatchWithHandler) SetCollation(c *Collation) WatchWithHandler {
+func (w *WatchWithHandler) SetCollation(c *Collation) *WatchWithHandler {
 	w.Collation = c
 	return w
 }
 
 // SetComment sets value for the Comment field.
-func (w WatchWithHandler) SetComment(s string) WatchWithHandler {
+func (w *WatchWithHandler) SetComment(s string) *WatchWithHandler {
 	w.Comment = &s
 	return w
 }
 
 // SetFullDocument sets value for the FullDocument field.
-func (w WatchWithHandler) SetFullDocument(f FullDocument) WatchWithHandler {
+func (w *WatchWithHandler) SetFullDocument(f FullDocument) *WatchWithHandler {
 	w.FullDocument = &f
 	return w
 }
 
 // SetFullDocumentBeforeChange sets value for the FullDocumentBeforeChange field.
-func (w WatchWithHandler) SetFullDocumentBeforeChange(f FullDocument) WatchWithHandler {
+func (w *WatchWithHandler) SetFullDocumentBeforeChange(f FullDocument) *WatchWithHandler {
 	w.FullDocumentBeforeChange = &f
 	return w
 }
 
 // SetMaxAwaitTime sets value for the MaxAwaitTime field.
-func (w WatchWithHandler) SetMaxAwaitTime(d time.Duration) WatchWithHandler {
+func (w *WatchWithHandler) SetMaxAwaitTime(d time.Duration) *WatchWithHandler {
 	w.MaxAwaitTime = &d
 	return w
 }
 
 // SetResumeAfter sets value for the ResumeAfter field.
-func (w WatchWithHandler) SetResumeAfter(a any) WatchWithHandler {
+func (w *WatchWithHandler) SetResumeAfter(a any) *WatchWithHandler {
 	w.ResumeAfter = a
 	return w
 }
 
 // SetShowExpandedEvents sets value for the ShowExpandedEvents field.
-func (w WatchWithHandler) SetShowExpandedEvents(b bool) WatchWithHandler {
+func (w *WatchWithHandler) SetShowExpandedEvents(b bool) *WatchWithHandler {
 	w.ShowExpandedEvents = &b
 	return w
 }
 
 // SetStartAtOperationTime sets value for the StartAtOperationTime field.
-func (w WatchWithHandler) SetStartAtOperationTime(t primitive.Timestamp) WatchWithHandler {
+func (w *WatchWithHandler) SetStartAtOperationTime(t primitive.Timestamp) *WatchWithHandler {
 	w.StartAtOperationTime = &t
 	return w
 }
 
 // SetStartAfter sets value for the StartAfter field.
-func (w WatchWithHandler) SetStartAfter(a any) WatchWithHandler {
+func (w *WatchWithHandler) SetStartAfter(a any) *WatchWithHandler {
 	w.StartAfter = a
 	return w
 }
 
 // SetCustom sets value for the Custom field.
-func (w WatchWithHandler) SetCustom(b bson.M) WatchWithHandler {
+func (w *WatchWithHandler) SetCustom(b bson.M) *WatchWithHandler {
 	w.Custom = b
 	return w
 }
 
 // SetCustomPipeline sets value for the CustomPipeline field.
-func (w WatchWithHandler) SetCustomPipeline(b bson.M) WatchWithHandler {
+func (w *WatchWithHandler) SetCustomPipeline(b bson.M) *WatchWithHandler {
 	w.CustomPipeline = b
 	return w
 }
 
 // GetWatchOptionByParams assembles the Watch object from optional parameters.
-func GetWatchOptionByParams(opts []Watch) Watch {
-	result := Watch{}
+func GetWatchOptionByParams(opts []*Watch) *Watch {
+	result := &Watch{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.BatchSize != nil {
 			result.BatchSize = opt.BatchSize
 		}
@@ -362,9 +365,12 @@ func GetWatchOptionByParams(opts []Watch) Watch {
 }
 
 // GetWatchHandlerOptionByParams assembles the WatchWithHandler object from optional parameters.
-func GetWatchHandlerOptionByParams(opts []WatchWithHandler) WatchWithHandler {
+func GetWatchHandlerOptionByParams(opts []*WatchWithHandler) *WatchWithHandler {
 	result := WatchWithHandler{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.ContextFuncTimeout > 0 {
 			result.ContextFuncTimeout = opt.ContextFuncTimeout
 		}
@@ -423,5 +429,5 @@ func GetWatchHandlerOptionByParams(opts []WatchWithHandler) WatchWithHandler {
 	if result.DelayLoop == 0 {
 		result.DelayLoop = 5 * time.Second
 	}
-	return result
+	return &result
 }

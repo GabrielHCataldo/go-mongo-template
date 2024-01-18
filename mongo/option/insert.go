@@ -39,73 +39,76 @@ type InsertMany struct {
 }
 
 // NewInsertOne creates a new InsertOne instance.
-func NewInsertOne() InsertOne {
-	return InsertOne{}
+func NewInsertOne() *InsertOne {
+	return &InsertOne{}
 }
 
 // NewInsertMany creates a new InsertMany instance.
-func NewInsertMany() InsertMany {
-	return InsertMany{}
+func NewInsertMany() *InsertMany {
+	return &InsertMany{}
 }
 
 // SetBypassDocumentValidation sets value for the BypassDocumentValidation field.
-func (i InsertOne) SetBypassDocumentValidation(b bool) InsertOne {
+func (i *InsertOne) SetBypassDocumentValidation(b bool) *InsertOne {
 	i.BypassDocumentValidation = &b
 	return i
 }
 
 // SetComment sets value for the Comment field.
-func (i InsertOne) SetComment(a any) InsertOne {
+func (i *InsertOne) SetComment(a any) *InsertOne {
 	i.Comment = a
 	return i
 }
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
-func (i InsertOne) SetDisableAutoCloseSession(b bool) InsertOne {
+func (i *InsertOne) SetDisableAutoCloseSession(b bool) *InsertOne {
 	i.DisableAutoCloseSession = b
 	return i
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
-func (i InsertOne) SetForceRecreateSession(b bool) InsertOne {
+func (i *InsertOne) SetForceRecreateSession(b bool) *InsertOne {
 	i.ForceRecreateSession = b
 	return i
 }
 
 // SetBypassDocumentValidation sets value for the BypassDocumentValidation field.
-func (i InsertMany) SetBypassDocumentValidation(b bool) InsertMany {
+func (i *InsertMany) SetBypassDocumentValidation(b bool) *InsertMany {
 	i.BypassDocumentValidation = &b
 	return i
 }
 
 // SetComment sets value for the Comment field.
-func (i InsertMany) SetComment(a any) InsertMany {
+func (i *InsertMany) SetComment(a any) *InsertMany {
 	i.Comment = a
 	return i
 }
 
 // SetDisableAutoRollback sets value for the DisableAutoRollbackSession field.
-func (i InsertMany) SetDisableAutoRollback(b bool) InsertMany {
+func (i *InsertMany) SetDisableAutoRollback(b bool) *InsertMany {
 	i.DisableAutoRollbackSession = b
 	return i
 }
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
-func (i InsertMany) SetDisableAutoCloseSession(b bool) InsertMany {
+func (i *InsertMany) SetDisableAutoCloseSession(b bool) *InsertMany {
 	i.DisableAutoCloseSession = b
 	return i
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
-func (i InsertMany) SetForceRecreateSession(b bool) InsertMany {
+func (i *InsertMany) SetForceRecreateSession(b bool) *InsertMany {
 	i.ForceRecreateSession = b
 	return i
 }
 
 // GetInsertOneOptionByParams assembles the InsertOne object from optional parameters.
-func GetInsertOneOptionByParams(opts []InsertOne) InsertOne {
-	result := InsertOne{}
+func GetInsertOneOptionByParams(opts []*InsertOne) *InsertOne {
+	result := &InsertOne{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.BypassDocumentValidation != nil {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
@@ -123,9 +126,12 @@ func GetInsertOneOptionByParams(opts []InsertOne) InsertOne {
 }
 
 // GetInsertManyOptionByParams assembles the InsertMany object from optional parameters.
-func GetInsertManyOptionByParams(opts []InsertMany) InsertMany {
-	result := InsertMany{}
+func GetInsertManyOptionByParams(opts []*InsertMany) *InsertMany {
+	result := &InsertMany{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.ForceRecreateSession {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}

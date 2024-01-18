@@ -95,7 +95,7 @@ func NewTemplate(ctx context.Context, opts ...*options.ClientOptions) (*Template
 // The opts parameter can be used to specify options for the operation (see the option.InsertOne documentation.)
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/insert/.
-func (t *Template) InsertOne(ctx context.Context, document any, opts ...option.InsertOne) error {
+func (t *Template) InsertOne(ctx context.Context, document any, opts ...*option.InsertOne) error {
 	opt := option.GetInsertOneOptionByParams(opts)
 	err := t.startSession(ctx, opt.ForceRecreateSession)
 	if err == nil {
@@ -117,7 +117,7 @@ func (t *Template) InsertOne(ctx context.Context, document any, opts ...option.I
 // The opts parameter can be used to specify options for the operation (see the option.InsertMany documentation.)
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/insert/.
-func (t *Template) InsertMany(ctx context.Context, documents any, opts ...option.InsertMany) error {
+func (t *Template) InsertMany(ctx context.Context, documents any, opts ...*option.InsertMany) error {
 	opt := option.GetInsertManyOptionByParams(opts)
 	err := t.startSession(ctx, opt.ForceRecreateSession)
 	if err == nil {
@@ -142,7 +142,7 @@ func (t *Template) InsertMany(ctx context.Context, documents any, opts ...option
 // The opts parameter can be used to specify options for the operation (see the option.Delete documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/delete/.
-func (t *Template) DeleteOne(ctx context.Context, filter, ref any, opts ...option.Delete) (*DeleteResult, error) {
+func (t *Template) DeleteOne(ctx context.Context, filter, ref any, opts ...*option.Delete) (*DeleteResult, error) {
 	var result *DeleteResult
 	var err error
 	opt := option.GetDeleteOptionByParams(opts)
@@ -167,7 +167,7 @@ func (t *Template) DeleteOne(ctx context.Context, filter, ref any, opts ...optio
 // The opts parameter can be used to specify options for the operation (see the option.Delete documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/delete/.
-func (t *Template) DeleteOneById(ctx context.Context, id, ref any, opts ...option.Delete) (*DeleteResult, error) {
+func (t *Template) DeleteOneById(ctx context.Context, id, ref any, opts ...*option.Delete) (*DeleteResult, error) {
 	var result *DeleteResult
 	var err error
 	opt := option.GetDeleteOptionByParams(opts)
@@ -193,7 +193,7 @@ func (t *Template) DeleteOneById(ctx context.Context, id, ref any, opts ...optio
 // The opts parameter can be used to specify options for the operation (see the option.Delete documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/delete/.
-func (t *Template) DeleteMany(ctx context.Context, filter, ref any, opts ...option.Delete) (*DeleteResult, error) {
+func (t *Template) DeleteMany(ctx context.Context, filter, ref any, opts ...*option.Delete) (*DeleteResult, error) {
 	var result *DeleteResult
 	var err error
 	opt := option.GetDeleteOptionByParams(opts)
@@ -222,7 +222,7 @@ func (t *Template) DeleteMany(ctx context.Context, filter, ref any, opts ...opti
 // The opts parameter can be used to specify options for the operation (see the option.Update documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
-func (t *Template) UpdateOneById(ctx context.Context, id, update, ref any, opts ...option.Update) (*UpdateResult, error) {
+func (t *Template) UpdateOneById(ctx context.Context, id, update, ref any, opts ...*option.Update) (*UpdateResult, error) {
 	var result *UpdateResult
 	var err error
 	opt := option.GetUpdateOptionByParams(opts)
@@ -252,7 +252,7 @@ func (t *Template) UpdateOneById(ctx context.Context, id, update, ref any, opts 
 // The opts parameter can be used to specify options for the operation (see the option.Update documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
-func (t *Template) UpdateOne(ctx context.Context, filter any, update, ref any, opts ...option.Update) (*UpdateResult,
+func (t *Template) UpdateOne(ctx context.Context, filter any, update, ref any, opts ...*option.Update) (*UpdateResult,
 	error) {
 	var result *UpdateResult
 	var err error
@@ -282,7 +282,7 @@ func (t *Template) UpdateOne(ctx context.Context, filter any, update, ref any, o
 // The opts parameter can be used to specify options for the operation (see the option.Update documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
-func (t *Template) UpdateMany(ctx context.Context, filter any, update, ref any, opts ...option.Update) (*UpdateResult,
+func (t *Template) UpdateMany(ctx context.Context, filter any, update, ref any, opts ...*option.Update) (*UpdateResult,
 	error) {
 	var result *UpdateResult
 	var err error
@@ -312,7 +312,7 @@ func (t *Template) UpdateMany(ctx context.Context, filter any, update, ref any, 
 // The opts parameter can be used to specify options for the operation (see the option.Replace documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
-func (t *Template) ReplaceOne(ctx context.Context, filter any, update, ref any, opts ...option.Replace) (*UpdateResult,
+func (t *Template) ReplaceOne(ctx context.Context, filter any, update, ref any, opts ...*option.Replace) (*UpdateResult,
 	error) {
 	var result *UpdateResult
 	var err error
@@ -336,7 +336,7 @@ func (t *Template) ReplaceOne(ctx context.Context, filter any, update, ref any, 
 // The opts parameter can be used to specify options for the operation (see the option.Replace documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/update/.
-func (t *Template) ReplaceOneById(ctx context.Context, id, replacement, ref any, opts ...option.Replace) (*UpdateResult,
+func (t *Template) ReplaceOneById(ctx context.Context, id, replacement, ref any, opts ...*option.Replace) (*UpdateResult,
 	error) {
 	var result *UpdateResult
 	var err error
@@ -363,9 +363,9 @@ func (t *Template) ReplaceOneById(ctx context.Context, id, replacement, ref any,
 // The opts parameter can be used to specify options for this operation (see the option.FindOneById documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/find/.
-func (t *Template) FindOneById(ctx context.Context, id, dest any, opts ...option.FindOneById) error {
+func (t *Template) FindOneById(ctx context.Context, id, dest any, opts ...*option.FindOneById) error {
 	opt := option.GetFindOneByIdOptionByParams(opts)
-	return t.findOne(ctx, bson.D{{"_id", id}}, dest, option.FindOne{
+	return t.findOne(ctx, bson.D{{"_id", id}}, dest, &option.FindOne{
 		AllowPartialResults: opt.AllowPartialResults,
 		Collation:           opt.Collation,
 		Comment:             opt.Comment,
@@ -391,7 +391,7 @@ func (t *Template) FindOneById(ctx context.Context, id, dest any, opts ...option
 // The opts parameter can be used to specify options for this operation (see the option.FindOne documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/find/.
-func (t *Template) FindOne(ctx context.Context, filter, dest any, opts ...option.FindOne) error {
+func (t *Template) FindOne(ctx context.Context, filter, dest any, opts ...*option.FindOne) error {
 	return t.findOne(ctx, filter, dest, opts...)
 }
 
@@ -408,7 +408,7 @@ func (t *Template) FindOne(ctx context.Context, filter, dest any, opts ...option
 // The opts parameter can be used to specify options for the operation (see the option.FindOneAndDelete documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/findAndModify/.
-func (t *Template) FindOneAndDelete(ctx context.Context, filter, dest any, opts ...option.FindOneAndDelete) error {
+func (t *Template) FindOneAndDelete(ctx context.Context, filter, dest any, opts ...*option.FindOneAndDelete) error {
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	} else if util.IsNotStruct(dest) {
@@ -441,7 +441,7 @@ func (t *Template) FindOneAndDelete(ctx context.Context, filter, dest any, opts 
 // The opts parameter can be used to specify options for the operation (see the option.FindOneAndReplace documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/findAndModify/.
-func (t *Template) FindOneAndReplace(ctx context.Context, filter, replacement, dest any, opts ...option.FindOneAndReplace) error {
+func (t *Template) FindOneAndReplace(ctx context.Context, filter, replacement, dest any, opts ...*option.FindOneAndReplace) error {
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	} else if util.IsNotStruct(dest) {
@@ -473,7 +473,7 @@ func (t *Template) FindOneAndReplace(ctx context.Context, filter, replacement, d
 // documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/findAndModify/.
-func (t *Template) FindOneAndUpdate(ctx context.Context, filter, update, dest any, opts ...option.FindOneAndUpdate) error {
+func (t *Template) FindOneAndUpdate(ctx context.Context, filter, update, dest any, opts ...*option.FindOneAndUpdate) error {
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	} else if util.IsNotStruct(dest) {
@@ -502,7 +502,7 @@ func (t *Template) FindOneAndUpdate(ctx context.Context, filter, update, dest an
 // The opts parameter can be used to specify options for the operation (see the option.Find documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/find/.
-func (t *Template) Find(ctx context.Context, filter, dest any, opts ...option.Find) error {
+func (t *Template) Find(ctx context.Context, filter, dest any, opts ...*option.Find) error {
 	return t.find(ctx, filter, dest, opts...)
 }
 
@@ -514,7 +514,7 @@ func (t *Template) Find(ctx context.Context, filter, dest any, opts ...option.Fi
 // The opts parameter can be used to specify options for the operation (see the option.Find documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/find/.
-func (t *Template) FindAll(ctx context.Context, dest any, opts ...option.Find) error {
+func (t *Template) FindAll(ctx context.Context, dest any, opts ...*option.Find) error {
 	return t.find(ctx, bson.D{}, dest, opts...)
 }
 
@@ -529,7 +529,7 @@ func (t *Template) FindAll(ctx context.Context, dest any, opts ...option.Find) e
 // The opts parameter can be used to specify options for the operation (see the option.FindPageable documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/find/.
-func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput, opts ...option.FindPageable) (
+func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput, opts ...*option.FindPageable) (
 	*PageResult, error) {
 	if util.IsPointer(input.Ref) {
 		return nil, errors.New("mongo: input.Ref cannot be a pointer")
@@ -580,9 +580,9 @@ func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput
 // The ref parameter must be the collection structure with database and collection tags configured.
 //
 // The opts parameter can be used to specify options for the operation (see the option.Exists documentation).
-func (t *Template) Exists(ctx context.Context, filter, ref any, opts ...option.Exists) (bool, error) {
+func (t *Template) Exists(ctx context.Context, filter, ref any, opts ...*option.Exists) (bool, error) {
 	opt := option.GetExistsOptionByParams(opts)
-	count, err := t.CountDocuments(ctx, filter, ref, option.Count{
+	count, err := t.CountDocuments(ctx, filter, ref, &option.Count{
 		Collation: opt.Collation,
 		Comment:   opt.Comment,
 		Hint:      opt.Hint,
@@ -602,7 +602,7 @@ func (t *Template) Exists(ctx context.Context, filter, ref any, opts ...option.E
 // The ref parameter must be the collection structure with database and collection tags configured.
 //
 // The opts parameter can be used to specify options for the operation (see the option.Exists documentation).
-func (t *Template) ExistsById(ctx context.Context, id, ref any, opts ...option.Exists) (bool, error) {
+func (t *Template) ExistsById(ctx context.Context, id, ref any, opts ...*option.Exists) (bool, error) {
 	return t.Exists(ctx, bson.D{{"_id", id}}, ref, opts...)
 }
 
@@ -621,7 +621,7 @@ func (t *Template) ExistsById(ctx context.Context, id, ref any, opts ...option.E
 // The opts parameter can be used to specify options for the operation (see the option.Aggregate documentation.)
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/aggregate/.
-func (t *Template) Aggregate(ctx context.Context, pipeline any, dest any, opts ...option.Aggregate) error {
+func (t *Template) Aggregate(ctx context.Context, pipeline any, dest any, opts ...*option.Aggregate) error {
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	}
@@ -662,7 +662,7 @@ func (t *Template) Aggregate(ctx context.Context, pipeline any, dest any, opts .
 // The ref parameter must be the collection structure with database and collection tags configured.
 //
 // The opts parameter can be used to specify options for the operation (see the option.Count documentation).
-func (t *Template) CountDocuments(ctx context.Context, filter, ref any, opts ...option.Count) (int64, error) {
+func (t *Template) CountDocuments(ctx context.Context, filter, ref any, opts ...*option.Count) (int64, error) {
 	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return 0, err
@@ -687,7 +687,7 @@ func (t *Template) CountDocuments(ctx context.Context, filter, ref any, opts ...
 // documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/count/.
-func (t *Template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...option.EstimatedDocumentCount) (int64,
+func (t *Template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...*option.EstimatedDocumentCount) (int64,
 	error) {
 	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
@@ -714,7 +714,7 @@ func (t *Template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...
 // The opts parameter can be used to specify options for the operation (see the options.DistinctOptions documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/distinct/.
-func (t *Template) Distinct(ctx context.Context, fieldName string, filter, dest, ref any, opts ...option.Distinct) error {
+func (t *Template) Distinct(ctx context.Context, fieldName string, filter, dest, ref any, opts ...*option.Distinct) error {
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	}
@@ -746,7 +746,7 @@ func (t *Template) Distinct(ctx context.Context, fieldName string, filter, dest,
 // type can be used.
 //
 // The opts parameter can be used to specify options for change stream creation (see the option.Watch documentation).
-func (t *Template) Watch(ctx context.Context, pipeline any, opts ...option.Watch) (*mongo.ChangeStream, error) {
+func (t *Template) Watch(ctx context.Context, pipeline any, opts ...*option.Watch) (*mongo.ChangeStream, error) {
 	opt := option.GetWatchOptionByParams(opts)
 	var watchChangeEvents *mongo.ChangeStream
 	var err error
@@ -784,12 +784,12 @@ func (t *Template) Watch(ctx context.Context, pipeline any, opts ...option.Watch
 //
 // The opts parameter can be used to specify options for change stream creation (see the option.WatchWithHandler
 // documentation).
-func (t *Template) WatchWithHandler(ctx context.Context, pipeline any, handler EventHandler, opts ...option.WatchWithHandler) error {
+func (t *Template) WatchWithHandler(ctx context.Context, pipeline any, handler EventHandler, opts ...*option.WatchWithHandler) error {
 	if handler == nil {
 		return ErrWatchHandlerIsNil
 	}
 	opt := option.GetWatchHandlerOptionByParams(opts)
-	watchEventChanges, err := t.Watch(ctx, pipeline, option.Watch{
+	watchEventChanges, err := t.Watch(ctx, pipeline, &option.Watch{
 		DatabaseName:             opt.DatabaseName,
 		CollectionName:           opt.CollectionName,
 		BatchSize:                opt.BatchSize,
@@ -877,7 +877,7 @@ func (t *Template) CreateManyIndex(ctx context.Context, inputs []IndexInput) ([]
 // The opts parameter can be used to specify options for this operation (see the option.DropIndex documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/dropIndexes/.
-func (t *Template) DropOneIndex(ctx context.Context, name string, ref any, opts ...option.DropIndex) error {
+func (t *Template) DropOneIndex(ctx context.Context, name string, ref any, opts ...*option.DropIndex) error {
 	opt := option.GetDropIndexOptionByParams(opts)
 	_, collection, err := t.getMongoInfosByAny(ref)
 	if err == nil {
@@ -895,7 +895,7 @@ func (t *Template) DropOneIndex(ctx context.Context, name string, ref any, opts 
 // The opts parameter can be used to specify options for this operation (see the option.DropIndex documentation).
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/dropIndexes/.
-func (t *Template) DropAllIndexes(ctx context.Context, ref any, opts ...option.DropIndex) error {
+func (t *Template) DropAllIndexes(ctx context.Context, ref any, opts ...*option.DropIndex) error {
 	opt := option.GetDropIndexOptionByParams(opts)
 	_, collection, err := t.getMongoInfosByAny(ref)
 	if err == nil {
@@ -911,7 +911,7 @@ func (t *Template) DropAllIndexes(ctx context.Context, ref any, opts ...option.D
 // The ref parameter must be the collection structure with database and collection tags configured.
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/listIndexes/.
-func (t *Template) ListIndexes(ctx context.Context, ref any, opts ...option.ListIndexes) ([]IndexResult, error) {
+func (t *Template) ListIndexes(ctx context.Context, ref any, opts ...*option.ListIndexes) ([]IndexResult, error) {
 	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
@@ -932,7 +932,7 @@ func (t *Template) ListIndexes(ctx context.Context, ref any, opts ...option.List
 // ListIndexSpecifications executes a List command and returns a slice of returned IndexSpecifications.
 //
 // The ref parameter must be the collection structure with database and collection tags configured.
-func (t *Template) ListIndexSpecifications(ctx context.Context, ref any, opts ...option.ListIndexes) (
+func (t *Template) ListIndexSpecifications(ctx context.Context, ref any, opts ...*option.ListIndexes) (
 	[]IndexSpecification, error) {
 	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
@@ -1018,7 +1018,7 @@ func (t *Template) GetClient() mongo.Client {
 	return *t.client
 }
 
-func (t *Template) insertOne(sc mongo.SessionContext, document any, opt option.InsertOne) error {
+func (t *Template) insertOne(sc mongo.SessionContext, document any, opt *option.InsertOne) error {
 	if util.IsNotPointer(document) {
 		return ErrDocumentIsNotPointer
 	} else if util.IsNotStruct(document) {
@@ -1041,7 +1041,7 @@ func (t *Template) insertOne(sc mongo.SessionContext, document any, opt option.I
 	return nil
 }
 
-func (t *Template) insertMany(sc mongo.SessionContext, a any, opt option.InsertMany) error {
+func (t *Template) insertMany(sc mongo.SessionContext, a any, opt *option.InsertMany) error {
 	documents := reflect.ValueOf(a)
 	if documents.Kind() != reflect.Slice {
 		return errors.New("mongo: document on insert many needs be a slice")
@@ -1061,7 +1061,7 @@ func (t *Template) insertMany(sc mongo.SessionContext, a any, opt option.InsertM
 		} else if util.IsZero(document) {
 			errs = append(errs, errors.New(ErrDocumentIsEmpty.Error()+" (index: "+indexStr+")"))
 		} else {
-			err := t.insertOne(sc, document, option.InsertOne{
+			err := t.insertOne(sc, document, &option.InsertOne{
 				BypassDocumentValidation: opt.BypassDocumentValidation,
 				Comment:                  opt.Comment,
 			})
@@ -1083,7 +1083,7 @@ func (t *Template) insertMany(sc mongo.SessionContext, a any, opt option.InsertM
 	return nil
 }
 
-func (t *Template) deleteOne(sc mongo.SessionContext, filter, ref any, opt option.Delete) (*DeleteResult, error) {
+func (t *Template) deleteOne(sc mongo.SessionContext, filter, ref any, opt *option.Delete) (*DeleteResult, error) {
 	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
@@ -1103,7 +1103,7 @@ func (t *Template) deleteOne(sc mongo.SessionContext, filter, ref any, opt optio
 	return result, err
 }
 
-func (t *Template) deleteMany(sc mongo.SessionContext, filter, ref any, opt option.Delete) (*DeleteResult, error) {
+func (t *Template) deleteMany(sc mongo.SessionContext, filter, ref any, opt *option.Delete) (*DeleteResult, error) {
 	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
@@ -1123,7 +1123,7 @@ func (t *Template) deleteMany(sc mongo.SessionContext, filter, ref any, opt opti
 	return result, err
 }
 
-func (t *Template) updateOne(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (*UpdateResult, error) {
+func (t *Template) updateOne(sc mongo.SessionContext, filter, update, ref any, opt *option.Update) (*UpdateResult, error) {
 	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
@@ -1149,7 +1149,7 @@ func (t *Template) updateOne(sc mongo.SessionContext, filter, update, ref any, o
 	return result, err
 }
 
-func (t *Template) updateMany(sc mongo.SessionContext, filter, update, ref any, opt option.Update) (*UpdateResult, error) {
+func (t *Template) updateMany(sc mongo.SessionContext, filter, update, ref any, opt *option.Update) (*UpdateResult, error) {
 	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
 		return nil, err
@@ -1175,7 +1175,7 @@ func (t *Template) updateMany(sc mongo.SessionContext, filter, update, ref any, 
 	return result, err
 }
 
-func (t *Template) replaceOne(sc mongo.SessionContext, filter, update, ref any, opt option.Replace) (*UpdateResult,
+func (t *Template) replaceOne(sc mongo.SessionContext, filter, update, ref any, opt *option.Replace) (*UpdateResult,
 	error) {
 	_, collection, err := t.getMongoInfosByAny(ref)
 	if err != nil {
@@ -1201,7 +1201,7 @@ func (t *Template) replaceOne(sc mongo.SessionContext, filter, update, ref any, 
 	return result, err
 }
 
-func (t *Template) find(ctx context.Context, filter, dest any, opts ...option.Find) error {
+func (t *Template) find(ctx context.Context, filter, dest any, opts ...*option.Find) error {
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	}
@@ -1237,7 +1237,7 @@ func (t *Template) find(ctx context.Context, filter, dest any, opts ...option.Fi
 	return cursor.All(ctx, dest)
 }
 
-func (t *Template) findOne(ctx context.Context, filter, dest any, opts ...option.FindOne) error {
+func (t *Template) findOne(ctx context.Context, filter, dest any, opts ...*option.FindOne) error {
 	if util.IsNotPointer(dest) {
 		return ErrDestIsNotPointer
 	} else if util.IsNotStruct(dest) {
@@ -1268,7 +1268,7 @@ func (t *Template) findOne(ctx context.Context, filter, dest any, opts ...option
 	return nil
 }
 
-func (t *Template) findOneAndDelete(sc mongo.SessionContext, filter, dest any, opt option.FindOneAndDelete) error {
+func (t *Template) findOneAndDelete(sc mongo.SessionContext, filter, dest any, opt *option.FindOneAndDelete) error {
 	_, collection, err := t.getMongoInfosByAny(dest)
 	if err != nil {
 		return err
@@ -1290,7 +1290,7 @@ func (t *Template) findOneAndDelete(sc mongo.SessionContext, filter, dest any, o
 	return nil
 }
 
-func (t *Template) findOneAndReplace(sc mongo.SessionContext, filter, replacement, dest any, opt option.FindOneAndReplace) error {
+func (t *Template) findOneAndReplace(sc mongo.SessionContext, filter, replacement, dest any, opt *option.FindOneAndReplace) error {
 	_, collection, err := t.getMongoInfosByAny(dest)
 	if err != nil {
 		return err
@@ -1315,7 +1315,7 @@ func (t *Template) findOneAndReplace(sc mongo.SessionContext, filter, replacemen
 	return nil
 }
 
-func (t *Template) findOneAndUpdate(sc mongo.SessionContext, filter, update, dest any, opt option.FindOneAndUpdate) error {
+func (t *Template) findOneAndUpdate(sc mongo.SessionContext, filter, update, dest any, opt *option.FindOneAndUpdate) error {
 	_, collection, err := t.getMongoInfosByAny(dest)
 	if err != nil {
 		return err

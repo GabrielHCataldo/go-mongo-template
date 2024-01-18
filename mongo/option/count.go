@@ -45,67 +45,70 @@ type EstimatedDocumentCount struct {
 }
 
 // NewCount creates a new Count instance.
-func NewCount() Count {
-	return Count{}
+func NewCount() *Count {
+	return &Count{}
 }
 
 // NewEstimatedDocumentCount creates a new EstimatedDocumentCount instance.
-func NewEstimatedDocumentCount() EstimatedDocumentCount {
-	return EstimatedDocumentCount{}
+func NewEstimatedDocumentCount() *EstimatedDocumentCount {
+	return &EstimatedDocumentCount{}
 }
 
 // SetCollation sets value for the Collation field.
-func (c Count) SetCollation(collation *Collation) Count {
+func (c *Count) SetCollation(collation *Collation) *Count {
 	c.Collation = collation
 	return c
 }
 
 // SetComment sets value for the Comment field.
-func (c Count) SetComment(comment string) Count {
+func (c *Count) SetComment(comment string) *Count {
 	c.Comment = &comment
 	return c
 }
 
 // SetHint sets value for the Hint field.
-func (c Count) SetHint(a any) Count {
+func (c *Count) SetHint(a any) *Count {
 	c.Hint = a
 	return c
 }
 
 // SetLimit sets value for the Limit field.
-func (c Count) SetLimit(i int64) Count {
+func (c *Count) SetLimit(i int64) *Count {
 	c.Limit = &i
 	return c
 }
 
 // SetMaxTime sets value for the MaxTime field.
-func (c Count) SetMaxTime(d time.Duration) Count {
+func (c *Count) SetMaxTime(d time.Duration) *Count {
 	c.MaxTime = &d
 	return c
 }
 
 // SetSkip sets value for the Skip field.
-func (c Count) SetSkip(i int64) Count {
+func (c *Count) SetSkip(i int64) *Count {
 	c.Skip = &i
 	return c
 }
 
 // SetMaxTime sets value for the MaxTime field.
-func (e EstimatedDocumentCount) SetMaxTime(d time.Duration) EstimatedDocumentCount {
+func (e *EstimatedDocumentCount) SetMaxTime(d time.Duration) *EstimatedDocumentCount {
 	e.MaxTime = &d
 	return e
 }
 
 // SetComment sets value for the Comment field.
-func (e EstimatedDocumentCount) SetComment(comment any) EstimatedDocumentCount {
+func (e *EstimatedDocumentCount) SetComment(comment any) *EstimatedDocumentCount {
 	e.Comment = comment
 	return e
 }
 
 // GetCountOptionByParams assembles the Count object from optional parameters.
-func GetCountOptionByParams(opts []Count) Count {
+func GetCountOptionByParams(opts []*Count) Count {
 	result := Count{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.Collation != nil {
 			result.Collation = opt.Collation
 		}
@@ -129,9 +132,12 @@ func GetCountOptionByParams(opts []Count) Count {
 }
 
 // GetEstimatedDocumentCountOptionByParams assembles the EstimatedDocumentCount object from optional parameters.
-func GetEstimatedDocumentCountOptionByParams(opts []EstimatedDocumentCount) EstimatedDocumentCount {
-	result := EstimatedDocumentCount{}
+func GetEstimatedDocumentCountOptionByParams(opts []*EstimatedDocumentCount) *EstimatedDocumentCount {
+	result := &EstimatedDocumentCount{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.Comment != nil {
 			result.Comment = opt.Comment
 		}

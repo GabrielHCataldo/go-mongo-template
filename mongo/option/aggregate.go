@@ -52,74 +52,77 @@ type Aggregate struct {
 }
 
 // NewAggregate creates a new Aggregate instance.
-func NewAggregate() Aggregate {
-	return Aggregate{}
+func NewAggregate() *Aggregate {
+	return &Aggregate{}
 }
 
 // SetAllowDiskUse sets value for the AllowDiskUse field.
-func (a Aggregate) SetAllowDiskUse(b bool) Aggregate {
+func (a *Aggregate) SetAllowDiskUse(b bool) *Aggregate {
 	a.AllowDiskUse = &b
 	return a
 }
 
 // SetBatchSize sets value for the BatchSize field.
-func (a Aggregate) SetBatchSize(i int32) Aggregate {
+func (a *Aggregate) SetBatchSize(i int32) *Aggregate {
 	a.BatchSize = &i
 	return a
 }
 
 // SetBypassDocumentValidation sets value for the BypassDocumentValidation field.
-func (a Aggregate) SetBypassDocumentValidation(b bool) Aggregate {
+func (a *Aggregate) SetBypassDocumentValidation(b bool) *Aggregate {
 	a.BypassDocumentValidation = &b
 	return a
 }
 
 // SetCollation sets value for the Collation field.
-func (a Aggregate) SetCollation(c *Collation) Aggregate {
+func (a *Aggregate) SetCollation(c *Collation) *Aggregate {
 	a.Collation = c
 	return a
 }
 
 // SetMaxTime sets value for the MaxTime field.
-func (a Aggregate) SetMaxTime(d time.Duration) Aggregate {
+func (a *Aggregate) SetMaxTime(d time.Duration) *Aggregate {
 	a.MaxTime = &d
 	return a
 }
 
 // SetMaxAwaitTime sets value for the MaxAwaitTime field.
-func (a Aggregate) SetMaxAwaitTime(d time.Duration) Aggregate {
+func (a *Aggregate) SetMaxAwaitTime(d time.Duration) *Aggregate {
 	a.MaxAwaitTime = &d
 	return a
 }
 
 // SetComment sets value for the Comment field.
-func (a Aggregate) SetComment(s string) Aggregate {
+func (a *Aggregate) SetComment(s string) *Aggregate {
 	a.Comment = &s
 	return a
 }
 
 // SetHint sets value for the Hint field.
-func (a Aggregate) SetHint(v any) Aggregate {
+func (a *Aggregate) SetHint(v any) *Aggregate {
 	a.Hint = v
 	return a
 }
 
 // SetLet sets value for the Let field.
-func (a Aggregate) SetLet(v any) Aggregate {
+func (a *Aggregate) SetLet(v any) *Aggregate {
 	a.Let = v
 	return a
 }
 
 // SetCustom sets value for the Custom field.
-func (a Aggregate) SetCustom(b bson.M) Aggregate {
+func (a *Aggregate) SetCustom(b bson.M) *Aggregate {
 	a.Custom = b
 	return a
 }
 
 // GetAggregateOptionByParams assembles the Aggregate object from optional parameters.
-func GetAggregateOptionByParams(opts []Aggregate) Aggregate {
-	result := Aggregate{}
+func GetAggregateOptionByParams(opts []*Aggregate) *Aggregate {
+	result := &Aggregate{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.AllowDiskUse != nil {
 			result.AllowDiskUse = opt.AllowDiskUse
 		}

@@ -378,589 +378,592 @@ type FindOneAndUpdate struct {
 }
 
 // NewFind creates a new Find instance.
-func NewFind() Find {
-	return Find{}
+func NewFind() *Find {
+	return &Find{}
 }
 
 // NewFindPageable creates a new FindPageable instance.
-func NewFindPageable() FindPageable {
-	return FindPageable{}
+func NewFindPageable() *FindPageable {
+	return &FindPageable{}
 }
 
 // NewFindOne creates a new FindOne instance.
-func NewFindOne() FindOne {
-	return FindOne{}
+func NewFindOne() *FindOne {
+	return &FindOne{}
 }
 
 // NewFindOneById creates a new FindOneById instance.
-func NewFindOneById() FindOneById {
-	return FindOneById{}
+func NewFindOneById() *FindOneById {
+	return &FindOneById{}
 }
 
 // NewFindOneAndDelete creates a new FindOneAndDelete instance.
-func NewFindOneAndDelete() FindOneAndDelete {
-	return FindOneAndDelete{}
+func NewFindOneAndDelete() *FindOneAndDelete {
+	return &FindOneAndDelete{}
 }
 
 // NewFindOneAndReplace creates a new FindOneAndReplace instance.
-func NewFindOneAndReplace() FindOneAndReplace {
-	return FindOneAndReplace{}
+func NewFindOneAndReplace() *FindOneAndReplace {
+	return &FindOneAndReplace{}
 }
 
 // NewFindOneAndUpdate creates a new FindOneAndUpdate instance.
-func NewFindOneAndUpdate() FindOneAndUpdate {
-	return FindOneAndUpdate{}
+func NewFindOneAndUpdate() *FindOneAndUpdate {
+	return &FindOneAndUpdate{}
 }
 
 // SetAllowDiskUse creates a new AllowDiskUse instance.
-func (f Find) SetAllowDiskUse(b bool) Find {
+func (f *Find) SetAllowDiskUse(b bool) *Find {
 	f.AllowDiskUse = &b
 	return f
 }
 
 // SetAllowPartialResults creates a new AllowPartialResults instance.
-func (f Find) SetAllowPartialResults(b bool) Find {
+func (f *Find) SetAllowPartialResults(b bool) *Find {
 	f.AllowPartialResults = &b
 	return f
 }
 
 // SetBatchSize creates a new BatchSize instance.
-func (f Find) SetBatchSize(i int32) Find {
+func (f *Find) SetBatchSize(i int32) *Find {
 	f.BatchSize = &i
 	return f
 }
 
 // SetCollation creates a new Collation instance.
-func (f Find) SetCollation(c *Collation) Find {
+func (f *Find) SetCollation(c *Collation) *Find {
 	f.Collation = c
 	return f
 }
 
 // SetComment creates a new Comment instance.
-func (f Find) SetComment(s string) Find {
+func (f *Find) SetComment(s string) *Find {
 	f.Comment = &s
 	return f
 }
 
 // SetCursorType creates a new CursorType instance.
-func (f Find) SetCursorType(c CursorType) Find {
+func (f *Find) SetCursorType(c CursorType) *Find {
 	f.CursorType = &c
 	return f
 }
 
 // SetHint creates a new Hint instance.
-func (f Find) SetHint(v any) Find {
+func (f *Find) SetHint(v any) *Find {
 	f.Hint = v
 	return f
 }
 
 // SetLimit creates a new Limit instance.
-func (f Find) SetLimit(i int64) Find {
+func (f *Find) SetLimit(i int64) *Find {
 	f.Limit = &i
 	return f
 }
 
 // SetMax creates a new Max instance.
-func (f Find) SetMax(v any) Find {
+func (f *Find) SetMax(v any) *Find {
 	f.Max = v
 	return f
 }
 
 // SetMaxAwaitTime creates a new MaxAwaitTime instance.
-func (f Find) SetMaxAwaitTime(d time.Duration) Find {
+func (f *Find) SetMaxAwaitTime(d time.Duration) *Find {
 	f.MaxAwaitTime = &d
 	return f
 }
 
 // SetMaxTime creates a new MaxTime instance.
-func (f Find) SetMaxTime(d time.Duration) Find {
+func (f *Find) SetMaxTime(d time.Duration) *Find {
 	f.MaxTime = &d
 	return f
 }
 
 // SetMin creates a new Min instance.
-func (f Find) SetMin(v any) Find {
+func (f *Find) SetMin(v any) *Find {
 	f.Min = v
 	return f
 }
 
 // SetNoCursorTimeout creates a new NoCursorTimeout instance.
-func (f Find) SetNoCursorTimeout(b bool) Find {
+func (f *Find) SetNoCursorTimeout(b bool) *Find {
 	f.NoCursorTimeout = &b
 	return f
 }
 
 // SetProjection creates a new Projection instance.
-func (f Find) SetProjection(v any) Find {
+func (f *Find) SetProjection(v any) *Find {
 	f.Projection = v
 	return f
 }
 
 // SetReturnKey creates a new ReturnKey instance.
-func (f Find) SetReturnKey(b bool) Find {
+func (f *Find) SetReturnKey(b bool) *Find {
 	f.ReturnKey = &b
 	return f
 }
 
 // SetShowRecordID creates a new ShowRecordID instance.
-func (f Find) SetShowRecordID(b bool) Find {
+func (f *Find) SetShowRecordID(b bool) *Find {
 	f.ShowRecordID = &b
 	return f
 }
 
 // SetSkip creates a new Skip instance.
-func (f Find) SetSkip(i int64) Find {
+func (f *Find) SetSkip(i int64) *Find {
 	f.Skip = &i
 	return f
 }
 
 // SetSort creates a new Sort instance.
-func (f Find) SetSort(a any) Find {
+func (f *Find) SetSort(a any) *Find {
 	f.Sort = a
 	return f
 }
 
 // SetLet creates a new Let instance.
-func (f Find) SetLet(v any) Find {
+func (f *Find) SetLet(v any) *Find {
 	f.Let = v
 	return f
 }
 
 // SetAllowDiskUse creates a new AllowDiskUse instance.
-func (f FindPageable) SetAllowDiskUse(b bool) FindPageable {
+func (f *FindPageable) SetAllowDiskUse(b bool) *FindPageable {
 	f.AllowDiskUse = &b
 	return f
 }
 
 // SetAllowPartialResults creates a new AllowPartialResults instance.
-func (f FindPageable) SetAllowPartialResults(b bool) FindPageable {
+func (f *FindPageable) SetAllowPartialResults(b bool) *FindPageable {
 	f.AllowPartialResults = &b
 	return f
 }
 
 // SetBatchSize creates a new BatchSize instance.
-func (f FindPageable) SetBatchSize(i int32) FindPageable {
+func (f *FindPageable) SetBatchSize(i int32) *FindPageable {
 	f.BatchSize = &i
 	return f
 }
 
 // SetCollation creates a new Collation instance.
-func (f FindPageable) SetCollation(c *Collation) FindPageable {
+func (f *FindPageable) SetCollation(c *Collation) *FindPageable {
 	f.Collation = c
 	return f
 }
 
 // SetComment creates a new Comment instance.
-func (f FindPageable) SetComment(s string) FindPageable {
+func (f *FindPageable) SetComment(s string) *FindPageable {
 	f.Comment = &s
 	return f
 }
 
 // SetCursorType creates a new CursorType instance.
-func (f FindPageable) SetCursorType(c CursorType) FindPageable {
+func (f *FindPageable) SetCursorType(c CursorType) *FindPageable {
 	f.CursorType = &c
 	return f
 }
 
 // SetHint creates a new Hint instance.
-func (f FindPageable) SetHint(v any) FindPageable {
+func (f *FindPageable) SetHint(v any) *FindPageable {
 	f.Hint = v
 	return f
 }
 
 // SetMax creates a new Max instance.
-func (f FindPageable) SetMax(v any) FindPageable {
+func (f *FindPageable) SetMax(v any) *FindPageable {
 	f.Max = v
 	return f
 }
 
 // SetMaxAwaitTime creates a new MaxAwaitTime instance.
-func (f FindPageable) SetMaxAwaitTime(d time.Duration) FindPageable {
+func (f *FindPageable) SetMaxAwaitTime(d time.Duration) *FindPageable {
 	f.MaxAwaitTime = &d
 	return f
 }
 
 // SetMaxTime creates a new MaxTime instance.
-func (f FindPageable) SetMaxTime(d time.Duration) FindPageable {
+func (f *FindPageable) SetMaxTime(d time.Duration) *FindPageable {
 	f.MaxTime = &d
 	return f
 }
 
 // SetMin creates a new Min instance.
-func (f FindPageable) SetMin(v any) FindPageable {
+func (f *FindPageable) SetMin(v any) *FindPageable {
 	f.Min = v
 	return f
 }
 
 // SetNoCursorTimeout creates a new NoCursorTimeout instance.
-func (f FindPageable) SetNoCursorTimeout(b bool) FindPageable {
+func (f *FindPageable) SetNoCursorTimeout(b bool) *FindPageable {
 	f.NoCursorTimeout = &b
 	return f
 }
 
 // SetProjection creates a new Projection instance.
-func (f FindPageable) SetProjection(v any) FindPageable {
+func (f *FindPageable) SetProjection(v any) *FindPageable {
 	f.Projection = v
 	return f
 }
 
 // SetReturnKey creates a new ReturnKey instance.
-func (f FindPageable) SetReturnKey(b bool) FindPageable {
+func (f *FindPageable) SetReturnKey(b bool) *FindPageable {
 	f.ReturnKey = &b
 	return f
 }
 
 // SetShowRecordID creates a new ShowRecordID instance.
-func (f FindPageable) SetShowRecordID(b bool) FindPageable {
+func (f *FindPageable) SetShowRecordID(b bool) *FindPageable {
 	f.ShowRecordID = &b
 	return f
 }
 
 // SetLet creates a new Let instance.
-func (f FindPageable) SetLet(v any) FindPageable {
+func (f *FindPageable) SetLet(v any) *FindPageable {
 	f.Let = v
 	return f
 }
 
 // SetAllowPartialResults creates a new AllowPartialResults instance.
-func (f FindOne) SetAllowPartialResults(b bool) FindOne {
+func (f *FindOne) SetAllowPartialResults(b bool) *FindOne {
 	f.AllowPartialResults = &b
 	return f
 }
 
 // SetCollation creates a new Collation instance.
-func (f FindOne) SetCollation(c *Collation) FindOne {
+func (f *FindOne) SetCollation(c *Collation) *FindOne {
 	f.Collation = c
 	return f
 }
 
 // SetComment creates a new Comment instance.
-func (f FindOne) SetComment(s string) FindOne {
+func (f *FindOne) SetComment(s string) *FindOne {
 	f.Comment = &s
 	return f
 }
 
 // SetHint creates a new Hint instance.
-func (f FindOne) SetHint(v any) FindOne {
+func (f *FindOne) SetHint(v any) *FindOne {
 	f.Hint = v
 	return f
 }
 
 // SetMax creates a new Max instance.
-func (f FindOne) SetMax(v any) FindOne {
+func (f *FindOne) SetMax(v any) *FindOne {
 	f.Max = v
 	return f
 }
 
 // SetMaxTime creates a new MaxTime instance.
-func (f FindOne) SetMaxTime(d time.Duration) FindOne {
+func (f *FindOne) SetMaxTime(d time.Duration) *FindOne {
 	f.MaxTime = &d
 	return f
 }
 
 // SetMin creates a new Min instance.
-func (f FindOne) SetMin(v any) FindOne {
+func (f *FindOne) SetMin(v any) *FindOne {
 	f.Min = v
 	return f
 }
 
 // SetProjection creates a new Projection instance.
-func (f FindOne) SetProjection(v any) FindOne {
+func (f *FindOne) SetProjection(v any) *FindOne {
 	f.Projection = v
 	return f
 }
 
 // SetReturnKey creates a new ReturnKey instance.
-func (f FindOne) SetReturnKey(b bool) FindOne {
+func (f *FindOne) SetReturnKey(b bool) *FindOne {
 	f.ReturnKey = &b
 	return f
 }
 
 // SetShowRecordID creates a new ShowRecordID instance.
-func (f FindOne) SetShowRecordID(b bool) FindOne {
+func (f *FindOne) SetShowRecordID(b bool) *FindOne {
 	f.ShowRecordID = &b
 	return f
 }
 
 // SetSkip creates a new Skip instance.
-func (f FindOne) SetSkip(i int64) FindOne {
+func (f *FindOne) SetSkip(i int64) *FindOne {
 	f.Skip = &i
 	return f
 }
 
 // SetSort creates a new Sort instance.
-func (f FindOne) SetSort(a any) FindOne {
+func (f *FindOne) SetSort(a any) *FindOne {
 	f.Sort = a
 	return f
 }
 
 // SetAllowPartialResults creates a new AllowPartialResults instance.
-func (f FindOneById) SetAllowPartialResults(b bool) FindOneById {
+func (f *FindOneById) SetAllowPartialResults(b bool) *FindOneById {
 	f.AllowPartialResults = &b
 	return f
 }
 
 // SetCollation creates a new Collation instance.
-func (f FindOneById) SetCollation(c *Collation) FindOneById {
+func (f *FindOneById) SetCollation(c *Collation) *FindOneById {
 	f.Collation = c
 	return f
 }
 
 // SetComment creates a new Comment instance.
-func (f FindOneById) SetComment(s string) FindOneById {
+func (f *FindOneById) SetComment(s string) *FindOneById {
 	f.Comment = &s
 	return f
 }
 
 // SetHint creates a new Hint instance.
-func (f FindOneById) SetHint(v any) FindOneById {
+func (f *FindOneById) SetHint(v any) *FindOneById {
 	f.Hint = v
 	return f
 }
 
 // SetMax creates a new Max instance.
-func (f FindOneById) SetMax(v any) FindOneById {
+func (f *FindOneById) SetMax(v any) *FindOneById {
 	f.Max = v
 	return f
 }
 
 // SetMaxTime creates a new MaxTime instance.
-func (f FindOneById) SetMaxTime(d time.Duration) FindOneById {
+func (f *FindOneById) SetMaxTime(d time.Duration) *FindOneById {
 	f.MaxTime = &d
 	return f
 }
 
 // SetMin creates a new Min instance.
-func (f FindOneById) SetMin(v any) FindOneById {
+func (f *FindOneById) SetMin(v any) *FindOneById {
 	f.Min = v
 	return f
 }
 
 // SetProjection creates a new Projection instance.
-func (f FindOneById) SetProjection(v any) FindOneById {
+func (f *FindOneById) SetProjection(v any) *FindOneById {
 	f.Projection = v
 	return f
 }
 
 // SetReturnKey creates a new ReturnKey instance.
-func (f FindOneById) SetReturnKey(b bool) FindOneById {
+func (f *FindOneById) SetReturnKey(b bool) *FindOneById {
 	f.ReturnKey = &b
 	return f
 }
 
 // SetShowRecordID creates a new ShowRecordID instance.
-func (f FindOneById) SetShowRecordID(b bool) FindOneById {
+func (f *FindOneById) SetShowRecordID(b bool) *FindOneById {
 	f.ShowRecordID = &b
 	return f
 }
 
 // SetCollation creates a new Collation instance.
-func (f FindOneAndDelete) SetCollation(c *Collation) FindOneAndDelete {
+func (f *FindOneAndDelete) SetCollation(c *Collation) *FindOneAndDelete {
 	f.Collation = c
 	return f
 }
 
 // SetComment creates a new Comment instance.
-func (f FindOneAndDelete) SetComment(s string) FindOneAndDelete {
+func (f *FindOneAndDelete) SetComment(s string) *FindOneAndDelete {
 	f.Comment = s
 	return f
 }
 
 // SetHint creates a new Hint instance.
-func (f FindOneAndDelete) SetHint(v any) FindOneAndDelete {
+func (f *FindOneAndDelete) SetHint(v any) *FindOneAndDelete {
 	f.Hint = v
 	return f
 }
 
 // SetMaxTime creates a new MaxTime instance.
-func (f FindOneAndDelete) SetMaxTime(d time.Duration) FindOneAndDelete {
+func (f *FindOneAndDelete) SetMaxTime(d time.Duration) *FindOneAndDelete {
 	f.MaxTime = &d
 	return f
 }
 
 // SetProjection creates a new Projection instance.
-func (f FindOneAndDelete) SetProjection(v any) FindOneAndDelete {
+func (f *FindOneAndDelete) SetProjection(v any) *FindOneAndDelete {
 	f.Projection = v
 	return f
 }
 
 // SetSort creates a new Sort instance.
-func (f FindOneAndDelete) SetSort(a any) FindOneAndDelete {
+func (f *FindOneAndDelete) SetSort(a any) *FindOneAndDelete {
 	f.Sort = a
 	return f
 }
 
 // SetLet creates a new Let instance.
-func (f FindOneAndDelete) SetLet(v any) FindOneAndDelete {
+func (f *FindOneAndDelete) SetLet(v any) *FindOneAndDelete {
 	f.Let = v
 	return f
 }
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
-func (f FindOneAndDelete) SetDisableAutoCloseSession(b bool) FindOneAndDelete {
+func (f *FindOneAndDelete) SetDisableAutoCloseSession(b bool) *FindOneAndDelete {
 	f.DisableAutoCloseSession = b
 	return f
 }
 
 // SetForceRecreateSession creates a new ForceRecreateSession instance.
-func (f FindOneAndDelete) SetForceRecreateSession(b bool) FindOneAndDelete {
+func (f *FindOneAndDelete) SetForceRecreateSession(b bool) *FindOneAndDelete {
 	f.ForceRecreateSession = b
 	return f
 }
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
-func (f FindOneAndReplace) SetDisableAutoCloseSession(b bool) FindOneAndReplace {
+func (f *FindOneAndReplace) SetDisableAutoCloseSession(b bool) *FindOneAndReplace {
 	f.DisableAutoCloseSession = b
 	return f
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
-func (f FindOneAndReplace) SetForceRecreateSession(b bool) FindOneAndReplace {
+func (f *FindOneAndReplace) SetForceRecreateSession(b bool) *FindOneAndReplace {
 	f.ForceRecreateSession = b
 	return f
 }
 
 // SetBypassDocumentValidation sets value for the BypassDocumentValidation field.
-func (f FindOneAndReplace) SetBypassDocumentValidation(b bool) FindOneAndReplace {
+func (f *FindOneAndReplace) SetBypassDocumentValidation(b bool) *FindOneAndReplace {
 	f.BypassDocumentValidation = &b
 	return f
 }
 
 // SetCollation sets value for the Collation field.
-func (f FindOneAndReplace) SetCollation(c *Collation) FindOneAndReplace {
+func (f *FindOneAndReplace) SetCollation(c *Collation) *FindOneAndReplace {
 	f.Collation = c
 	return f
 }
 
 // SetComment sets value for the Comment field.
-func (f FindOneAndReplace) SetComment(s string) FindOneAndReplace {
+func (f *FindOneAndReplace) SetComment(s string) *FindOneAndReplace {
 	f.Comment = s
 	return f
 }
 
 // SetHint sets value for the Hint field.
-func (f FindOneAndReplace) SetHint(v any) FindOneAndReplace {
+func (f *FindOneAndReplace) SetHint(v any) *FindOneAndReplace {
 	f.Hint = v
 	return f
 }
 
 // SetMaxTime creates a new MaxTime instance.
-func (f FindOneAndReplace) SetMaxTime(d time.Duration) FindOneAndReplace {
+func (f *FindOneAndReplace) SetMaxTime(d time.Duration) *FindOneAndReplace {
 	f.MaxTime = &d
 	return f
 }
 
 // SetProjection creates a new Projection instance.
-func (f FindOneAndReplace) SetProjection(v any) FindOneAndReplace {
+func (f *FindOneAndReplace) SetProjection(v any) *FindOneAndReplace {
 	f.Projection = v
 	return f
 }
 
 // SetReturnDocument creates a new ReturnDocument instance.
-func (f FindOneAndReplace) SetReturnDocument(r ReturnDocument) FindOneAndReplace {
+func (f *FindOneAndReplace) SetReturnDocument(r ReturnDocument) *FindOneAndReplace {
 	f.ReturnDocument = &r
 	return f
 }
 
 // SetUpsert creates a new Upsert instance.
-func (f FindOneAndReplace) SetUpsert(b bool) FindOneAndReplace {
+func (f *FindOneAndReplace) SetUpsert(b bool) *FindOneAndReplace {
 	f.Upsert = &b
 	return f
 }
 
 // SetLet sets value for the Let field.
-func (f FindOneAndReplace) SetLet(v any) FindOneAndReplace {
+func (f *FindOneAndReplace) SetLet(v any) *FindOneAndReplace {
 	f.Let = v
 	return f
 }
 
 // SetSort creates a new Sort instance.
-func (f FindOneAndReplace) SetSort(a any) FindOneAndReplace {
+func (f *FindOneAndReplace) SetSort(a any) *FindOneAndReplace {
 	f.Sort = a
 	return f
 }
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
-func (f FindOneAndUpdate) SetDisableAutoCloseSession(b bool) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetDisableAutoCloseSession(b bool) *FindOneAndUpdate {
 	f.DisableAutoCloseSession = b
 	return f
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
-func (f FindOneAndUpdate) SetForceRecreateSession(b bool) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetForceRecreateSession(b bool) *FindOneAndUpdate {
 	f.ForceRecreateSession = b
 	return f
 }
 
-func (f FindOneAndUpdate) SetArrayFilters(a *ArrayFilters) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetArrayFilters(a *ArrayFilters) *FindOneAndUpdate {
 	f.ArrayFilters = a
 	return f
 }
 
 // SetBypassDocumentValidation sets value for the BypassDocumentValidation field.
-func (f FindOneAndUpdate) SetBypassDocumentValidation(b bool) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetBypassDocumentValidation(b bool) *FindOneAndUpdate {
 	f.BypassDocumentValidation = &b
 	return f
 }
 
 // SetCollation sets value for the Collation field.
-func (f FindOneAndUpdate) SetCollation(c *Collation) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetCollation(c *Collation) *FindOneAndUpdate {
 	f.Collation = c
 	return f
 }
 
 // SetComment sets value for the Comment field.
-func (f FindOneAndUpdate) SetComment(a any) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetComment(a any) *FindOneAndUpdate {
 	f.Comment = a
 	return f
 }
 
 // SetHint sets value for the Hint field.
-func (f FindOneAndUpdate) SetHint(v any) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetHint(v any) *FindOneAndUpdate {
 	f.Hint = v
 	return f
 }
 
 // SetLet sets value for the Let field.
-func (f FindOneAndUpdate) SetLet(v any) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetLet(v any) *FindOneAndUpdate {
 	f.Let = v
 	return f
 }
 
 // SetMaxTime creates a new MaxTime instance.
-func (f FindOneAndUpdate) SetMaxTime(d time.Duration) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetMaxTime(d time.Duration) *FindOneAndUpdate {
 	f.MaxTime = &d
 	return f
 }
 
 // SetProjection creates a new Projection instance.
-func (f FindOneAndUpdate) SetProjection(v any) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetProjection(v any) *FindOneAndUpdate {
 	f.Projection = v
 	return f
 }
 
 // SetReturnDocument creates a new ReturnDocument instance.
-func (f FindOneAndUpdate) SetReturnDocument(r ReturnDocument) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetReturnDocument(r ReturnDocument) *FindOneAndUpdate {
 	f.ReturnDocument = &r
 	return f
 }
 
 // SetSort creates a new Sort instance.
-func (f FindOneAndUpdate) SetSort(i any) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetSort(i any) *FindOneAndUpdate {
 	f.Sort = i
 	return f
 }
 
 // SetUpsert creates a new Upsert instance.
-func (f FindOneAndUpdate) SetUpsert(b bool) FindOneAndUpdate {
+func (f *FindOneAndUpdate) SetUpsert(b bool) *FindOneAndUpdate {
 	f.Upsert = &b
 	return f
 }
 
 // GetFindOptionByParams assembles the Find object from optional parameters.
-func GetFindOptionByParams(opts []Find) Find {
-	result := Find{}
+func GetFindOptionByParams(opts []*Find) *Find {
+	result := &Find{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.AllowDiskUse != nil {
 			result.AllowDiskUse = opt.AllowDiskUse
 		}
@@ -1023,9 +1026,12 @@ func GetFindOptionByParams(opts []Find) Find {
 }
 
 // GetFindPageableOptionByParams assembles the FindPageable object from optional parameters.
-func GetFindPageableOptionByParams(opts []FindPageable) FindPageable {
-	result := FindPageable{}
+func GetFindPageableOptionByParams(opts []*FindPageable) *FindPageable {
+	result := &FindPageable{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.AllowDiskUse != nil {
 			result.AllowDiskUse = opt.AllowDiskUse
 		}
@@ -1079,9 +1085,12 @@ func GetFindPageableOptionByParams(opts []FindPageable) FindPageable {
 }
 
 // GetFindOneOptionByParams assembles the FindOne object from optional parameters.
-func GetFindOneOptionByParams(opts []FindOne) FindOne {
-	result := FindOne{}
+func GetFindOneOptionByParams(opts []*FindOne) *FindOne {
+	result := &FindOne{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.AllowPartialResults != nil {
 			result.AllowPartialResults = opt.AllowPartialResults
 		}
@@ -1123,9 +1132,12 @@ func GetFindOneOptionByParams(opts []FindOne) FindOne {
 }
 
 // GetFindOneByIdOptionByParams assembles the FindOneById object from optional parameters.
-func GetFindOneByIdOptionByParams(opts []FindOneById) FindOneById {
-	result := FindOneById{}
+func GetFindOneByIdOptionByParams(opts []*FindOneById) *FindOneById {
+	result := &FindOneById{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.AllowPartialResults != nil {
 			result.AllowPartialResults = opt.AllowPartialResults
 		}
@@ -1161,9 +1173,12 @@ func GetFindOneByIdOptionByParams(opts []FindOneById) FindOneById {
 }
 
 // GetFindOneAndDeleteOptionByParams assembles the FindOneAndDelete object from optional parameters.
-func GetFindOneAndDeleteOptionByParams(opts []FindOneAndDelete) FindOneAndDelete {
-	result := FindOneAndDelete{}
+func GetFindOneAndDeleteOptionByParams(opts []*FindOneAndDelete) *FindOneAndDelete {
+	result := &FindOneAndDelete{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.DisableAutoCloseSession {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
@@ -1199,9 +1214,12 @@ func GetFindOneAndDeleteOptionByParams(opts []FindOneAndDelete) FindOneAndDelete
 }
 
 // GetFindOneAndReplaceOptionByParams assembles the FindOneAndReplace object from optional parameters.
-func GetFindOneAndReplaceOptionByParams(opts []FindOneAndReplace) FindOneAndReplace {
-	result := FindOneAndReplace{}
+func GetFindOneAndReplaceOptionByParams(opts []*FindOneAndReplace) *FindOneAndReplace {
+	result := &FindOneAndReplace{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.BypassDocumentValidation != nil {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
@@ -1243,9 +1261,12 @@ func GetFindOneAndReplaceOptionByParams(opts []FindOneAndReplace) FindOneAndRepl
 }
 
 // GetFindOneAndUpdateOptionByParams assembles the FindOneAndUpdate object from optional parameters.
-func GetFindOneAndUpdateOptionByParams(opts []FindOneAndUpdate) FindOneAndUpdate {
-	result := FindOneAndUpdate{}
+func GetFindOneAndUpdateOptionByParams(opts []*FindOneAndUpdate) *FindOneAndUpdate {
+	result := &FindOneAndUpdate{}
 	for _, opt := range opts {
+		if opt == nil {
+			continue
+		}
 		if opt.BypassDocumentValidation != nil {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}

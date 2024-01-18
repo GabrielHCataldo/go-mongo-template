@@ -38,7 +38,7 @@ type EventContext struct {
 
 type EventHandler func(ctx *EventContext)
 
-func processNextEvent(handler EventHandler, event EventInfo, opt option.WatchWithHandler) {
+func processNextEvent(handler EventHandler, event EventInfo, opt *option.WatchWithHandler) {
 	ctx, cancel := context.WithTimeout(context.TODO(), opt.ContextFuncTimeout)
 	defer cancel()
 	signal := make(chan struct{}, 1)
