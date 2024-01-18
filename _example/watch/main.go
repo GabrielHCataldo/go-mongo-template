@@ -56,7 +56,8 @@ func watchHandler() {
 	pipeline := mongo.Pipeline{bson.D{{"$match", bson.D{
 		{"operationType", bson.M{"$in": []string{"insert", "update", "delete", "replace"}}},
 	}}}}
-	err = mongoTemplate.WatchHandler(context.TODO(), pipeline, handler, option.NewWatchWithHandler().SetDatabaseName("test"))
+	opt := option.NewWatchWithHandler().SetDatabaseName("test")
+	err = mongoTemplate.WatchWithHandler(context.TODO(), pipeline, handler, opt)
 	if err != nil {
 		logger.Error("error watch handler:", err)
 	} else {
@@ -64,6 +65,6 @@ func watchHandler() {
 	}
 }
 
-func handler(ctx *mongo.ContextWatch) {
-	logger.Info("handler watch called:", ctx)
+func handler(ctx *mongo.EventContext) {
+	logger.Info("handler called:", ctx)
 }

@@ -784,12 +784,12 @@ func (t *Template) Watch(ctx context.Context, pipeline any, opts ...option.Watch
 //
 // The opts parameter can be used to specify options for change stream creation (see the option.WatchWithHandler
 // documentation).
-func (t *Template) WatchWithHandler(ctx context.Context, pipeline any, handler Handler, opts ...option.WatchWithHandler) error {
+func (t *Template) WatchWithHandler(ctx context.Context, pipeline any, handler EventHandler, opts ...option.WatchWithHandler) error {
 	if handler == nil {
 		return ErrWatchHandlerIsNil
 	}
 	opt := option.GetWatchHandlerOptionByParams(opts)
-	watchChangeEvents, err := t.Watch(ctx, pipeline, option.Watch{
+	watchEventChanges, err := t.Watch(ctx, pipeline, option.Watch{
 		DatabaseName:             opt.DatabaseName,
 		CollectionName:           opt.CollectionName,
 		BatchSize:                opt.BatchSize,
@@ -808,12 +808,12 @@ func (t *Template) WatchWithHandler(ctx context.Context, pipeline any, handler H
 	if err != nil {
 		return err
 	}
-	for watchChangeEvents.Next(ctx) {
-		var event WatchEvent
-		_ = watchChangeEvents.Decode(&event)
-		processToWatchNext(handler, event, opt)
+	for watchEventChanges.Next(ctx) {
+		var event EventInfo
+		_ = watchEventChanges.Decode(&event)
+		processNextEvent(handler, event, opt)
 	}
-	_ = watchChangeEvents.Close(ctx)
+	_ = watchEventChanges.Close(ctx)
 	return nil
 }
 

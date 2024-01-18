@@ -231,7 +231,7 @@ type testWatch struct {
 type testWatchHandler struct {
 	name            string
 	pipeline        any
-	handler         Handler
+	handler         EventHandler
 	option          option.WatchWithHandler
 	durationTimeout time.Duration
 	wantErr         bool
@@ -1580,7 +1580,7 @@ func initListTestWatchHandler() []testWatchHandler {
 			pipeline: Pipeline{bson.D{{"$match", bson.D{
 				{"operationType", bson.M{"$in": []string{"insert", "update", "delete", "replace"}}},
 			}}}},
-			handler: func(ctx *ContextWatch) {
+			handler: func(ctx *EventContext) {
 				logger.Info("watch handler ctx:", ctx)
 			},
 			option:          initOptionWatchHandler(),
@@ -1591,7 +1591,7 @@ func initListTestWatchHandler() []testWatchHandler {
 			pipeline: Pipeline{bson.D{{"$match", bson.D{
 				{"operationType", bson.M{"$in": []string{"insert", "update", "delete", "replace"}}},
 			}}}},
-			handler: func(ctx *ContextWatch) {
+			handler: func(ctx *EventContext) {
 				logger.Info("watch handler ctx:", ctx)
 				time.Sleep(5 * time.Nanosecond)
 			},
@@ -1601,7 +1601,7 @@ func initListTestWatchHandler() []testWatchHandler {
 		{
 			name:     "failed",
 			pipeline: nil,
-			handler: func(ctx *ContextWatch) {
+			handler: func(ctx *EventContext) {
 			},
 			option: initOptionWatchHandler().
 				SetDatabaseName("test").

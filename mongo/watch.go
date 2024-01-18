@@ -7,7 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type WatchEvent struct {
+type EventInfo struct {
 	DocumentKey       documentKey         `bson:"documentKey"`
 	NS                ns                  `bson:"ns"`
 	OperationType     string              `bson:"operationType"`
@@ -31,18 +31,18 @@ type updateDescription struct {
 	TruncatedArrays []string       `bson:"truncatedArrays"`
 }
 
-type ContextWatch struct {
+type EventContext struct {
 	context.Context `json:"-"`
-	Event           WatchEvent
+	Event           EventInfo
 }
 
-type Handler func(ctx *ContextWatch)
+type EventHandler func(ctx *EventContext)
 
-func processToWatchNext(handler Handler, event WatchEvent, opt option.WatchWithHandler) {
+func processNextEvent(handler EventHandler, event EventInfo, opt option.WatchWithHandler) {
 	ctx, cancel := context.WithTimeout(context.TODO(), opt.ContextFuncTimeout)
 	defer cancel()
 	signal := make(chan struct{}, 1)
-	go executeWatchHandler(ctx, handler, event, &signal)
+	go executeEventHandler(ctx, handler, event, &signal)
 	select {
 	case <-ctx.Done():
 	case <-signal:
@@ -50,8 +50,8 @@ func processToWatchNext(handler Handler, event WatchEvent, opt option.WatchWithH
 	}
 }
 
-func executeWatchHandler(ctx context.Context, handler Handler, event WatchEvent, signal *chan struct{}) {
-	handler(&ContextWatch{
+func executeEventHandler(ctx context.Context, handler EventHandler, event EventInfo, signal *chan struct{}) {
+	handler(&EventContext{
 		Context: ctx,
 		Event:   event,
 	})

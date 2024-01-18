@@ -3,7 +3,7 @@ MongoDB Template
 <!--suppress ALL -->
 <img align="right" src="gopher-mongo.png" alt="">
 
-[![Project status](https://img.shields.io/badge/version-v1.0.8-vividgreen.svg)](https://github.com/GabrielHCataldo/go-mongo-template/releases/tag/v1.0.8)
+[![Project status](https://img.shields.io/badge/version-v1.0.9-vividgreen.svg)](https://github.com/GabrielHCataldo/go-mongo-template/releases/tag/v1.0.9)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GabrielHCataldo/go-mongo-template)](https://goreportcard.com/report/github.com/GabrielHCataldo/go-mongo-template)
 [![Coverage Status](https://coveralls.io/repos/GabrielHCataldo/go-mongo-template/badge.svg?branch=main&service=github)](https://coveralls.io/github/GabrielHCataldo/go-mongo?branch=main)
 [![Open Source Helpers](https://www.codetriage.com/gabrielhcataldo/go-mongo-template/badges/users.svg)](https://www.codetriage.com/gabrielhcataldo/go-mongo)
@@ -779,7 +779,7 @@ Output:
 ## Watch
 
 To watch the operations we highlight the **WatchWithHandler**, where it will persist the searches and
-will convert the received data, transforming it into a **ContextWatch** where it will have all the necessary data, then
+will convert the received data, transforming it into a **EventContext** where it will have all the necessary data, then
 After the conversion, we call the function informed in the function parameter, see a basic example:
 
 ```go
@@ -809,7 +809,8 @@ func main() {
     pipeline := mongo.Pipeline{bson.D{{"$match", bson.D{
         {"operationType", bson.M{"$in": []string{"insert", "update", "delete", "replace"}}},
     }}}}
-    err = mongoTemplate.WatchWithHandler(context.TODO(), pipeline, handler, option.NewWatchWithHandler().SetDatabaseName("test"))
+	opt := option.NewWatchWithHandler().SetDatabaseName("test")
+    err = mongoTemplate.WatchWithHandler(context.TODO(), pipeline, handler, opt)
     if err != nil {
         logger.Error("error watch handler:", err)
     } else {
@@ -817,15 +818,15 @@ func main() {
     }
 }
 
-func handler(ctx *mongo.ContextWatch) {
-    logger.Info("watch handler called:", ctx)
+func handler(ctx *mongo.EventContext) {
+	logger.Info("handler called:", ctx)
 }
 ```
 
 Output:
 
-    [INFO 2023/12/22 18:39:42] main.go:36: watch handler called: {"Event":{"ClusterTime":{"I":5,"T":1703281182},"DocumentKey":{"ID":[101,134,2,30,136,59,150,210,55,170,55,135]},"FullDocument":{"_id":[101,134,2,30,136,59,150,210,55,170,55,135],"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:39:42.288Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"name":"Foo Bar","random":2217047455415420974},"NS":{"Coll":"test","DB":"test"},"OperationType":"insert","UpdateDescription":{"RemovedFields":null,"TruncatedArrays":null,"UpdatedFields":null}}}
-    [INFO 2023/12/22 18:42:51] main.go:36: watch handler called: {"Event":{"ClusterTime":{"I":9,"T":1703281182},"DocumentKey":{"ID":[101,134,2,30,136,59,150,210,55,170,55,137]},"FullDocument":{"_id":[101,134,2,30,136,59,150,210,55,170,55,137],"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:39:42.627Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"name":"Foo Bar","random":2251712412936242638},"NS":{"Coll":"test","DB":"test"},"OperationType":"insert","UpdateDescription":{"RemovedFields":null,"TruncatedArrays":null,"UpdatedFields":null}}}
+    [INFO 2023/12/22 18:39:42] main.go:36: handler called: {"Event":{"ClusterTime":{"I":5,"T":1703281182},"DocumentKey":{"ID":[101,134,2,30,136,59,150,210,55,170,55,135]},"FullDocument":{"_id":[101,134,2,30,136,59,150,210,55,170,55,135],"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:39:42.288Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"name":"Foo Bar","random":2217047455415420974},"NS":{"Coll":"test","DB":"test"},"OperationType":"insert","UpdateDescription":{"RemovedFields":null,"TruncatedArrays":null,"UpdatedFields":null}}}
+    [INFO 2023/12/22 18:42:51] main.go:36: handler called: {"Event":{"ClusterTime":{"I":9,"T":1703281182},"DocumentKey":{"ID":[101,134,2,30,136,59,150,210,55,170,55,137]},"FullDocument":{"_id":[101,134,2,30,136,59,150,210,55,170,55,137],"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:39:42.627Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"name":"Foo Bar","random":2251712412936242638},"NS":{"Coll":"test","DB":"test"},"OperationType":"insert","UpdateDescription":{"RemovedFields":null,"TruncatedArrays":null,"UpdatedFields":null}}}
     Process finished with the exit code 130 (interrupted by signal 2:SIGINT)
 
 For more watch examples visit [link](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/watch/main).
@@ -839,7 +840,7 @@ Below are some examples that were not shown or cited:
 - [Watch](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/watch/main)
 - [Drop](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/drop/main)
 - [Indexes](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/indexes/main)
-- [Handler Session and Transaction](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/session/main)
+- [EventHandler Session and Transaction](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/session/main)
 
 How to contribute
 ------
