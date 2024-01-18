@@ -27,7 +27,7 @@ much more. See below some implemented features:
 - Ease of opening and closing sessions, and also aborting or committing transactions.
 - Pre-developed functions such as **FindOneById**, **FindAll**, **FindPageable**, **Exists**, among others.
 - Easy and intuitive pagination scheme.
-- Predefined watch handler with automatic conversion and advanced customization.
+- Watching events has never been easier, with automatic calls to handler functions, with a context ready to work.
 
 Installation
 ------------
