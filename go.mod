@@ -3,12 +3,13 @@ module github.com/GabrielHCataldo/go-mongo-template
 go 1.21.3
 
 require (
-	github.com/GabrielHCataldo/go-logger v1.1.3
+	github.com/GabrielHCataldo/go-errors v1.0.8
+	github.com/GabrielHCataldo/go-helper v1.3.1
+	github.com/GabrielHCataldo/go-logger v1.1.6
 	go.mongodb.org/mongo-driver v1.13.1
 )
 
 require (
-	github.com/GabrielHCataldo/go-helper v1.2.1 // indirect
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect

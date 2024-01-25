@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"github.com/GabrielHCataldo/go-mongo-template/mongo"
 	"go.mongodb.org/mongo-driver/bson"
@@ -30,14 +31,14 @@ func exists() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
 	defer mongoTemplate.SimpleDisconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	existsResult, err := mongoTemplate.Exists(ctx, filter, test{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error check exists document:", err)
 	} else {
 		logger.Info("document exists:", existsResult)
@@ -48,14 +49,14 @@ func existsById() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
 	defer mongoTemplate.SimpleDisconnect(ctx)
 	objectId, _ := primitive.ObjectIDFromHex("6585f5b8fd8fa97d562419f7")
 	existsResult, err := mongoTemplate.ExistsById(ctx, objectId, test{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error check exists document:", err)
 	} else {
 		logger.Info("document exists:", existsResult)

@@ -1,6 +1,7 @@
 package option
 
 import (
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"time"
 )
 
@@ -259,10 +260,12 @@ type FindOneAndDelete struct {
 	Let any
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
-	DisableAutoCloseSession bool
+	// default is false.
+	DisableAutoCloseSession *bool
 	// ForceRecreateSession Force the creation of the session, if any session is still open, we close it automatically,
 	// committing the transactions, and continue creating a new session.
-	ForceRecreateSession bool
+	// default is false.
+	ForceRecreateSession *bool
 }
 
 // FindOneAndReplace represents options that can be used to configure a FindOneAndReplace operation.
@@ -313,10 +316,12 @@ type FindOneAndReplace struct {
 	Let any
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
-	DisableAutoCloseSession bool
+	// default is false.
+	DisableAutoCloseSession *bool
 	// ForceRecreateSession Force the creation of the session, if any session is still open, we close it automatically,
 	// committing the transactions, and continue creating a new session.
-	ForceRecreateSession bool
+	// default is false.
+	ForceRecreateSession *bool
 }
 
 // FindOneAndUpdate represents options that can be used to configure a FindOneAndUpdate operation.
@@ -371,10 +376,12 @@ type FindOneAndUpdate struct {
 	Let any
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
-	DisableAutoCloseSession bool
+	// default is false
+	DisableAutoCloseSession *bool
 	// ForceRecreateSession Force the creation of the session, if any session is still open, we close it automatically,
 	// committing the transactions, and continue creating a new session.
-	ForceRecreateSession bool
+	// default is false
+	ForceRecreateSession *bool
 }
 
 // NewFind creates a new Find instance.
@@ -798,25 +805,25 @@ func (f *FindOneAndDelete) SetLet(v any) *FindOneAndDelete {
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
 func (f *FindOneAndDelete) SetDisableAutoCloseSession(b bool) *FindOneAndDelete {
-	f.DisableAutoCloseSession = b
+	f.DisableAutoCloseSession = &b
 	return f
 }
 
 // SetForceRecreateSession creates a new ForceRecreateSession instance.
 func (f *FindOneAndDelete) SetForceRecreateSession(b bool) *FindOneAndDelete {
-	f.ForceRecreateSession = b
+	f.ForceRecreateSession = &b
 	return f
 }
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
 func (f *FindOneAndReplace) SetDisableAutoCloseSession(b bool) *FindOneAndReplace {
-	f.DisableAutoCloseSession = b
+	f.DisableAutoCloseSession = &b
 	return f
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
 func (f *FindOneAndReplace) SetForceRecreateSession(b bool) *FindOneAndReplace {
-	f.ForceRecreateSession = b
+	f.ForceRecreateSession = &b
 	return f
 }
 
@@ -882,13 +889,13 @@ func (f *FindOneAndReplace) SetSort(a any) *FindOneAndReplace {
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
 func (f *FindOneAndUpdate) SetDisableAutoCloseSession(b bool) *FindOneAndUpdate {
-	f.DisableAutoCloseSession = b
+	f.DisableAutoCloseSession = &b
 	return f
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
 func (f *FindOneAndUpdate) SetForceRecreateSession(b bool) *FindOneAndUpdate {
-	f.ForceRecreateSession = b
+	f.ForceRecreateSession = &b
 	return f
 }
 
@@ -957,355 +964,370 @@ func (f *FindOneAndUpdate) SetUpsert(b bool) *FindOneAndUpdate {
 	return f
 }
 
-// GetFindOptionByParams assembles the Find object from optional parameters.
-func GetFindOptionByParams(opts []*Find) *Find {
+// MergeFindByParams assembles the Find object from optional parameters.
+func MergeFindByParams(opts []*Find) *Find {
 	result := &Find{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.AllowDiskUse != nil {
+		if helper.IsNotNil(opt.AllowDiskUse) {
 			result.AllowDiskUse = opt.AllowDiskUse
 		}
-		if opt.AllowPartialResults != nil {
+		if helper.IsNotNil(opt.AllowPartialResults) {
 			result.AllowPartialResults = opt.AllowPartialResults
 		}
-		if opt.NoCursorTimeout != nil {
+		if helper.IsNotNil(opt.NoCursorTimeout) {
 			result.NoCursorTimeout = opt.NoCursorTimeout
 		}
-		if opt.ReturnKey != nil {
+		if helper.IsNotNil(opt.ReturnKey) {
 			result.ReturnKey = opt.ReturnKey
 		}
-		if opt.ShowRecordID != nil {
+		if helper.IsNotNil(opt.ShowRecordID) {
 			result.ShowRecordID = opt.ShowRecordID
 		}
-		if opt.CursorType != nil {
+		if helper.IsNotNil(opt.CursorType) {
 			result.CursorType = opt.CursorType
 		}
-		if opt.BatchSize != nil {
+		if helper.IsNotNil(opt.BatchSize) {
 			result.BatchSize = opt.BatchSize
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.Let != nil {
+		if helper.IsNotNil(opt.Let) {
 			result.Let = opt.Let
 		}
-		if opt.Limit != nil {
+		if helper.IsNotNil(opt.Limit) {
 			result.Limit = opt.Limit
 		}
-		if opt.Skip != nil {
+		if helper.IsNotNil(opt.Skip) {
 			result.Skip = opt.Skip
 		}
-		if opt.Max != nil {
+		if helper.IsNotNil(opt.Max) {
 			result.Max = opt.Max
 		}
-		if opt.Min != nil {
+		if helper.IsNotNil(opt.Min) {
 			result.Min = opt.Min
 		}
-		if opt.Sort != nil {
+		if helper.IsNotNil(opt.Sort) {
 			result.Sort = opt.Sort
 		}
-		if opt.Projection != nil {
+		if helper.IsNotNil(opt.Projection) {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.MaxAwaitTime != nil {
+		if helper.IsNotNil(opt.MaxAwaitTime) {
 			result.MaxAwaitTime = opt.MaxAwaitTime
 		}
 	}
 	return result
 }
 
-// GetFindPageableOptionByParams assembles the FindPageable object from optional parameters.
-func GetFindPageableOptionByParams(opts []*FindPageable) *FindPageable {
+// MergeFindPageableByParams assembles the FindPageable object from optional parameters.
+func MergeFindPageableByParams(opts []*FindPageable) *FindPageable {
 	result := &FindPageable{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.AllowDiskUse != nil {
+		if helper.IsNotNil(opt.AllowDiskUse) {
 			result.AllowDiskUse = opt.AllowDiskUse
 		}
-		if opt.AllowPartialResults != nil {
+		if helper.IsNotNil(opt.AllowPartialResults) {
 			result.AllowPartialResults = opt.AllowPartialResults
 		}
-		if opt.NoCursorTimeout != nil {
+		if helper.IsNotNil(opt.NoCursorTimeout) {
 			result.NoCursorTimeout = opt.NoCursorTimeout
 		}
-		if opt.ReturnKey != nil {
+		if helper.IsNotNil(opt.ReturnKey) {
 			result.ReturnKey = opt.ReturnKey
 		}
-		if opt.ShowRecordID != nil {
+		if helper.IsNotNil(opt.ShowRecordID) {
 			result.ShowRecordID = opt.ShowRecordID
 		}
-		if opt.CursorType != nil {
+		if helper.IsNotNil(opt.CursorType) {
 			result.CursorType = opt.CursorType
 		}
-		if opt.BatchSize != nil {
+		if helper.IsNotNil(opt.BatchSize) {
 			result.BatchSize = opt.BatchSize
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.Let != nil {
+		if helper.IsNotNil(opt.Let) {
 			result.Let = opt.Let
 		}
-		if opt.Max != nil {
+		if helper.IsNotNil(opt.Max) {
 			result.Max = opt.Max
 		}
-		if opt.Min != nil {
+		if helper.IsNotNil(opt.Min) {
 			result.Min = opt.Min
 		}
-		if opt.Projection != nil {
+		if helper.IsNotNil(opt.Projection) {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.MaxAwaitTime != nil {
+		if helper.IsNotNil(opt.MaxAwaitTime) {
 			result.MaxAwaitTime = opt.MaxAwaitTime
 		}
 	}
 	return result
 }
 
-// GetFindOneOptionByParams assembles the FindOne object from optional parameters.
-func GetFindOneOptionByParams(opts []*FindOne) *FindOne {
+// MergeFindOneByParams assembles the FindOne object from optional parameters.
+func MergeFindOneByParams(opts []*FindOne) *FindOne {
 	result := &FindOne{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.AllowPartialResults != nil {
+		if helper.IsNotNil(opt.AllowPartialResults) {
 			result.AllowPartialResults = opt.AllowPartialResults
 		}
-		if opt.ReturnKey != nil {
+		if helper.IsNotNil(opt.ReturnKey) {
 			result.ReturnKey = opt.ReturnKey
 		}
-		if opt.ShowRecordID != nil {
+		if helper.IsNotNil(opt.ShowRecordID) {
 			result.ShowRecordID = opt.ShowRecordID
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.Skip != nil {
+		if helper.IsNotNil(opt.Skip) {
 			result.Skip = opt.Skip
 		}
-		if opt.Max != nil {
+		if helper.IsNotNil(opt.Max) {
 			result.Max = opt.Max
 		}
-		if opt.Min != nil {
+		if helper.IsNotNil(opt.Min) {
 			result.Min = opt.Min
 		}
-		if opt.Sort != nil {
+		if helper.IsNotNil(opt.Sort) {
 			result.Sort = opt.Sort
 		}
-		if opt.Projection != nil {
+		if helper.IsNotNil(opt.Projection) {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
 	}
 	return result
 }
 
-// GetFindOneByIdOptionByParams assembles the FindOneById object from optional parameters.
-func GetFindOneByIdOptionByParams(opts []*FindOneById) *FindOneById {
+// MergeFindOneByIdByParams assembles the FindOneById object from optional parameters.
+func MergeFindOneByIdByParams(opts []*FindOneById) *FindOneById {
 	result := &FindOneById{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.AllowPartialResults != nil {
+		if helper.IsNotNil(opt.AllowPartialResults) {
 			result.AllowPartialResults = opt.AllowPartialResults
 		}
-		if opt.ReturnKey != nil {
+		if helper.IsNotNil(opt.ReturnKey) {
 			result.ReturnKey = opt.ReturnKey
 		}
-		if opt.ShowRecordID != nil {
+		if helper.IsNotNil(opt.ShowRecordID) {
 			result.ShowRecordID = opt.ShowRecordID
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.Max != nil {
+		if helper.IsNotNil(opt.Max) {
 			result.Max = opt.Max
 		}
-		if opt.Min != nil {
+		if helper.IsNotNil(opt.Min) {
 			result.Min = opt.Min
 		}
-		if opt.Projection != nil {
+		if helper.IsNotNil(opt.Projection) {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
 	}
 	return result
 }
 
-// GetFindOneAndDeleteOptionByParams assembles the FindOneAndDelete object from optional parameters.
-func GetFindOneAndDeleteOptionByParams(opts []*FindOneAndDelete) *FindOneAndDelete {
+// MergeFindOneAndDeleteByParams assembles the FindOneAndDelete object from optional parameters.
+func MergeFindOneAndDeleteByParams(opts []*FindOneAndDelete) *FindOneAndDelete {
 	result := &FindOneAndDelete{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.DisableAutoCloseSession {
+		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
-		if opt.ForceRecreateSession {
+		if helper.IsNotNil(opt.ForceRecreateSession) {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
-		if opt.ForceRecreateSession {
-			result.ForceRecreateSession = opt.ForceRecreateSession
-		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.Let != nil {
+		if helper.IsNotNil(opt.Let) {
 			result.Let = opt.Let
 		}
-		if opt.Sort != nil {
+		if helper.IsNotNil(opt.Sort) {
 			result.Sort = opt.Sort
 		}
-		if opt.Projection != nil {
+		if helper.IsNotNil(opt.Projection) {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
+	}
+	if helper.IsNil(result.DisableAutoCloseSession) {
+		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+	}
+	if helper.IsNil(result.ForceRecreateSession) {
+		result.ForceRecreateSession = helper.ConvertToPointer(false)
 	}
 	return result
 }
 
-// GetFindOneAndReplaceOptionByParams assembles the FindOneAndReplace object from optional parameters.
-func GetFindOneAndReplaceOptionByParams(opts []*FindOneAndReplace) *FindOneAndReplace {
+// MergeFindOneAndReplaceByParams assembles the FindOneAndReplace object from optional parameters.
+func MergeFindOneAndReplaceByParams(opts []*FindOneAndReplace) *FindOneAndReplace {
 	result := &FindOneAndReplace{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.BypassDocumentValidation != nil {
+		if helper.IsNotNil(opt.BypassDocumentValidation) {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
-		if opt.DisableAutoCloseSession {
+		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
-		if opt.ForceRecreateSession {
+		if helper.IsNotNil(opt.ForceRecreateSession) {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
-		if opt.Upsert != nil {
+		if helper.IsNotNil(opt.Upsert) {
 			result.Upsert = opt.Upsert
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.Let != nil {
+		if helper.IsNotNil(opt.Let) {
 			result.Let = opt.Let
 		}
-		if opt.Sort != nil {
+		if helper.IsNotNil(opt.Sort) {
 			result.Sort = opt.Sort
 		}
-		if opt.Projection != nil {
+		if helper.IsNotNil(opt.Projection) {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.ReturnDocument != nil {
+		if helper.IsNotNil(opt.ReturnDocument) {
 			result.ReturnDocument = opt.ReturnDocument
 		}
+	}
+	if helper.IsNil(result.DisableAutoCloseSession) {
+		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+	}
+	if helper.IsNil(result.ForceRecreateSession) {
+		result.ForceRecreateSession = helper.ConvertToPointer(false)
 	}
 	return result
 }
 
-// GetFindOneAndUpdateOptionByParams assembles the FindOneAndUpdate object from optional parameters.
-func GetFindOneAndUpdateOptionByParams(opts []*FindOneAndUpdate) *FindOneAndUpdate {
+// MergeFindOneAndUpdateByParams assembles the FindOneAndUpdate object from optional parameters.
+func MergeFindOneAndUpdateByParams(opts []*FindOneAndUpdate) *FindOneAndUpdate {
 	result := &FindOneAndUpdate{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.BypassDocumentValidation != nil {
+		if helper.IsNotNil(opt.BypassDocumentValidation) {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
-		if opt.DisableAutoCloseSession {
+		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
-		if opt.ForceRecreateSession {
+		if helper.IsNotNil(opt.ForceRecreateSession) {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
-		if opt.Upsert != nil {
+		if helper.IsNotNil(opt.Upsert) {
 			result.Upsert = opt.Upsert
 		}
-		if opt.ArrayFilters != nil {
+		if helper.IsNotNil(opt.ArrayFilters) {
 			result.ArrayFilters = opt.ArrayFilters
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.Let != nil {
+		if helper.IsNotNil(opt.Let) {
 			result.Let = opt.Let
 		}
-		if opt.Sort != nil {
+		if helper.IsNotNil(opt.Sort) {
 			result.Sort = opt.Sort
 		}
-		if opt.Projection != nil {
+		if helper.IsNotNil(opt.Projection) {
 			result.Projection = opt.Projection
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.ReturnDocument != nil {
+		if helper.IsNotNil(opt.ReturnDocument) {
 			result.ReturnDocument = opt.ReturnDocument
 		}
+	}
+	if helper.IsNil(result.DisableAutoCloseSession) {
+		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+	}
+	if helper.IsNil(result.ForceRecreateSession) {
+		result.ForceRecreateSession = helper.ConvertToPointer(false)
 	}
 	return result
 }

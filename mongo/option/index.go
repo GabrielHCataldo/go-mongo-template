@@ -1,6 +1,9 @@
 package option
 
-import "time"
+import (
+	"github.com/GabrielHCataldo/go-helper/helper"
+	"time"
+)
 
 // Index represents options that can be used to configure a CreateOneIndex and CreateManyIndex operation.
 type Index struct {
@@ -240,28 +243,28 @@ func (l *ListIndexes) SetBatchSize(i int32) *ListIndexes {
 	return l
 }
 
-// GetDropIndexOptionByParams assembles the DropIndex object from optional parameters.
-func GetDropIndexOptionByParams(opts []*DropIndex) *DropIndex {
+// MergeDropIndexByParams assembles the DropIndex object from optional parameters.
+func MergeDropIndexByParams(opts []*DropIndex) *DropIndex {
 	result := &DropIndex{}
 	for _, opt := range opts {
-		if opt != nil && opt.MaxTime != nil {
+		if helper.IsNotNil(opt) && helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
 	}
 	return result
 }
 
-// GetListIndexesOptionByParams assembles the ListIndexes object from optional parameters.
-func GetListIndexesOptionByParams(opts []*ListIndexes) *ListIndexes {
+// MergeListIndexesByParams assembles the ListIndexes object from optional parameters.
+func MergeListIndexesByParams(opts []*ListIndexes) *ListIndexes {
 	result := &ListIndexes{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.BatchSize != nil {
+		if helper.IsNotNil(opt.BatchSize) {
 			result.BatchSize = opt.BatchSize
 		}
 	}

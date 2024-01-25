@@ -1,6 +1,7 @@
 package option
 
 import (
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"go.mongodb.org/mongo-driver/bson/bsoncodec"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -41,56 +42,61 @@ type ArrayFilters struct {
 
 // ParseCollationMongoOptions convert Collation to mongo options.Collation
 func ParseCollationMongoOptions(c *Collation) *options.Collation {
-	if c == nil {
-		return nil
+	var mongoCollation *options.Collation
+	if helper.IsNotNil(c) {
+		mongoCollation = &options.Collation{
+			Locale:          c.Locale,
+			CaseLevel:       c.CaseLevel,
+			CaseFirst:       c.CaseFirst,
+			Strength:        c.Strength,
+			NumericOrdering: c.NumericOrdering,
+			Alternate:       c.Alternate,
+			MaxVariable:     c.MaxVariable,
+			Normalization:   c.Normalization,
+			Backwards:       c.Backwards,
+		}
 	}
-	return &options.Collation{
-		Locale:          c.Locale,
-		CaseLevel:       c.CaseLevel,
-		CaseFirst:       c.CaseFirst,
-		Strength:        c.Strength,
-		NumericOrdering: c.NumericOrdering,
-		Alternate:       c.Alternate,
-		MaxVariable:     c.MaxVariable,
-		Normalization:   c.Normalization,
-		Backwards:       c.Backwards,
-	}
+	return mongoCollation
 }
 
 // ParseArrayFiltersMongoOptions convert ArrayFilters to mongo options.ArrayFilters
 func ParseArrayFiltersMongoOptions(a *ArrayFilters) *options.ArrayFilters {
-	if a == nil {
-		return nil
+	var mongoArrayFilters *options.ArrayFilters
+	if helper.IsNotNil(a) {
+		mongoArrayFilters = &options.ArrayFilters{
+			Registry: a.Registry,
+			Filters:  a.Filters,
+		}
 	}
-	return &options.ArrayFilters{
-		Registry: a.Registry,
-		Filters:  a.Filters,
-	}
+	return mongoArrayFilters
 }
 
 // ParseCursorType convert CursorType to mongo options.CursorType
 func ParseCursorType(c *CursorType) *options.CursorType {
-	if c == nil {
-		return nil
+	var mongoCursorType *options.CursorType
+	if helper.IsNotNil(c) {
+		value := options.CursorType(*c)
+		mongoCursorType = &value
 	}
-	result := options.CursorType(*c)
-	return &result
+	return mongoCursorType
 }
 
 // ParseReturnDocument convert ReturnDocument to mongo options.ReturnDocument
 func ParseReturnDocument(r *ReturnDocument) *options.ReturnDocument {
-	if r == nil {
-		return nil
+	var mongoReturnDocument *options.ReturnDocument
+	if helper.IsNotNil(r) {
+		value := options.ReturnDocument(*r)
+		mongoReturnDocument = &value
 	}
-	result := options.ReturnDocument(*r)
-	return &result
+	return mongoReturnDocument
 }
 
 // ParseFullDocument convert FullDocument to mongo options.FullDocument
 func ParseFullDocument(f *FullDocument) *options.FullDocument {
-	if f == nil {
-		return nil
+	var mongoFullDocument *options.FullDocument
+	if helper.IsNotNil(f) {
+		value := options.FullDocument(*f)
+		mongoFullDocument = &value
 	}
-	result := options.FullDocument(*f)
-	return &result
+	return mongoFullDocument
 }

@@ -1,5 +1,7 @@
 package option
 
+import "github.com/GabrielHCataldo/go-helper/helper"
+
 // Update represents options that can be used to configure a 'UpdateOne' ,'UpdateMany'  or 'UpdateOneById'  operation.
 type Update struct {
 	// ArrayFilters A set of filters specifying to which array elements an update should apply. This option is only valid for MongoDB
@@ -35,10 +37,12 @@ type Update struct {
 	Let any
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
-	DisableAutoCloseSession bool
+	// default is false
+	DisableAutoCloseSession *bool
 	// ForceRecreateSession Force the creation of the session, if any session is still open, we close it automatically,
 	// committing the transactions, and continue creating a new session.
-	ForceRecreateSession bool
+	// default is false
+	ForceRecreateSession *bool
 }
 
 // NewUpdate creates a new Update instance.
@@ -84,13 +88,13 @@ func (u *Update) SetLet(a any) *Update {
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
 func (u *Update) SetDisableAutoCloseSession(b bool) *Update {
-	u.DisableAutoCloseSession = b
+	u.DisableAutoCloseSession = &b
 	return u
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
 func (u *Update) SetForceRecreateSession(b bool) *Update {
-	u.ForceRecreateSession = b
+	u.ForceRecreateSession = &b
 	return u
 }
 
@@ -100,34 +104,40 @@ func (u *Update) SetUpsert(b bool) *Update {
 	return u
 }
 
-// GetUpdateOptionByParams assembles the Update object from optional parameters.
-func GetUpdateOptionByParams(opts []*Update) *Update {
+// MergeUpdateByParams assembles the Update object from optional parameters.
+func MergeUpdateByParams(opts []*Update) *Update {
 	result := &Update{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.ArrayFilters != nil {
+		if helper.IsNotNil(opt.ArrayFilters) {
 			result.ArrayFilters = opt.ArrayFilters
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.Let != nil {
+		if helper.IsNotNil(opt.Let) {
 			result.Let = opt.Let
 		}
-		if opt.DisableAutoCloseSession {
+		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
-		if opt.ForceRecreateSession {
+		if helper.IsNotNil(opt.ForceRecreateSession) {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
+	}
+	if helper.IsNil(result.DisableAutoCloseSession) {
+		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+	}
+	if helper.IsNil(result.ForceRecreateSession) {
+		result.ForceRecreateSession = helper.ConvertToPointer(false)
 	}
 	return result
 }

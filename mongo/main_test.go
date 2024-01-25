@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"github.com/GabrielHCataldo/go-mongo-template/mongo/option"
 	"go.mongodb.org/mongo-driver/bson"
@@ -314,11 +315,11 @@ func TestMain(t *testing.M) {
 }
 
 func initMongoTemplate() {
-	if mongoTemplate != nil {
+	if helper.IsNotNil(mongoTemplate) {
 		return
 	}
 	nMongoTemplate, err := NewTemplate(context.TODO(), options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error new Template:", err)
 		return
 	}
@@ -331,12 +332,12 @@ func initDocument() {
 	defer cancel()
 	test := initTestStruct()
 	err := mongoTemplate.InsertOne(ctx, test)
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error init document:", err)
 		return
 	}
 	err = os.Setenv(MongoDBTestId, test.Id.Hex())
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("err set MongoDBTestId env:", err)
 	}
 }
@@ -347,37 +348,37 @@ func initIndex() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	result, err := mongoTemplate.CreateOneIndex(ctx, initIndexInput())
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error init index:", err)
 		return
 	}
 	err = os.Setenv(MongoDBIndexName, result)
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("err set MongoDBIndexName env:", err)
 	}
 }
 
 func disconnectMongoTemplate() {
-	if mongoTemplate == nil {
+	if helper.IsNil(mongoTemplate) {
 		return
 	}
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	err := mongoTemplate.Disconnect(ctx)
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error disconnect mongodb:", err)
 	}
 	mongoTemplate = nil
 }
 
 func clearCollection() {
-	if mongoTemplate == nil {
+	if helper.IsNil(mongoTemplate) {
 		return
 	}
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	_, err := mongoTemplate.DeleteMany(ctx, bson.M{"_id": bson.M{"$exists": true}}, testStruct{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error clean collection:", err)
 	} else {
 		logger.Info("collection cleaned!")
@@ -385,13 +386,13 @@ func clearCollection() {
 }
 
 func clearIndexes() {
-	if mongoTemplate == nil {
+	if helper.IsNil(mongoTemplate) {
 		return
 	}
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	err := mongoTemplate.DropAllIndexes(ctx, testStruct{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error clean indexes:", err)
 	} else {
 		logger.Info("collection indexes cleaned!")
@@ -522,7 +523,7 @@ func initListTestInsertOne() []testInsertOne {
 		{
 			name:                     "failed timeout",
 			value:                    initTestStruct(),
-			option:                   initOptionInsertOne().SetDisableAutoCloseSession(true),
+			option:                   initOptionInsertOne().SetForceRecreateSession(true).SetDisableAutoCloseSession(true),
 			durationTimeout:          1 * time.Millisecond,
 			forceErrCloseMongoClient: true,
 			wantErr:                  true,
@@ -559,7 +560,8 @@ func initListTestInsertMany() []testInsertMany {
 			},
 			option: initOptionInsertMany().
 				SetDisableAutoRollback(true).
-				SetDisableAutoCloseSession(true),
+				SetDisableAutoCloseSession(true).
+				SetForceRecreateSession(true),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -609,7 +611,7 @@ func initListTestDelete() []testDelete {
 			name:            "failed type ref",
 			filter:          bson.M{},
 			ref:             initTestString(),
-			option:          initOptionDelete().SetDisableAutoCloseSession(true),
+			option:          initOptionDelete().SetForceRecreateSession(true).SetDisableAutoCloseSession(true),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -725,7 +727,7 @@ func initListTestUpdate() []testUpdate {
 			filter:          bson.M{"_id": bson.M{"$exists": true}},
 			update:          nil,
 			ref:             testStruct{},
-			option:          initOptionUpdate().SetDisableAutoCloseSession(true),
+			option:          initOptionUpdate().SetForceRecreateSession(true).SetDisableAutoCloseSession(true),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -764,7 +766,7 @@ func initListTestReplaceOne() []testReplaceOne {
 			filter:          bson.M{"_id": objectId},
 			replacement:     nil,
 			ref:             testStruct{},
-			option:          initOptionReplace().SetDisableAutoCloseSession(true),
+			option:          initOptionReplace().SetForceRecreateSession(true).SetDisableAutoCloseSession(true),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -934,6 +936,7 @@ func initListTestFindOneAndDelete() []testFindOneAndDelete {
 			dest:   &testStruct{},
 			option: initOptionFindOneAndDelete().
 				SetCollation(&option.Collation{}).
+				SetForceRecreateSession(true).
 				SetDisableAutoCloseSession(true),
 			durationTimeout: 1 * time.Millisecond,
 			wantErr:         true,
@@ -994,6 +997,7 @@ func initListTestFindOneAndReplace() []testFindOneAndReplace {
 				SetCollation(&option.Collation{}).
 				SetReturnDocument(option.ReturnDocumentAfter).
 				SetBypassDocumentValidation(true).
+				SetForceRecreateSession(true).
 				SetDisableAutoCloseSession(true),
 			durationTimeout: 1 * time.Millisecond,
 			wantErr:         true,
@@ -1057,6 +1061,7 @@ func initListTestFindOneAndUpdate() []testFindOneAndUpdate {
 				SetCollation(&option.Collation{}).
 				SetReturnDocument(option.ReturnDocumentAfter).
 				SetBypassDocumentValidation(true).
+				SetForceRecreateSession(true).
 				SetDisableAutoCloseSession(true),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
@@ -1581,7 +1586,12 @@ func initListTestWatchHandler() []testWatchHandler {
 				{"operationType", bson.M{"$in": []string{"insert", "update", "delete", "replace"}}},
 			}}}},
 			handler: func(ctx *EventContext) {
-				logger.Info("watch handler ctx:", ctx)
+				var testStr string
+				var test testStruct
+				_ = ctx.Event.FullDocument.ParseToStruct(testStr)
+				_ = ctx.Event.FullDocument.ParseToStruct(&testStr)
+				_ = ctx.Event.FullDocument.ParseToStruct(&test)
+				logger.Info("watch handler ctx:", ctx, "fullDocument:", test)
 			},
 			option:          initOptionWatchHandler(),
 			durationTimeout: 5 * time.Second,
@@ -1864,24 +1874,17 @@ func initListTestDropIndex() []testDropIndex {
 func initOptionInsertOne() *option.InsertOne {
 	return option.NewInsertOne().
 		SetBypassDocumentValidation(true).
-		SetForceRecreateSession(true).
-		SetComment("comment insert golang unit test").
-		SetDisableAutoCloseSession(false)
+		SetComment("comment insert golang unit test")
 }
 
 func initOptionInsertMany() *option.InsertMany {
 	return option.NewInsertMany().
 		SetBypassDocumentValidation(true).
-		SetForceRecreateSession(true).
-		SetComment("comment insert golang unit test").
-		SetDisableAutoCloseSession(true).
-		SetDisableAutoRollback(false)
+		SetComment("comment insert golang unit test")
 }
 
 func initOptionDelete() *option.Delete {
 	return option.NewDelete().
-		SetForceRecreateSession(true).
-		SetDisableAutoCloseSession(false).
 		SetComment("comment delete golang unit test").
 		SetCollation(&option.Collation{}).
 		SetHint(bson.M{}).
@@ -1890,8 +1893,6 @@ func initOptionDelete() *option.Delete {
 
 func initOptionUpdate() *option.Update {
 	return option.NewUpdate().
-		SetDisableAutoCloseSession(false).
-		SetForceRecreateSession(true).
 		SetComment("comment update golang unit test").
 		SetCollation(&option.Collation{}).
 		SetHint(bson.M{}).
@@ -1903,8 +1904,6 @@ func initOptionUpdate() *option.Update {
 
 func initOptionReplace() *option.Replace {
 	return option.NewReplace().
-		SetForceRecreateSession(true).
-		SetDisableAutoCloseSession(false).
 		SetComment("comment replace golang unit test").
 		SetCollation(&option.Collation{}).
 		SetHint(bson.M{}).
@@ -1946,20 +1945,17 @@ func initOptionFindOneById() *option.FindOneById {
 
 func initOptionFindOneAndDelete() *option.FindOneAndDelete {
 	return option.NewFindOneAndDelete().
-		SetForceRecreateSession(true).
 		SetCollation(nil).
 		SetComment("comment golang unit test").
 		SetHint(bson.M{}).
 		SetMaxTime(5 * time.Second).
 		SetProjection(bson.M{}).
 		SetSort(bson.M{}).
-		SetLet(bson.M{}).
-		SetDisableAutoCloseSession(false)
+		SetLet(bson.M{})
 }
 
 func initOptionFindOneAndReplace() *option.FindOneAndReplace {
 	return option.NewFindOneAndReplace().
-		SetForceRecreateSession(true).
 		SetCollation(nil).
 		SetComment("comment golang unit test").
 		SetHint(bson.M{}).
@@ -1967,13 +1963,11 @@ func initOptionFindOneAndReplace() *option.FindOneAndReplace {
 		SetProjection(bson.M{}).
 		SetSort(bson.M{}).
 		SetLet(bson.M{}).
-		SetDisableAutoCloseSession(false).
 		SetUpsert(true)
 }
 
 func initOptionFindOneAndUpdate() *option.FindOneAndUpdate {
 	return option.NewFindOneAndUpdate().
-		SetForceRecreateSession(true).
 		SetCollation(nil).
 		SetComment("comment golang unit test").
 		SetHint(bson.M{}).
@@ -1981,7 +1975,6 @@ func initOptionFindOneAndUpdate() *option.FindOneAndUpdate {
 		SetProjection(bson.M{}).
 		SetSort(bson.M{}).
 		SetLet(bson.M{}).
-		SetDisableAutoCloseSession(false).
 		SetUpsert(true)
 }
 

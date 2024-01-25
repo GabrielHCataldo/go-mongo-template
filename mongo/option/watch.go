@@ -1,6 +1,7 @@
 package option
 
 import (
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
@@ -308,125 +309,125 @@ func (w *WatchWithHandler) SetCustomPipeline(b bson.M) *WatchWithHandler {
 	return w
 }
 
-// GetWatchOptionByParams assembles the Watch object from optional parameters.
-func GetWatchOptionByParams(opts []*Watch) *Watch {
+// MergeWatchByParams assembles the Watch object from optional parameters.
+func MergeWatchByParams(opts []*Watch) *Watch {
 	result := &Watch{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.BatchSize != nil {
+		if helper.IsNotNil(opt.BatchSize) {
 			result.BatchSize = opt.BatchSize
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if len(opt.DatabaseName) != 0 {
+		if helper.IsNotEmpty(opt.DatabaseName) {
 			result.DatabaseName = opt.DatabaseName
 		}
-		if len(opt.CollectionName) != 0 {
+		if helper.IsNotEmpty(opt.CollectionName) {
 			result.CollectionName = opt.CollectionName
 		}
-		if opt.MaxAwaitTime != nil {
+		if helper.IsNotNil(opt.MaxAwaitTime) {
 			result.MaxAwaitTime = opt.MaxAwaitTime
 		}
-		if opt.Custom != nil {
+		if helper.IsNotNil(opt.Custom) {
 			result.Custom = opt.Custom
 		}
-		if opt.ResumeAfter != nil {
+		if helper.IsNotNil(opt.ResumeAfter) {
 			result.ResumeAfter = opt.ResumeAfter
 		}
-		if opt.FullDocument != nil {
+		if helper.IsNotNil(opt.FullDocument) {
 			result.FullDocument = opt.FullDocument
 		}
-		if opt.FullDocumentBeforeChange != nil {
+		if helper.IsNotNil(opt.FullDocumentBeforeChange) {
 			result.FullDocumentBeforeChange = opt.FullDocumentBeforeChange
 		}
-		if opt.ShowExpandedEvents != nil {
+		if helper.IsNotNil(opt.ShowExpandedEvents) {
 			result.ShowExpandedEvents = opt.ShowExpandedEvents
 		}
-		if opt.StartAtOperationTime != nil {
+		if helper.IsNotNil(opt.StartAtOperationTime) {
 			result.StartAtOperationTime = opt.StartAtOperationTime
 		}
-		if opt.StartAfter != nil {
+		if helper.IsNotNil(opt.StartAfter) {
 			result.StartAfter = opt.StartAfter
 		}
-		if opt.Custom != nil {
+		if helper.IsNotNil(opt.Custom) {
 			result.Custom = opt.Custom
 		}
-		if opt.CustomPipeline != nil {
+		if helper.IsNotNil(opt.CustomPipeline) {
 			result.CustomPipeline = opt.CustomPipeline
 		}
 	}
 	return result
 }
 
-// GetWatchHandlerOptionByParams assembles the WatchWithHandler object from optional parameters.
-func GetWatchHandlerOptionByParams(opts []*WatchWithHandler) *WatchWithHandler {
+// MergeWatchHandlerByParams assembles the WatchWithHandler object from optional parameters.
+func MergeWatchHandlerByParams(opts []*WatchWithHandler) *WatchWithHandler {
 	result := WatchWithHandler{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.ContextFuncTimeout > 0 {
+		if helper.IsGreaterThan(opt.ContextFuncTimeout, 0) {
 			result.ContextFuncTimeout = opt.ContextFuncTimeout
 		}
-		if opt.DelayLoop > 0 {
+		if helper.IsGreaterThan(opt.DelayLoop, 0) {
 			result.DelayLoop = opt.DelayLoop
 		}
-		if opt.BatchSize != nil {
+		if helper.IsNotNil(opt.BatchSize) {
 			result.BatchSize = opt.BatchSize
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if len(opt.DatabaseName) != 0 {
+		if helper.IsNotEmpty(opt.DatabaseName) {
 			result.DatabaseName = opt.DatabaseName
 		}
-		if len(opt.CollectionName) != 0 {
+		if helper.IsNotEmpty(opt.CollectionName) {
 			result.CollectionName = opt.CollectionName
 		}
-		if opt.MaxAwaitTime != nil {
+		if helper.IsNotNil(opt.MaxAwaitTime) {
 			result.MaxAwaitTime = opt.MaxAwaitTime
 		}
-		if opt.Custom != nil {
+		if helper.IsNotNil(opt.Custom) {
 			result.Custom = opt.Custom
 		}
-		if opt.ResumeAfter != nil {
+		if helper.IsNotNil(opt.ResumeAfter) {
 			result.ResumeAfter = opt.ResumeAfter
 		}
-		if opt.FullDocument != nil {
+		if helper.IsNotNil(opt.FullDocument) {
 			result.FullDocument = opt.FullDocument
 		}
-		if opt.FullDocumentBeforeChange != nil {
+		if helper.IsNotNil(opt.FullDocumentBeforeChange) {
 			result.FullDocumentBeforeChange = opt.FullDocumentBeforeChange
 		}
-		if opt.ShowExpandedEvents != nil {
+		if helper.IsNotNil(opt.ShowExpandedEvents) {
 			result.ShowExpandedEvents = opt.ShowExpandedEvents
 		}
-		if opt.StartAtOperationTime != nil {
+		if helper.IsNotNil(opt.StartAtOperationTime) {
 			result.StartAtOperationTime = opt.StartAtOperationTime
 		}
-		if opt.StartAfter != nil {
+		if helper.IsNotNil(opt.StartAfter) {
 			result.StartAfter = opt.StartAfter
 		}
-		if opt.Custom != nil {
+		if helper.IsNotNil(opt.Custom) {
 			result.Custom = opt.Custom
 		}
-		if opt.CustomPipeline != nil {
+		if helper.IsNotNil(opt.CustomPipeline) {
 			result.CustomPipeline = opt.CustomPipeline
 		}
 	}
-	if result.ContextFuncTimeout == 0 {
+	if helper.IsLessThanOrEqual(result.ContextFuncTimeout, 0) {
 		result.ContextFuncTimeout = 5 * time.Second
 	}
-	if result.DelayLoop == 0 {
+	if helper.IsLessThanOrEqual(result.DelayLoop, 0) {
 		result.DelayLoop = 5 * time.Second
 	}
 	return &result

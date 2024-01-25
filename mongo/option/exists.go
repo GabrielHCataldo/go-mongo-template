@@ -1,6 +1,9 @@
 package option
 
-import "time"
+import (
+	"github.com/GabrielHCataldo/go-helper/helper"
+	"time"
+)
 
 // Exists represents options that can be used to configure an 'Exists' operation.
 type Exists struct {
@@ -53,23 +56,23 @@ func (e *Exists) SetMaxTime(d time.Duration) *Exists {
 	return e
 }
 
-// GetExistsOptionByParams assembles the Exists object from optional parameters.
-func GetExistsOptionByParams(opts []*Exists) *Exists {
+// MergeExistsByParams assembles the Exists object from optional parameters.
+func MergeExistsByParams(opts []*Exists) *Exists {
 	result := &Exists{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
 	}

@@ -1,5 +1,7 @@
 package option
 
+import "github.com/GabrielHCataldo/go-helper/helper"
+
 // Delete represents options that can be used to configure DeleteOne and DeleteMany operations.
 type Delete struct {
 	// Collation Specifies a collation to use for string comparisons during the operation. This option is only valid
@@ -23,10 +25,12 @@ type Delete struct {
 	Let any
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
-	DisableAutoCloseSession bool
+	// default is false
+	DisableAutoCloseSession *bool
 	// ForceRecreateSession Force the creation of the session, if any session is still open, we close it automatically,
 	// committing the transactions, and continue creating a new session.
-	ForceRecreateSession bool
+	// default is false
+	ForceRecreateSession *bool
 }
 
 // NewDelete creates a new Delete instance.
@@ -60,41 +64,47 @@ func (d *Delete) SetLet(a any) *Delete {
 
 // SetDisableAutoCloseSession sets value for the DisableAutoCloseSession field.
 func (d *Delete) SetDisableAutoCloseSession(b bool) *Delete {
-	d.DisableAutoCloseSession = b
+	d.DisableAutoCloseSession = &b
 	return d
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
 func (d *Delete) SetForceRecreateSession(b bool) *Delete {
-	d.ForceRecreateSession = b
+	d.ForceRecreateSession = &b
 	return d
 }
 
-// GetDeleteOptionByParams assembles the Delete object from optional parameters.
-func GetDeleteOptionByParams(opts []*Delete) *Delete {
+// MergeDeleteByParams assembles the Delete object from optional parameters.
+func MergeDeleteByParams(opts []*Delete) *Delete {
 	result := &Delete{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.Let != nil {
+		if helper.IsNotNil(opt.Let) {
 			result.Let = opt.Let
 		}
-		if opt.DisableAutoCloseSession {
+		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
-		if opt.ForceRecreateSession {
+		if helper.IsNotNil(opt.ForceRecreateSession) {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
+	}
+	if helper.IsNil(result.DisableAutoCloseSession) {
+		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+	}
+	if helper.IsNil(result.ForceRecreateSession) {
+		result.ForceRecreateSession = helper.ConvertToPointer(false)
 	}
 	return result
 }

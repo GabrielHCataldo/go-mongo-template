@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"github.com/GabrielHCataldo/go-mongo-template/mongo"
 	"github.com/GabrielHCataldo/go-mongo-template/mongo/option"
@@ -32,7 +33,7 @@ func insertOne() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
@@ -47,7 +48,7 @@ func insertOne() {
 	}
 	//new document need a pointer
 	err = mongoTemplate.InsertOne(ctx, &testDocument)
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error insert document:", err)
 	} else {
 		logger.Info("document inserted successfully:", testDocument)
@@ -58,7 +59,7 @@ func insertMany() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
@@ -83,7 +84,7 @@ func insertMany() {
 	}
 	//new document need a slice of the pointer
 	err = mongoTemplate.InsertMany(ctx, testDocuments)
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error insert document:", err)
 	} else {
 		logger.Info("document inserted successfully:", testDocuments)
@@ -94,7 +95,7 @@ func insertOneManualCloseSession() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
@@ -110,15 +111,15 @@ func insertOneManualCloseSession() {
 	//new document need a pointer
 	err = mongoTemplate.InsertOne(ctx, &testDocument, option.NewInsertOne().
 		SetForceRecreateSession(false).SetDisableAutoCloseSession(true))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error insert document:", err)
 	} else {
 		logger.Info("document inserted successfully:", testDocument)
 	}
 	//mongoTemplate.AbortTransaction(ctx) or mongoTemplate.CommitTransaction(ctc)
-	abort := err != nil
+	abort := helper.IsNotNil(err)
 	err = mongoTemplate.CloseSession(ctx, abort)
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error close session:", err)
 	}
 }

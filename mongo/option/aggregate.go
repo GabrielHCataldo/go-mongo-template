@@ -1,6 +1,7 @@
 package option
 
 import (
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"go.mongodb.org/mongo-driver/bson"
 	"time"
 )
@@ -116,38 +117,38 @@ func (a *Aggregate) SetCustom(b bson.M) *Aggregate {
 	return a
 }
 
-// GetAggregateOptionByParams assembles the Aggregate object from optional parameters.
-func GetAggregateOptionByParams(opts []*Aggregate) *Aggregate {
+// MergeAggregateByParams assembles the Aggregate object from optional parameters.
+func MergeAggregateByParams(opts []*Aggregate) *Aggregate {
 	result := &Aggregate{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.AllowDiskUse != nil {
+		if helper.IsNotNil(opt.AllowDiskUse) {
 			result.AllowDiskUse = opt.AllowDiskUse
 		}
-		if opt.BatchSize != nil {
+		if helper.IsNotNil(opt.BatchSize) {
 			result.BatchSize = opt.BatchSize
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.Let != nil {
+		if helper.IsNotNil(opt.Let) {
 			result.Let = opt.Let
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.MaxAwaitTime != nil {
+		if helper.IsNotNil(opt.MaxAwaitTime) {
 			result.MaxAwaitTime = opt.MaxAwaitTime
 		}
-		if opt.Custom != nil {
+		if helper.IsNotNil(opt.Custom) {
 			result.Custom = opt.Custom
 		}
 	}

@@ -1,6 +1,9 @@
 package option
 
-import "time"
+import (
+	"github.com/GabrielHCataldo/go-helper/helper"
+	"time"
+)
 
 // Count represents options that can be used to configure a 'CountDocuments' operation.
 type Count struct {
@@ -102,46 +105,46 @@ func (e *EstimatedDocumentCount) SetComment(comment any) *EstimatedDocumentCount
 	return e
 }
 
-// GetCountOptionByParams assembles the Count object from optional parameters.
-func GetCountOptionByParams(opts []*Count) Count {
+// MergeCountByParams assembles the Count object from optional parameters.
+func MergeCountByParams(opts []*Count) Count {
 	result := Count{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.Hint != nil {
+		if helper.IsNotNil(opt.Hint) {
 			result.Hint = opt.Hint
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
-		if opt.Limit != nil {
+		if helper.IsNotNil(opt.Limit) {
 			result.Limit = opt.Limit
 		}
-		if opt.Skip != nil {
+		if helper.IsNotNil(opt.Skip) {
 			result.Skip = opt.Skip
 		}
 	}
 	return result
 }
 
-// GetEstimatedDocumentCountOptionByParams assembles the EstimatedDocumentCount object from optional parameters.
-func GetEstimatedDocumentCountOptionByParams(opts []*EstimatedDocumentCount) *EstimatedDocumentCount {
+// MergeEstimatedDocumentCountByParams assembles the EstimatedDocumentCount object from optional parameters.
+func MergeEstimatedDocumentCountByParams(opts []*EstimatedDocumentCount) *EstimatedDocumentCount {
 	result := &EstimatedDocumentCount{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
 	}

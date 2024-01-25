@@ -1,7 +1,7 @@
 package mongo
 
 import (
-	"github.com/GabrielHCataldo/go-mongo-template/internal/util"
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"math"
 	"time"
 )
@@ -24,15 +24,16 @@ type PageResult struct {
 
 func newPageResult(pageInput PageInput, result any, countTotal int64) *PageResult {
 	minPageTotal := 1
-	if util.IsZero(result) {
+	if helper.IsEmpty(result) {
 		minPageTotal = 0
 	}
-	pageTotal := util.MinInt64(int64(math.Ceil(float64(countTotal)/float64(pageInput.PageSize))), int64(minPageTotal))
+	fPageTotal := math.Ceil(float64(countTotal) / float64(pageInput.PageSize))
+	pageTotal := helper.MinInt(int(fPageTotal), minPageTotal)
 	lastQueryAt := time.Now().UTC()
 	return &PageResult{
 		Page:          pageInput.Page,
 		PageSize:      pageInput.PageSize,
-		PageTotal:     pageTotal,
+		PageTotal:     int64(pageTotal),
 		TotalElements: countTotal,
 		Content:       result,
 		LastQueryAt:   lastQueryAt,

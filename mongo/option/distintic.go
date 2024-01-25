@@ -1,6 +1,9 @@
 package option
 
-import "time"
+import (
+	"github.com/GabrielHCataldo/go-helper/helper"
+	"time"
+)
 
 // Distinct represents options that can be used to configure a Distinct operation.
 type Distinct struct {
@@ -43,20 +46,20 @@ func (d *Distinct) SetComment(comment any) *Distinct {
 	return d
 }
 
-// GetDistinctOptionByParams assembles the Distinct object from optional parameters.
-func GetDistinctOptionByParams(opts []*Distinct) *Distinct {
+// MergeDistinctByParams assembles the Distinct object from optional parameters.
+func MergeDistinctByParams(opts []*Distinct) *Distinct {
 	result := &Distinct{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.Collation != nil {
+		if helper.IsNotNil(opt.Collation) {
 			result.Collation = opt.Collation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.MaxTime != nil {
+		if helper.IsNotNil(opt.MaxTime) {
 			result.MaxTime = opt.MaxTime
 		}
 	}

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"github.com/GabrielHCataldo/go-mongo-template/mongo"
 	"go.mongodb.org/mongo-driver/bson"
@@ -31,14 +32,14 @@ func deleteOne() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
 	defer mongoTemplate.SimpleDisconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	deleteResult, err := mongoTemplate.DeleteOne(ctx, filter, test{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error delete document:", err)
 	} else {
 		logger.Info("document deleted successfully:", deleteResult)
@@ -49,14 +50,14 @@ func deleteOneById() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
 	defer mongoTemplate.SimpleDisconnect(ctx)
 	objectId, _ := primitive.ObjectIDFromHex("6585f3a8bf2af8ad9bcab912")
 	deleteResult, err := mongoTemplate.DeleteOneById(ctx, objectId, test{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error delete document:", err)
 	} else {
 		logger.Info("document deleted successfully:", deleteResult)
@@ -67,14 +68,14 @@ func deleteMany() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
 	defer mongoTemplate.SimpleDisconnect(ctx)
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	deleteResult, err := mongoTemplate.DeleteMany(ctx, filter, test{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error delete documents:", err)
 	} else {
 		logger.Info("documents deleted successfully:", deleteResult)

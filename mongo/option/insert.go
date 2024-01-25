@@ -1,5 +1,7 @@
 package option
 
+import "github.com/GabrielHCataldo/go-helper/helper"
+
 // InsertOne represents options that can be used to configure a 'InsertOne' operation.
 type InsertOne struct {
 	// BypassDocumentValidation If true, writes executed as part of the operation will opt out of document-level
@@ -12,10 +14,12 @@ type InsertOne struct {
 	Comment any
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
-	DisableAutoCloseSession bool
+	// default is false
+	DisableAutoCloseSession *bool
 	// ForceRecreateSession Force the creation of the session, if any session is still open, we close it automatically,
 	// aborting all open transactions, and continue creating a new session.
-	ForceRecreateSession bool
+	// default is false
+	ForceRecreateSession *bool
 }
 
 // InsertMany represents options that can be used to configure a 'InsertMany' operation.
@@ -29,13 +33,15 @@ type InsertMany struct {
 	// the operation.  The default value is nil, which means that no comment will be included in the logs.
 	Comment any
 	// DisableAutoRollbackSession disable auto rollback if an error occurs.
-	DisableAutoRollbackSession bool
+	DisableAutoRollbackSession *bool
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
-	DisableAutoCloseSession bool
+	// default is false
+	DisableAutoCloseSession *bool
 	// ForceRecreateSession Force the creation of the session, if any session is still open, we close it automatically,
 	// committing the transactions, and continue creating a new session.
-	ForceRecreateSession bool
+	// default is false
+	ForceRecreateSession *bool
 }
 
 // NewInsertOne creates a new InsertOne instance.
@@ -62,13 +68,13 @@ func (i *InsertOne) SetComment(a any) *InsertOne {
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
 func (i *InsertOne) SetDisableAutoCloseSession(b bool) *InsertOne {
-	i.DisableAutoCloseSession = b
+	i.DisableAutoCloseSession = &b
 	return i
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
 func (i *InsertOne) SetForceRecreateSession(b bool) *InsertOne {
-	i.ForceRecreateSession = b
+	i.ForceRecreateSession = &b
 	return i
 }
 
@@ -86,67 +92,82 @@ func (i *InsertMany) SetComment(a any) *InsertMany {
 
 // SetDisableAutoRollback sets value for the DisableAutoRollbackSession field.
 func (i *InsertMany) SetDisableAutoRollback(b bool) *InsertMany {
-	i.DisableAutoRollbackSession = b
+	i.DisableAutoRollbackSession = &b
 	return i
 }
 
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
 func (i *InsertMany) SetDisableAutoCloseSession(b bool) *InsertMany {
-	i.DisableAutoCloseSession = b
+	i.DisableAutoCloseSession = &b
 	return i
 }
 
 // SetForceRecreateSession sets value for the ForceRecreateSession field.
 func (i *InsertMany) SetForceRecreateSession(b bool) *InsertMany {
-	i.ForceRecreateSession = b
+	i.ForceRecreateSession = &b
 	return i
 }
 
-// GetInsertOneOptionByParams assembles the InsertOne object from optional parameters.
-func GetInsertOneOptionByParams(opts []*InsertOne) *InsertOne {
+// MergeInsertOneByParams assembles the InsertOne object from optional parameters.
+func MergeInsertOneByParams(opts []*InsertOne) *InsertOne {
 	result := &InsertOne{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.BypassDocumentValidation != nil {
+		if helper.IsNotNil(opt.BypassDocumentValidation) {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.DisableAutoCloseSession {
+		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
-		if opt.ForceRecreateSession {
+		if helper.IsNotNil(opt.ForceRecreateSession) {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
+	}
+	if helper.IsNil(result.DisableAutoCloseSession) {
+		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+	}
+	if helper.IsNil(result.ForceRecreateSession) {
+		result.ForceRecreateSession = helper.ConvertToPointer(false)
 	}
 	return result
 }
 
-// GetInsertManyOptionByParams assembles the InsertMany object from optional parameters.
-func GetInsertManyOptionByParams(opts []*InsertMany) *InsertMany {
+// MergeInsertManyByParams assembles the InsertMany object from optional parameters.
+func MergeInsertManyByParams(opts []*InsertMany) *InsertMany {
 	result := &InsertMany{}
 	for _, opt := range opts {
-		if opt == nil {
+		if helper.IsNil(opt) {
 			continue
 		}
-		if opt.ForceRecreateSession {
+		if helper.IsNotNil(opt.ForceRecreateSession) {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
-		if opt.BypassDocumentValidation != nil {
+		if helper.IsNotNil(opt.BypassDocumentValidation) {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
 		}
-		if opt.Comment != nil {
+		if helper.IsNotNil(opt.Comment) {
 			result.Comment = opt.Comment
 		}
-		if opt.DisableAutoRollbackSession {
+		if helper.IsNotNil(opt.DisableAutoRollbackSession) {
 			result.DisableAutoRollbackSession = opt.DisableAutoRollbackSession
 		}
-		if opt.DisableAutoCloseSession {
+		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
+	}
+	if helper.IsNil(result.DisableAutoCloseSession) {
+		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+	}
+	if helper.IsNil(result.DisableAutoRollbackSession) {
+		result.DisableAutoRollbackSession = helper.ConvertToPointer(false)
+	}
+	if helper.IsNil(result.ForceRecreateSession) {
+		result.ForceRecreateSession = helper.ConvertToPointer(false)
 	}
 	return result
 }

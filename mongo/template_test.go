@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"testing"
 	"time"
@@ -13,9 +14,9 @@ func TestNewTemplate(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			temp, err := NewTemplate(ctx, tt.options)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("InsertOne() error = %v, wantErr %v", err, tt.wantErr)
-			} else if temp != nil {
+			} else if helper.IsNotNil(temp) {
 				_ = temp.Disconnect(ctx)
 			}
 		})
@@ -34,17 +35,17 @@ func TestTemplateInsertOne(t *testing.T) {
 				_ = mongoTemplate.Disconnect(ctx)
 			}
 			err := mongoTemplate.InsertOne(ctx, tt.value, tt.option, nil)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("InsertOne() error = %v, wantErr %v", err, tt.wantErr)
-			} else if err != nil {
+			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}
 			if tt.forceErrCloseMongoClient {
 				mongoTemplate.SimpleDisconnect(ctx)
 				mongoTemplate.SimpleDisconnect(ctx)
 			}
-			_ = mongoTemplate.CloseSession(ctx, err != nil)
-			_ = mongoTemplate.CloseSession(ctx, err != nil)
+			_ = mongoTemplate.CloseSession(ctx, helper.IsNotNil(err))
+			_ = mongoTemplate.CloseSession(ctx, helper.IsNotNil(err))
 			disconnectMongoTemplate()
 		})
 	}
@@ -57,9 +58,9 @@ func TestTemplateInsertMany(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			err := mongoTemplate.InsertMany(ctx, tt.value, tt.option, nil)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("InsertMany() error = %v, wantErr %v", err, tt.wantErr)
-			} else if err != nil {
+			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}
 		})
@@ -73,12 +74,12 @@ func TestTemplateDeleteOne(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			_, err := mongoTemplate.DeleteOne(ctx, tt.filter, tt.ref, tt.option, nil)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("DeleteOne() error = %v, wantErr %v", err, tt.wantErr)
-			} else if err != nil {
+			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}
-			_ = mongoTemplate.CloseSession(ctx, err != nil)
+			_ = mongoTemplate.CloseSession(ctx, helper.IsNotNil(err))
 		})
 	}
 }
@@ -90,12 +91,12 @@ func TestTemplateDeleteOneById(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			_, err := mongoTemplate.DeleteOneById(ctx, tt.id, tt.ref, tt.option, nil)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("DeleteOneById() error = %v, wantErr %v", err, tt.wantErr)
-			} else if err != nil {
+			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}
-			_ = mongoTemplate.CloseSession(ctx, err != nil)
+			_ = mongoTemplate.CloseSession(ctx, helper.IsNotNil(err))
 		})
 	}
 }
@@ -107,9 +108,9 @@ func TestTemplateDeleteMany(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			_, err := mongoTemplate.DeleteMany(ctx, tt.filter, tt.ref, tt.option, nil)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("DeleteMany() error = %v, wantErr %v", err, tt.wantErr)
-			} else if err != nil {
+			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}
 		})
@@ -123,9 +124,9 @@ func TestTemplateUpdateOneById(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			_, err := mongoTemplate.UpdateOneById(ctx, tt.id, tt.update, tt.ref, tt.option, nil)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("UpdateOneById() error = %v, wantErr %v", err, tt.wantErr)
-			} else if err != nil {
+			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}
 		})
@@ -139,12 +140,12 @@ func TestTemplateUpdateOne(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			_, err := mongoTemplate.UpdateOne(ctx, tt.filter, tt.update, tt.ref, tt.option, nil)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("UpdateOneById() error = %v, wantErr %v", err, tt.wantErr)
-			} else if err != nil {
+			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}
-			_ = mongoTemplate.CloseSession(ctx, err != nil)
+			_ = mongoTemplate.CloseSession(ctx, helper.IsNotNil(err))
 		})
 	}
 }
@@ -156,12 +157,12 @@ func TestTemplateUpdateMany(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			_, err := mongoTemplate.UpdateMany(ctx, tt.filter, tt.update, tt.ref, tt.option, nil)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("UpdateMany() error = %v, wantErr %v", err, tt.wantErr)
-			} else if err != nil {
+			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}
-			_ = mongoTemplate.CloseSession(ctx, err != nil)
+			_ = mongoTemplate.CloseSession(ctx, helper.IsNotNil(err))
 		})
 	}
 }
@@ -173,12 +174,12 @@ func TestTemplateReplaceOne(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			_, err := mongoTemplate.ReplaceOne(ctx, tt.filter, tt.replacement, tt.ref, tt.option, nil)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("ReplaceOne() error = %v, wantErr %v", err, tt.wantErr)
-			} else if err != nil {
+			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}
-			_ = mongoTemplate.CloseSession(ctx, err != nil)
+			_ = mongoTemplate.CloseSession(ctx, helper.IsNotNil(err))
 		})
 	}
 }
@@ -190,12 +191,12 @@ func TestTemplateReplaceOneById(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			_, err := mongoTemplate.ReplaceOneById(ctx, tt.id, tt.replacement, tt.ref, tt.option, nil)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("ReplaceOneById() error = %v, wantErr %v", err, tt.wantErr)
-			} else if err != nil {
+			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}
-			_ = mongoTemplate.CloseSession(ctx, err != nil)
+			_ = mongoTemplate.CloseSession(ctx, helper.IsNotNil(err))
 		})
 	}
 }
@@ -207,9 +208,9 @@ func TestTemplateFindOneById(t *testing.T) {
 			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
 			defer cancel()
 			err := mongoTemplate.FindOneById(ctx, tt.id, tt.dest, tt.option, nil)
-			if (err != nil) != tt.wantErr {
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("FindOneById() error = %v, wantErr %v", err, tt.wantErr)
-			} else if err != nil {
+			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}
 		})

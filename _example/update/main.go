@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"github.com/GabrielHCataldo/go-mongo-template/mongo"
 	"go.mongodb.org/mongo-driver/bson"
@@ -31,7 +32,7 @@ func updateOne() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
@@ -39,7 +40,7 @@ func updateOne() {
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
 	updateResult, err := mongoTemplate.UpdateOne(ctx, filter, update, test{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error update document:", err)
 	} else {
 		logger.Info("document updated successfully:", updateResult)
@@ -50,7 +51,7 @@ func updateOneById() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
@@ -58,7 +59,7 @@ func updateOneById() {
 	objectId, _ := primitive.ObjectIDFromHex("6585f3a8bf2af8ad9bcab911")
 	update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
 	updateResult, err := mongoTemplate.UpdateOneById(ctx, objectId, update, test{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error update document:", err)
 	} else {
 		logger.Info("document updated successfully:", updateResult)
@@ -69,7 +70,7 @@ func updateMany() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
@@ -77,7 +78,7 @@ func updateMany() {
 	filter := bson.M{"_id": bson.M{"$exists": true}}
 	update := bson.M{"$set": bson.M{"name": "Foo Bar Updated"}}
 	updateResult, err := mongoTemplate.UpdateOne(ctx, filter, update, test{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error update documents:", err)
 	} else {
 		logger.Info("document updated successfully:", updateResult)

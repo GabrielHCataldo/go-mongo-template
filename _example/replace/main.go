@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"github.com/GabrielHCataldo/go-helper/helper"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"github.com/GabrielHCataldo/go-mongo-template/mongo"
 	"go.mongodb.org/mongo-driver/bson"
@@ -31,7 +32,7 @@ func replaceOne() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
@@ -46,7 +47,7 @@ func replaceOne() {
 		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
 	}
 	updateResult, err := mongoTemplate.ReplaceOne(ctx, filter, replacement, test{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error replace document:", err)
 	} else {
 		logger.Info("document replaced successfully:", updateResult)
@@ -57,7 +58,7 @@ func replaceOneById() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	mongoTemplate, err := mongo.NewTemplate(ctx, options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error to init mongo template:", err)
 		return
 	}
@@ -72,7 +73,7 @@ func replaceOneById() {
 		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
 	}
 	updateResult, err := mongoTemplate.ReplaceOneById(ctx, objectId, replacement, test{})
-	if err != nil {
+	if helper.IsNotNil(err) {
 		logger.Error("error replace document:", err)
 	} else {
 		logger.Info("document replaced successfully:", updateResult)
