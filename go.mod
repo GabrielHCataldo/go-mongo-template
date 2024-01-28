@@ -4,7 +4,7 @@ go 1.21.3
 
 require (
 	github.com/GabrielHCataldo/go-errors v1.1.1
-	github.com/GabrielHCataldo/go-helper v1.3.4
+	github.com/GabrielHCataldo/go-helper v1.3.5
 	github.com/GabrielHCataldo/go-logger v1.2.0
 	go.mongodb.org/mongo-driver v1.13.1
 )
