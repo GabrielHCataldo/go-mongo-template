@@ -25,8 +25,8 @@ type test struct {
 
 func main() {
 	insertOne()
-	insertMany()
-	insertOneManualCloseSession()
+	//insertMany()
+	//insertOneManualCloseSession()
 }
 
 func insertOne() {

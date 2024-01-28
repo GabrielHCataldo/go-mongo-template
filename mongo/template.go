@@ -927,18 +927,12 @@ func (t *Template) CloseSession(ctx context.Context, abort bool) error {
 
 // CommitTransaction commit all transactions on session
 func (t *Template) CommitTransaction(ctx context.Context) error {
-	if helper.IsNil(t.session) {
-		return errNoOpenSession(2)
-	}
-	return errors.NewSkipCaller(2, t.session.CommitTransaction(ctx))
+	return t.commitTransaction(ctx, 2)
 }
 
 // AbortTransaction abort all transactions on session
 func (t *Template) AbortTransaction(ctx context.Context) error {
-	if helper.IsNil(t.session) {
-		return errNoOpenSession(2)
-	}
-	return errors.NewSkipCaller(2, t.session.AbortTransaction(ctx))
+	return t.abortTransaction(ctx, 2)
 }
 
 // Disconnect closes the mongodb connection client with return error
@@ -1008,8 +1002,8 @@ func (t *Template) insertMany(sc mongo.SessionContext, a any, opt *option.Insert
 				Comment:                  opt.Comment,
 			})
 			if helper.IsNotNil(err) {
-				_, _, _, message := errors.GetErrorDetails(err)
-				errs = append(errs, helper.Sprintln(message, "index:", i))
+				errMessage := errors.Details(err).GetMessage()
+				errs = append(errs, helper.Sprintln(errMessage, "index:", i))
 			}
 		}
 	}
