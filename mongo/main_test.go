@@ -308,9 +308,9 @@ type testEmptyStruct struct {
 
 func TestMain(t *testing.M) {
 	initMongoTemplate()
-	//clearCollection()
+	clearCollection()
 	t.Run()
-	//clearCollection()
+	clearCollection()
 	disconnectMongoTemplate()
 }
 

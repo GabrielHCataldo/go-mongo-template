@@ -329,6 +329,7 @@ func TestTemplateFindPageable(t *testing.T) {
 				t.Log("err expected:", err)
 			} else {
 				var destContent []testStruct
+				_ = v.Decode(destContent)
 				_ = v.Content.Decode(destContent)
 				_ = v.Content.Decode(&destContent)
 				logger.Info("result pageable:", v)
