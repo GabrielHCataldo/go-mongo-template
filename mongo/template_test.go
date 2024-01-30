@@ -328,7 +328,15 @@ func TestTemplateFindPageable(t *testing.T) {
 			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			} else {
-				logger.Info("result pageable:", v)
+				var destContent []testStruct
+				_ = v.Content.Parse(destContent)
+				_ = v.Content.Parse(&destContent)
+				logger.Info("result pageable:", destContent)
+				if helper.IsGreaterThan(len(v.Content), 0) {
+					var destItemContent testStruct
+					_ = v.Content[0].Parse(&destItemContent)
+					logger.Info("result item content:", destItemContent)
+				}
 			}
 		})
 	}

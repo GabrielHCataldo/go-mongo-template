@@ -3,7 +3,7 @@ MongoDB Template
 <!--suppress ALL -->
 <img align="right" src="gopher-mongo.png" alt="">
 
-[![Project status](https://img.shields.io/badge/version-v1.1.4-vividgreen.svg)](https://github.com/GabrielHCataldo/go-mongo-template/releases/tag/v1.1.4)
+[![Project status](https://img.shields.io/badge/version-v1.1.5-vividgreen.svg)](https://github.com/GabrielHCataldo/go-mongo-template/releases/tag/v1.1.5)
 [![Go Report Card](https://goreportcard.com/badge/github.com/GabrielHCataldo/go-mongo-template)](https://goreportcard.com/report/github.com/GabrielHCataldo/go-mongo-template)
 [![Coverage Status](https://coveralls.io/repos/GabrielHCataldo/go-mongo-template/badge.svg?branch=main&service=github)](https://coveralls.io/github/GabrielHCataldo/go-mongo?branch=main)
 [![Open Source Helpers](https://www.codetriage.com/gabrielhcataldo/go-mongo-template/badges/users.svg)](https://www.codetriage.com/gabrielhcataldo/go-mongo)
@@ -129,7 +129,7 @@ func main() {
 
 Output:
 
-    [INFO 2023/12/22 13:02:07] main.go:35: document inserted successfully: {"id":[101,133,178,255,197,19,21,77,11,38,26,152],"random":6628457526937947134,"name":"Foo Bar","birthDate":"1999-01-21T02:00:00Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"balance":190.12,"createdAt":"2023-12-22T16:02:07.322Z"}
+    [INFO 2023/12/22 13:02:07] main.go:35: document inserted successfully: {"id":"65b8a8b753748d924631520c","random":6628457526937947134,"name":"Foo Bar","birthDate":"1999-01-21T02:00:00Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"balance":190.12,"createdAt":"2023-12-22T16:02:07.322Z"}
 
 We are able to insert multiple documents, remembering that if no ID is provided, and if you have
 configured a field with annotation **bson** _id and the type is **primitive.ObjectId** we will fill in the
@@ -190,7 +190,7 @@ func main() {
 
 Output:
 
-    [INFO 2023/12/22 16:11:33] main.go:46: document inserted successfully: [{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T19:11:33.206Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":[101,133,223,101,71,229,174,223,115,181,143,210],"name":"Foo Bar","random":8094092400336225232},{"balance":290.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T19:11:33.206Z","emails":["foobar2@gmail.com","foobar4@hotmail.com"],"id":[101,133,223,101,71,229,174,223,115,181,143,211],"name":"Foo Bar 2","random":4318945546650338065}]
+    [INFO 2023/12/22 16:11:33] main.go:46: document inserted successfully: [{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T19:11:33.206Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":"65b8a8b753748d924631520b","name":"Foo Bar","random":8094092400336225232},{"balance":290.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T19:11:33.206Z","emails":["foobar2@gmail.com","foobar4@hotmail.com"],"id":"65b8a8b753748d924631520f","name":"Foo Bar 2","random":4318945546650338065}]
 
 For more insert examples visit [link](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/insert/main).
 
@@ -538,7 +538,7 @@ func main() {
 
 Output:
 
-    [INFO 2023/12/22 17:02:22] main.go:28: find all documents successfully: [{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T18:53:26.695Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":[101,133,219,38,99,62,34,92,190,173,245,83],"name":"Foo Bar Updated","random":2576121145493409319},{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T19:11:33.206Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":[101,133,223,101,71,229,174,223,115,181,143,210],"name":"Foo Bar","random":8094092400336225232},{"balance":290.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T19:11:33.206Z","emails":["foobar2@gmail.com","foobar4@hotmail.com"],"id":[101,133,223,101,71,229,174,223,115,181,143,211],"name":"Foo Bar 2","random":4318945546650338065}]
+    [INFO 2023/12/22 17:02:22] main.go:28: find all documents successfully: [{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T18:53:26.695Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":"65b8a8b753748d924631520g","name":"Foo Bar Updated","random":2576121145493409319},{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T19:11:33.206Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":"65b8a8b753748d924631520j","name":"Foo Bar","random":8094092400336225232},{"balance":290.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T19:11:33.206Z","emails":["foobar2@gmail.com","foobar4@hotmail.com"],"id":"65b8a8b753748d924631520k","name":"Foo Bar 2","random":4318945546650338065}]
 
 Be able to page in a simple and intuitive way, see:
 
@@ -576,14 +576,18 @@ func main() {
     if helper.IsNotNil(err) {
         logger.Error("error find pageable documents:", err)
     } else {
+        var dest []test
+        _ = pageOutput.Content.Parse(&dest)
         logger.Info("find pageable documents successfully:", pageOutput)
+        logger.Info("find pageable get first value:", dest[0])
     }
 }
 ```
 
 Output:
 
-    [INFO 2023/12/22 18:04:54] main.go:33: find pageable documents successfully: {"page":0,"pageSize":10,"pageTotal":2,"totalElements":16,"content":[{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:03:03.589Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":[101,133,249,135,99,77,8,140,0,92,121,166],"name":"Foo Bar","random":9062939652073059162},{"balance":290.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:03:03.288Z","emails":["foobar2@gmail.com","foobar4@hotmail.com"],"id":[101,133,249,135,99,77,8,140,0,92,121,164],"name":"Foo Bar 2","random":3964041099041384637},{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:03:03.288Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":[101,133,249,135,99,77,8,140,0,92,121,163],"name":"Foo Bar","random":7118470983031370710},{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:03:02.895Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":[101,133,249,134,99,77,8,140,0,92,121,161],"name":"Foo Bar","random":685662021554519416},{"balance":290.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:03:02.032Z","emails":["foobar2@gmail.com","foobar4@hotmail.com"],"id":[101,133,249,134,109,6,181,94,237,141,156,103],"name":"Foo Bar 2","random":4825201869427500545},{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:03:02.032Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":[101,133,249,134,109,6,181,94,237,141,156,102],"name":"Foo Bar","random":5424075018439786230},{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T21:03:01.71Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":[101,133,249,133,109,6,181,94,237,141,156,100],"name":"Foo Bar","random":4901802038316432856},{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T20:46:48.598Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":[101,133,245,184,253,143,169,125,86,36,25,247],"name":"Foo Bar","random":5045147651911492796},{"balance":290.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T20:46:48.262Z","emails":["foobar2@gmail.com","foobar4@hotmail.com"],"id":[101,133,245,184,253,143,169,125,86,36,25,245],"name":"Foo Bar 2","random":5267773685750720182},{"balance":190.12,"birthDate":"1999-01-21T02:00:00Z","createdAt":"2023-12-22T20:46:48.262Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":[101,133,245,184,253,143,169,125,86,36,25,244],"name":"Foo Bar","random":6973387066252926888}],"lastQueryAt":"2023-12-22T21:04:54Z"}
+    [INFO 2024/01/30 04:57:45] main.go:33: find pageable documents successfully: {"page":null,"pageSize":"10","pageTotal":"1","totalElements":"2","content":[{"balance":"190.12","birthDate":"1999-01-21T02:00:00Z","createdAt":"2024-01-30T07:57:35.865Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"id":"65b8abef44f575c583b91a81","name":"Foo Bar","random":"5208816839613347000"},{"balance":"290.12","birthDate":"1999-01-21T02:00:00Z","createdAt":"2024-01-30T07:57:35.865Z","emails":["foobar2@gmail.com","foobar4@hotmail.com"],"id":"65b8abef44f575c583b91a82","name":"Foo Bar 2","random":"1873557180388720600"}],"lastQueryAt":"2024-01-30T07:57:45.444808Z"}
+    [INFO 2024/01/30 04:57:45] main.go:34: find pageable get first value: {"id":"65b8abef44f575c583b91a81","random":"5208816839613347000","name":"Foo Bar","birthDate":"1999-01-21T02:00:00Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"balance":"190.12","createdAt":"2024-01-30T07:57:35.865Z"}
 
 Also obtain a single document by id, see below:
 
@@ -624,7 +628,7 @@ func main() {
 
 Output:
 
-    [INFO 2023/12/22 17:14:47] main.go:29: find by id document successfully: {"id":[101,133,219,38,99,62,34,92,190,173,245,83],"random":2576121145493409319,"name":"Foo Bar Updated","birthDate":"1999-01-21T02:00:00Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"balance":190.12,"createdAt":"2023-12-22T18:53:26.695Z"}
+    [INFO 2023/12/22 17:14:47] main.go:29: find by id document successfully: {"id":"65b8a8b753748d924631521z","random":2576121145493409319,"name":"Foo Bar Updated","birthDate":"1999-01-21T02:00:00Z","emails":["foobar@gmail.com","foobar3@hotmail.com"],"balance":190.12,"createdAt":"2023-12-22T18:53:26.695Z"}
 
 For more find examples visit [link](https://github/GabrielHCataldo/go-mongo-template/blob/main/_example/find/main).
 

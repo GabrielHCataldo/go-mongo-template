@@ -2,8 +2,10 @@ github.com/GabrielHCataldo/go-errors v1.1.1 h1:cbEJIfWRk44843wE8eVpyvr9F7zOn/AHD
 github.com/GabrielHCataldo/go-errors v1.1.1/go.mod h1:rrwIP14EEGJ0N8BUpxuwHNM8auO5ZsVj9jGEj442ibo=
 github.com/GabrielHCataldo/go-helper v1.3.5 h1:H8BOYT5mkfMExWuyzp4guetI8cjQ7idyhyCsJsym6iw=
 github.com/GabrielHCataldo/go-helper v1.3.5/go.mod h1:+whI36aUg1BfvLpZWJ8j81+d5iPuxl58ApOJqTIliCU=
-github.com/GabrielHCataldo/go-logger v1.2.0 h1:fGdlkx+ihU7nhNYTvi/KOlLb2WEHmJrCuIFU9/zGQ1g=
-github.com/GabrielHCataldo/go-logger v1.2.0/go.mod h1:Q7+M9m9gu1MtgGiFkoYOHtobLLM/kJCPZVhszIJtsJ0=
+github.com/GabrielHCataldo/go-logger v1.2.1 h1:5pKq4449safXvGR5rYkq7Op2lGgqeDR4B87MTkwZaGY=
+github.com/GabrielHCataldo/go-logger v1.2.1/go.mod h1:Q7+M9m9gu1MtgGiFkoYOHtobLLM/kJCPZVhszIJtsJ0=
+github.com/GabrielHCataldo/go-logger v1.2.2 h1:+CFRBha2Pr7mwHpQrPI+4i+XX8J2WSFo7bNotZg7E8U=
+github.com/GabrielHCataldo/go-logger v1.2.2/go.mod h1:Q7+M9m9gu1MtgGiFkoYOHtobLLM/kJCPZVhszIJtsJ0=
 github.com/cockroachdb/apd v1.1.0 h1:3LFP3629v+1aKXU5Q37mxmRxX/pIu1nijXydLShEq5I=
 github.com/cockroachdb/apd v1.1.0/go.mod h1:8Sl8LxpKi29FqWXR16WEFZRNSz3SoPzUzeMeY4+DwBQ=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

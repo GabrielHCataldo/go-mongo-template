@@ -44,12 +44,11 @@ type EventHandler func(ctx *EventContext)
 
 // ParseToStruct convert Event.FullDocument to struct
 func (f FullDocument) ParseToStruct(dest any) error {
-	if helper.IsNotPointer(dest) {
-		return errDestIsNotPointer(2)
-	} else if helper.IsNotStruct(dest) {
+	if helper.IsNotStruct(dest) {
 		return errDestIsNotStruct(2)
 	}
-	return errors.NewSkipCaller(2, helper.ConvertToDest(f, dest))
+	err := helper.ConvertToDest(f, dest)
+	return errors.NewSkipCaller(2, err)
 }
 
 func processNextEvent(handler EventHandler, event Event, opt *option.WatchWithHandler) {
