@@ -30,11 +30,14 @@ type PageResult struct {
 type pageContent []pageItemContent
 type pageItemContent map[string]any
 
+// Decode parse pageResult to dest param
+func (p PageResult) Decode(dest any) error {
+	err := helper.ConvertToDest(p, dest)
+	return errors.NewSkipCaller(2, err)
+}
+
 // Decode parse pageResult.Content to dest param
 func (p pageContent) Decode(dest any) error {
-	if helper.IsNotSlice(dest) {
-		return errors.NewSkipCaller(2, "mongo: dest is not a slice or array")
-	}
 	err := helper.ConvertToDest(p, dest)
 	return errors.NewSkipCaller(2, err)
 }
