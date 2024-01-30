@@ -8,10 +8,14 @@ import (
 )
 
 type PageInput struct {
-	Page     int64
+	// Page current page (default 0)
+	Page int64
+	// PageSize page size (required)
 	PageSize int64
-	Ref      any
-	Sort     any
+	// Ref slice of the struct reference contained database and collection configured
+	Ref any
+	// Sort value sort to result
+	Sort any
 }
 
 type PageResult struct {
@@ -26,7 +30,8 @@ type PageResult struct {
 type pageContent []pageItemContent
 type pageItemContent map[string]any
 
-func (p pageContent) Parse(dest any) error {
+// Decode parse pageResult.Content to dest param
+func (p pageContent) Decode(dest any) error {
 	if helper.IsNotSlice(dest) {
 		return errors.NewSkipCaller(2, "mongo: dest is not a slice or array")
 	}
@@ -34,7 +39,8 @@ func (p pageContent) Parse(dest any) error {
 	return errors.NewSkipCaller(2, err)
 }
 
-func (p pageItemContent) Parse(dest any) error {
+// Decode parse pageResult item to dest param
+func (p pageItemContent) Decode(dest any) error {
 	err := helper.ConvertToDest(p, dest)
 	return errors.NewSkipCaller(2, err)
 }
@@ -50,7 +56,7 @@ func newPageResult(pageInput PageInput, result any, countTotal int64) *PageResul
 	var content pageContent
 	_ = helper.ConvertToDest(result, &content)
 	return &PageResult{
-		Page:          pageInput.Page,
+		Page:          0,
 		PageSize:      pageInput.PageSize,
 		PageTotal:     int64(pageTotal),
 		TotalElements: countTotal,

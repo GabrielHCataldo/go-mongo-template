@@ -515,9 +515,6 @@ func (t *Template) FindAll(ctx context.Context, dest any, opts ...*option.Find) 
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/find/.
 func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput, opts ...*option.FindPageable) (
 	*PageResult, error) {
-	if helper.IsNotSlice(input.Ref) {
-		return nil, errors.NewSkipCaller(2, "mongo: input.Ref can be a slice")
-	}
 	_, collection, err := t.getMongoInfosByAny(2, input.Ref)
 	if helper.IsNotNil(err) {
 		return nil, err
@@ -544,8 +541,9 @@ func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput
 		Sort:                input.Sort,
 		Let:                 opt.Let,
 	})
+	defer t.closeCursor(ctx, cursor)
 	if helper.IsNil(err) {
-		dest := input.Ref
+		dest := reflect.MakeSlice(reflect.TypeOf(input.Ref), 0, 0).Interface()
 		err = cursor.All(ctx, &dest)
 		if helper.IsNil(err) {
 			countTotal, _ := collection.CountDocuments(ctx, filter)
@@ -611,6 +609,7 @@ func (t *Template) Aggregate(ctx context.Context, pipeline any, dest any, opts .
 		Let:                      opt.Let,
 		Custom:                   opt.Custom,
 	})
+	defer t.closeCursor(ctx, cursor)
 	if helper.IsNil(err) {
 		err = cursor.All(ctx, dest)
 	}
@@ -875,6 +874,7 @@ func (t *Template) ListIndexes(ctx context.Context, ref any, opts ...*option.Lis
 		BatchSize: opt.BatchSize,
 		MaxTime:   opt.MaxTime,
 	})
+	defer t.closeCursor(ctx, cursor)
 	var results []IndexResult
 	if helper.IsNil(err) {
 		err = cursor.All(ctx, &results)
@@ -1168,6 +1168,7 @@ func (t *Template) find(ctx context.Context, filter, dest any, opts ...*option.F
 		Sort:                opt.Sort,
 		Let:                 opt.Let,
 	})
+	defer t.closeCursor(ctx, cursor)
 	if helper.IsNil(err) {
 		err = cursor.All(ctx, dest)
 	}
@@ -1428,6 +1429,12 @@ func (t *Template) endSession(ctx context.Context) {
 	if helper.IsNotNil(t.session) {
 		t.session.EndSession(ctx)
 		t.session = nil
+	}
+}
+
+func (t *Template) closeCursor(ctx context.Context, cursor *mongo.Cursor) {
+	if helper.IsNotNil(cursor) {
+		_ = cursor.Close(ctx)
 	}
 }
 

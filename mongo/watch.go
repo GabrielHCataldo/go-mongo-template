@@ -42,8 +42,8 @@ type EventContext struct {
 
 type EventHandler func(ctx *EventContext)
 
-// ParseToStruct convert Event.FullDocument to struct
-func (f FullDocument) ParseToStruct(dest any) error {
+// Decode convert Event.FullDocument to struct
+func (f FullDocument) Decode(dest any) error {
 	if helper.IsNotStruct(dest) {
 		return errDestIsNotStruct(2)
 	}

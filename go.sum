@@ -6,6 +6,8 @@ github.com/GabrielHCataldo/go-logger v1.2.1 h1:5pKq4449safXvGR5rYkq7Op2lGgqeDR4B
 github.com/GabrielHCataldo/go-logger v1.2.1/go.mod h1:Q7+M9m9gu1MtgGiFkoYOHtobLLM/kJCPZVhszIJtsJ0=
 github.com/GabrielHCataldo/go-logger v1.2.2 h1:+CFRBha2Pr7mwHpQrPI+4i+XX8J2WSFo7bNotZg7E8U=
 github.com/GabrielHCataldo/go-logger v1.2.2/go.mod h1:Q7+M9m9gu1MtgGiFkoYOHtobLLM/kJCPZVhszIJtsJ0=
+github.com/GabrielHCataldo/go-logger v1.2.3 h1:qkmmluuxsi5e2XZw6X4eU+fSr/cdlO/DvXxFKSGxH/k=
+github.com/GabrielHCataldo/go-logger v1.2.3/go.mod h1:Q7+M9m9gu1MtgGiFkoYOHtobLLM/kJCPZVhszIJtsJ0=
 github.com/cockroachdb/apd v1.1.0 h1:3LFP3629v+1aKXU5Q37mxmRxX/pIu1nijXydLShEq5I=
 github.com/cockroachdb/apd v1.1.0/go.mod h1:8Sl8LxpKi29FqWXR16WEFZRNSz3SoPzUzeMeY4+DwBQ=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

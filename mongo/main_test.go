@@ -279,7 +279,7 @@ type testListIndexes struct {
 var mongoTemplate *Template
 
 type testStruct struct {
-	Id        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty" database:"test" collection:"test"`
+	Id        primitive.ObjectID `json:"id" bson:"_id,omitempty" database:"test" collection:"test"`
 	Random    int                `json:"random,omitempty" bson:"random,omitempty"`
 	Name      string             `json:"name,omitempty" bson:"name,omitempty"`
 	BirthDate primitive.DateTime `json:"birthDate,omitempty" bson:"birthDate,omitempty"`
@@ -308,9 +308,9 @@ type testEmptyStruct struct {
 
 func TestMain(t *testing.M) {
 	initMongoTemplate()
-	clearCollection()
+	//clearCollection()
 	t.Run()
-	clearCollection()
+	//clearCollection()
 	disconnectMongoTemplate()
 }
 
@@ -1243,7 +1243,7 @@ func initListTestFindPageable() []testFindPageable {
 			pageInput: PageInput{
 				Page:     0,
 				PageSize: 10,
-				Ref:      testStruct{},
+				Ref:      "",
 				Sort:     nil,
 			},
 			option:          initOptionFindPageable(),
@@ -1588,9 +1588,9 @@ func initListTestWatchHandler() []testWatchHandler {
 			handler: func(ctx *EventContext) {
 				var testStr string
 				var test testStruct
-				_ = ctx.Event.FullDocument.ParseToStruct(testStr)
-				_ = ctx.Event.FullDocument.ParseToStruct(&testStr)
-				_ = ctx.Event.FullDocument.ParseToStruct(&test)
+				_ = ctx.Event.FullDocument.Decode(testStr)
+				_ = ctx.Event.FullDocument.Decode(&testStr)
+				_ = ctx.Event.FullDocument.Decode(&test)
 				logger.Info("watch handler ctx:", ctx, "fullDocument:", test)
 			},
 			option:          initOptionWatchHandler(),

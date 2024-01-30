@@ -109,7 +109,7 @@ func findPageable() {
 		logger.Error("error find pageable documents:", err)
 	} else {
 		var dest []test
-		_ = pageOutput.Content.Parse(&dest)
+		_ = pageOutput.Content.Decode(&dest)
 		logger.Info("find pageable documents successfully:", pageOutput)
 		logger.Info("find pageable get first value:", dest[0])
 	}

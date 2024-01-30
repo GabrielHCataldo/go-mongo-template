@@ -329,12 +329,12 @@ func TestTemplateFindPageable(t *testing.T) {
 				t.Log("err expected:", err)
 			} else {
 				var destContent []testStruct
-				_ = v.Content.Parse(destContent)
-				_ = v.Content.Parse(&destContent)
-				logger.Info("result pageable:", destContent)
+				_ = v.Content.Decode(destContent)
+				_ = v.Content.Decode(&destContent)
+				logger.Info("result pageable:", v)
 				if helper.IsGreaterThan(len(v.Content), 0) {
 					var destItemContent testStruct
-					_ = v.Content[0].Parse(&destItemContent)
+					_ = v.Content[0].Decode(&destItemContent)
 					logger.Info("result item content:", destItemContent)
 				}
 			}
@@ -354,7 +354,7 @@ func TestTemplateExists(t *testing.T) {
 			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			} else {
-				logger.Info("result pageable:", v)
+				logger.Info("result:", v)
 			}
 		})
 	}
@@ -372,7 +372,7 @@ func TestTemplateExistsById(t *testing.T) {
 			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			} else {
-				logger.Info("result pageable:", v)
+				logger.Info("result:", v)
 			}
 		})
 	}
