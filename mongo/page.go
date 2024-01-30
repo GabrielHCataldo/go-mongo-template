@@ -56,7 +56,7 @@ func newPageResult(pageInput PageInput, result any, countTotal int64) *PageResul
 	var content pageContent
 	_ = helper.ConvertToDest(result, &content)
 	return &PageResult{
-		Page:          0,
+		Page:          pageInput.Page,
 		PageSize:      pageInput.PageSize,
 		PageTotal:     int64(pageTotal),
 		TotalElements: countTotal,
