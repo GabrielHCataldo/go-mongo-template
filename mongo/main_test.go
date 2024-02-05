@@ -1163,7 +1163,7 @@ func initListTestFindPageable() []testFindPageable {
 			pageInput: PageInput{
 				Page:     0,
 				PageSize: 10,
-				Ref:      []testStruct{},
+				Ref:      testStruct{},
 				Sort:     bson.M{"createdAt": SortAsc},
 			},
 			option:          initOptionFindPageable(),
@@ -1175,7 +1175,7 @@ func initListTestFindPageable() []testFindPageable {
 			pageInput: PageInput{
 				Page:     0,
 				PageSize: 10,
-				Ref:      []testStruct{},
+				Ref:      testStruct{},
 				Sort:     nil,
 			},
 			option:          initOptionFindPageable(),
@@ -1187,7 +1187,7 @@ func initListTestFindPageable() []testFindPageable {
 			pageInput: PageInput{
 				Page:     0,
 				PageSize: 10,
-				Ref:      []testStruct{},
+				Ref:      testStruct{},
 				Sort:     nil,
 			},
 			option: initOptionFindPageable().
@@ -1205,7 +1205,7 @@ func initListTestFindPageable() []testFindPageable {
 			pageInput: PageInput{
 				Page:     0,
 				PageSize: 10,
-				Ref:      []testInvalidStruct{},
+				Ref:      testInvalidStruct{},
 				Sort:     nil,
 			},
 			option:          initOptionFindPageable(),
@@ -1218,7 +1218,7 @@ func initListTestFindPageable() []testFindPageable {
 			pageInput: PageInput{
 				Page:     0,
 				PageSize: 10,
-				Ref:      &testStruct{},
+				Ref:      []testStruct{},
 				Sort:     nil,
 			},
 			option:          initOptionFindPageable(),

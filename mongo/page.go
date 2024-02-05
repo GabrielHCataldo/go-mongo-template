@@ -12,7 +12,7 @@ type PageInput struct {
 	Page int64
 	// PageSize page size (required)
 	PageSize int64
-	// Ref slice of the struct reference contained database and collection configured
+	// Ref struct reference contained database and collection configured
 	Ref any
 	// Sort value sort to result
 	Sort any

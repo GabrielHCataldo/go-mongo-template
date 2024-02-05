@@ -515,6 +515,9 @@ func (t *Template) FindAll(ctx context.Context, dest any, opts ...*option.Find) 
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/find/.
 func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput, opts ...*option.FindPageable) (
 	*PageResult, error) {
+	if helper.IsNotStruct(input.Ref) {
+		return nil, errors.NewSkipCaller(2, "mongo: input.Ref need to be structure")
+	}
 	_, collection, err := t.getMongoInfosByAny(2, input.Ref)
 	if helper.IsNotNil(err) {
 		return nil, err
@@ -543,7 +546,7 @@ func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput
 	})
 	defer t.closeCursor(ctx, cursor)
 	if helper.IsNil(err) {
-		dest := reflect.MakeSlice(reflect.TypeOf(input.Ref), 0, 0).Interface()
+		dest := reflect.MakeSlice(reflect.SliceOf(reflect.TypeOf(input.Ref)), 0, 0).Interface()
 		err = cursor.All(ctx, &dest)
 		if helper.IsNil(err) {
 			countTotal, _ := collection.CountDocuments(ctx, filter)
