@@ -35,6 +35,8 @@ type Update struct {
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let any
+	// DisableAutoRollbackSession disable auto rollback if an error occurs.
+	DisableAutoRollbackSession *bool
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
 	// default is false
@@ -86,6 +88,12 @@ func (u *Update) SetLet(a any) *Update {
 	return u
 }
 
+// SetDisableAutoRollbackSession creates a new DisableAutoRollbackSession instance.
+func (u *Update) SetDisableAutoRollbackSession(b bool) *Update {
+	u.DisableAutoRollbackSession = &b
+	return u
+}
+
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
 func (u *Update) SetDisableAutoCloseSession(b bool) *Update {
 	u.DisableAutoCloseSession = &b
@@ -105,7 +113,7 @@ func (u *Update) SetUpsert(b bool) *Update {
 }
 
 // MergeUpdateByParams assembles the Update object from optional parameters.
-func MergeUpdateByParams(opts []*Update) *Update {
+func MergeUpdateByParams(opts []*Update, global *Global) *Update {
 	result := &Update{}
 	for _, opt := range opts {
 		if helper.IsNil(opt) {
@@ -126,6 +134,9 @@ func MergeUpdateByParams(opts []*Update) *Update {
 		if helper.IsNotNil(opt.Let) {
 			result.Let = opt.Let
 		}
+		if helper.IsNotNil(opt.DisableAutoRollbackSession) {
+			result.DisableAutoRollbackSession = opt.DisableAutoRollbackSession
+		}
 		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
@@ -133,11 +144,20 @@ func MergeUpdateByParams(opts []*Update) *Update {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
 	}
+	if helper.IsNil(result.BypassDocumentValidation) {
+		result.BypassDocumentValidation = helper.ConvertToPointer(global.BypassDocumentValidation)
+	}
+	if helper.IsNil(result.Comment) {
+		result.Comment = global.Comment
+	}
+	if helper.IsNil(result.DisableAutoRollbackSession) {
+		result.DisableAutoRollbackSession = helper.ConvertToPointer(global.DisableAutoRollbackSession)
+	}
 	if helper.IsNil(result.DisableAutoCloseSession) {
-		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+		result.DisableAutoCloseSession = helper.ConvertToPointer(global.DisableAutoCloseSession)
 	}
 	if helper.IsNil(result.ForceRecreateSession) {
-		result.ForceRecreateSession = helper.ConvertToPointer(false)
+		result.ForceRecreateSession = helper.ConvertToPointer(global.ForceRecreateSession)
 	}
 	return result
 }

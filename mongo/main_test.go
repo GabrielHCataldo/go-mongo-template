@@ -119,11 +119,30 @@ type testFindOne struct {
 	wantErr         bool
 }
 
+type testFindOneAndDeleteById struct {
+	name            string
+	id              any
+	dest            any
+	option          *option.FindOneAndDelete
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
 type testFindOneAndDelete struct {
 	name            string
 	filter          any
 	dest            any
 	option          *option.FindOneAndDelete
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testFindOneAndReplaceById struct {
+	name            string
+	id              any
+	replacement     any
+	dest            any
+	option          *option.FindOneAndReplace
 	durationTimeout time.Duration
 	wantErr         bool
 }
@@ -141,6 +160,16 @@ type testFindOneAndReplace struct {
 type testFindOneAndUpdate struct {
 	name            string
 	filter          any
+	update          any
+	dest            any
+	option          *option.FindOneAndUpdate
+	durationTimeout time.Duration
+	wantErr         bool
+}
+
+type testFindOneAndUpdateById struct {
+	name            string
+	id              any
 	update          any
 	dest            any
 	option          *option.FindOneAndUpdate
@@ -276,8 +305,6 @@ type testListIndexes struct {
 	wantErr         bool
 }
 
-var mongoTemplate *Template
-
 type testStruct struct {
 	Id        primitive.ObjectID `json:"id" bson:"_id,omitempty" database:"test" collection:"test"`
 	Random    int                `json:"random,omitempty" bson:"random,omitempty"`
@@ -306,6 +333,8 @@ type testInvalidCollectionStruct struct {
 type testEmptyStruct struct {
 }
 
+var mongoTemplate *Template
+
 func TestMain(t *testing.M) {
 	initMongoTemplate()
 	clearCollection()
@@ -318,12 +347,13 @@ func initMongoTemplate() {
 	if helper.IsNotNil(mongoTemplate) {
 		return
 	}
-	nMongoTemplate, err := NewTemplate(context.TODO(), options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
+	mt, err := NewTemplate(context.TODO(), options.Client().ApplyURI(os.Getenv("MONGODB_URL")))
 	if helper.IsNotNil(err) {
 		logger.Error("error new Template:", err)
 		return
 	}
-	mongoTemplate = nMongoTemplate
+	mt.SetGlobalOption(initGlobalOption())
+	mongoTemplate = mt
 }
 
 func initDocument() {
@@ -331,14 +361,26 @@ func initDocument() {
 	ctx, cancel := context.WithTimeout(context.TODO(), 5*time.Second)
 	defer cancel()
 	test := initTestStruct()
-	err := mongoTemplate.InsertOne(ctx, test)
+	err := mongoTemplate.StartSession(ctx)
+	if helper.IsNotNil(err) {
+		logger.Error("error start session init document:", err)
+		return
+	}
+	err = mongoTemplate.InsertOne(ctx, test)
 	if helper.IsNotNil(err) {
 		logger.Error("error init document:", err)
+		return
+	}
+	err = mongoTemplate.CommitTransaction(ctx)
+	if helper.IsNotNil(err) {
+		logger.Error("error commit init document:", err)
 		return
 	}
 	err = os.Setenv(MongoDBTestId, test.Id.Hex())
 	if helper.IsNotNil(err) {
 		logger.Error("err set MongoDBTestId env:", err)
+	} else {
+		logger.Info("set MongoDBTestId env successfully:", test.Id.Hex())
 	}
 }
 
@@ -366,7 +408,7 @@ func disconnectMongoTemplate() {
 	defer cancel()
 	err := mongoTemplate.Disconnect(ctx)
 	if helper.IsNotNil(err) {
-		logger.Error("error disconnect mongodb:", err)
+		logger.Error("Error disconnect mongodb:", err)
 	}
 	mongoTemplate = nil
 }
@@ -479,9 +521,13 @@ func initListTestInsertOne() []testInsertOne {
 			durationTimeout: 5 * time.Second,
 		},
 		{
-			name:                     "success with error commit transaction",
-			value:                    initTestStruct(),
-			option:                   initOptionInsertOne().SetDisableAutoCloseSession(true),
+			name:  "success with error commit transaction",
+			value: initTestStruct(),
+			option: initOptionInsertOne().
+				SetBypassDocumentValidation(true).
+				SetComment("comment insert golang unit test").
+				SetDisableAutoCloseSession(true).
+				SetDisableAutoRollbackSession(true),
 			forceErrCloseMongoClient: true,
 			durationTimeout:          5 * time.Second,
 		},
@@ -559,6 +605,8 @@ func initListTestInsertMany() []testInsertMany {
 				nil,
 			},
 			option: initOptionInsertMany().
+				SetBypassDocumentValidation(true).
+				SetComment("comment insert golang unit test").
 				SetDisableAutoRollback(true).
 				SetDisableAutoCloseSession(true).
 				SetForceRecreateSession(true),
@@ -608,10 +656,14 @@ func initListTestDelete() []testDelete {
 			wantErr:         true,
 		},
 		{
-			name:            "failed type ref",
-			filter:          bson.M{},
-			ref:             initTestString(),
-			option:          initOptionDelete().SetForceRecreateSession(true).SetDisableAutoCloseSession(true),
+			name:   "failed type ref",
+			filter: bson.M{},
+			ref:    initTestString(),
+			option: initOptionDelete().
+				SetComment("comment delete golang unit test").
+				SetForceRecreateSession(true).
+				SetDisableAutoRollbackSession(true).
+				SetDisableAutoCloseSession(true),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -685,11 +737,15 @@ func initListTestUpdateOneById() []testUpdateOneById {
 			wantErr:         true,
 		},
 		{
-			name:            "failed update param",
-			id:              objectId,
-			update:          nil,
-			ref:             testStruct{},
-			option:          initOptionUpdate().SetDisableAutoCloseSession(true),
+			name:   "failed update param",
+			id:     objectId,
+			update: nil,
+			ref:    testStruct{},
+			option: initOptionUpdate().
+				SetBypassDocumentValidation(true).
+				SetComment("comment update golang unit test").
+				SetDisableAutoRollbackSession(true).
+				SetDisableAutoCloseSession(true),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -762,11 +818,16 @@ func initListTestReplaceOne() []testReplaceOne {
 			wantErr:         true,
 		},
 		{
-			name:            "failed update param",
-			filter:          bson.M{"_id": objectId},
-			replacement:     nil,
-			ref:             testStruct{},
-			option:          initOptionReplace().SetForceRecreateSession(true).SetDisableAutoCloseSession(true),
+			name:        "failed update param",
+			filter:      bson.M{"_id": objectId},
+			replacement: nil,
+			ref:         testStruct{},
+			option: initOptionReplace().
+				SetBypassDocumentValidation(true).
+				SetComment("comment replace golang unit test").
+				SetForceRecreateSession(true).
+				SetDisableAutoRollbackSession(true).
+				SetDisableAutoCloseSession(true),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -828,6 +889,7 @@ func initListTestFindOneById() []testFindOneById {
 			dest:            &testStruct{},
 			option:          initOptionFindOneById(),
 			durationTimeout: 5 * time.Second,
+			wantErr:         true,
 		},
 		{
 			name: "failed",
@@ -912,6 +974,64 @@ func initListTestFindOne() []testFindOne {
 	}
 }
 
+func initListTestFindOneAndDeleteById() []testFindOneAndDeleteById {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testFindOneAndDeleteById{
+		{
+			name:            "success",
+			id:              objectId,
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndDelete(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed not found",
+			id:              primitive.NewObjectID(),
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndDelete(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name: "failed",
+			id:   objectId,
+			dest: &testStruct{},
+			option: initOptionFindOneAndDelete().
+				SetComment("comment golang unit test").
+				SetCollation(&option.Collation{}).
+				SetForceRecreateSession(true).
+				SetDisableAutoRollbackSession(true).
+				SetDisableAutoCloseSession(true),
+			durationTimeout: 1 * time.Millisecond,
+			wantErr:         true,
+		},
+		{
+			name:            "failed struct dest",
+			id:              nil,
+			dest:            &testInvalidStruct{},
+			option:          initOptionFindOneAndDelete(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type dest",
+			id:              nil,
+			dest:            initTestString(),
+			option:          initOptionFindOneAndDelete(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed dest non pointer",
+			id:              nil,
+			dest:            *initTestString(),
+			option:          initOptionFindOneAndDelete(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
 func initListTestFindOneAndDelete() []testFindOneAndDelete {
 	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
 	return []testFindOneAndDelete{
@@ -937,6 +1057,7 @@ func initListTestFindOneAndDelete() []testFindOneAndDelete {
 			option: initOptionFindOneAndDelete().
 				SetCollation(&option.Collation{}).
 				SetForceRecreateSession(true).
+				SetDisableAutoRollbackSession(true).
 				SetDisableAutoCloseSession(true),
 			durationTimeout: 1 * time.Millisecond,
 			wantErr:         true,
@@ -962,6 +1083,71 @@ func initListTestFindOneAndDelete() []testFindOneAndDelete {
 			filter:          nil,
 			dest:            *initTestString(),
 			option:          initOptionFindOneAndDelete(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestFindOneAndReplaceById() []testFindOneAndReplaceById {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testFindOneAndReplaceById{
+		{
+			name:            "success",
+			id:              objectId,
+			replacement:     *initTestStruct(),
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndReplace(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed not found",
+			id:              primitive.NewObjectID(),
+			replacement:     *initTestStruct(),
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndReplace(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:        "failed",
+			id:          objectId,
+			replacement: *initTestStruct(),
+			dest:        &testStruct{},
+			option: initOptionFindOneAndReplace().
+				SetBypassDocumentValidation(true).
+				SetComment("comment golang unit test").
+				SetCollation(&option.Collation{}).
+				SetReturnDocument(option.ReturnDocumentAfter).
+				SetForceRecreateSession(true).
+				SetDisableAutoRollbackSession(true).
+				SetDisableAutoCloseSession(true),
+			durationTimeout: 1 * time.Millisecond,
+			wantErr:         true,
+		},
+		{
+			name:            "failed struct dest",
+			id:              nil,
+			replacement:     nil,
+			dest:            &testInvalidStruct{},
+			option:          initOptionFindOneAndReplace(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type dest",
+			id:              nil,
+			replacement:     nil,
+			dest:            initTestString(),
+			option:          initOptionFindOneAndReplace(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed dest non pointer",
+			id:              nil,
+			dest:            *initTestString(),
+			option:          initOptionFindOneAndReplace(),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -1025,6 +1211,73 @@ func initListTestFindOneAndReplace() []testFindOneAndReplace {
 			filter:          nil,
 			dest:            *initTestString(),
 			option:          initOptionFindOneAndReplace(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+	}
+}
+
+func initListTestFindOneAndUpdateById() []testFindOneAndUpdateById {
+	objectId, _ := primitive.ObjectIDFromHex(os.Getenv(MongoDBTestId))
+	return []testFindOneAndUpdateById{
+		{
+			name:            "success",
+			id:              objectId,
+			update:          bson.M{"$set": bson.M{"name": "Updated Test Name"}},
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndUpdate(),
+			durationTimeout: 5 * time.Second,
+		},
+		{
+			name:            "failed not found",
+			id:              primitive.NewObjectID(),
+			update:          bson.M{"$set": bson.M{"name": "Updated Test Name"}},
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndUpdate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:   "failed struct dest",
+			id:     nil,
+			update: nil,
+			dest:   &testInvalidStruct{},
+			option: initOptionFindOneAndUpdate().
+				SetBypassDocumentValidation(true).
+				SetComment("comment golang unit test").
+				SetArrayFilters(&option.ArrayFilters{}).
+				SetCollation(&option.Collation{}).
+				SetReturnDocument(option.ReturnDocumentAfter).
+				SetForceRecreateSession(true).
+				SetDisableAutoRollbackSession(true).
+				SetDisableAutoCloseSession(true),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed type dest",
+			id:              nil,
+			update:          nil,
+			dest:            initTestString(),
+			option:          initOptionFindOneAndUpdate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed dest non pointer",
+			id:              nil,
+			update:          nil,
+			dest:            *initTestString(),
+			option:          initOptionFindOneAndUpdate(),
+			durationTimeout: 5 * time.Second,
+			wantErr:         true,
+		},
+		{
+			name:            "failed update",
+			id:              objectId,
+			update:          bson.M{"name": "Updated Test Name"},
+			dest:            &testStruct{},
+			option:          initOptionFindOneAndUpdate(),
 			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
@@ -1118,6 +1371,14 @@ func initListTestFind() []testFind {
 				SetLimit(10).
 				SetSkip(1),
 			durationTimeout: 1 * time.Millisecond,
+			wantErr:         true,
+		},
+		{
+			name:            "failed no documents",
+			filter:          bson.D{{"_id", bson.D{{"$exists", false}}}},
+			dest:            &[]testInvalidStruct{},
+			option:          initOptionFind(),
+			durationTimeout: 5 * time.Second,
 			wantErr:         true,
 		},
 		{
@@ -1872,20 +2133,15 @@ func initListTestDropIndex() []testDropIndex {
 }
 
 func initOptionInsertOne() *option.InsertOne {
-	return option.NewInsertOne().
-		SetBypassDocumentValidation(true).
-		SetComment("comment insert golang unit test")
+	return option.NewInsertOne()
 }
 
 func initOptionInsertMany() *option.InsertMany {
-	return option.NewInsertMany().
-		SetBypassDocumentValidation(true).
-		SetComment("comment insert golang unit test")
+	return option.NewInsertMany()
 }
 
 func initOptionDelete() *option.Delete {
 	return option.NewDelete().
-		SetComment("comment delete golang unit test").
 		SetCollation(&option.Collation{}).
 		SetHint(bson.M{}).
 		SetLet(bson.M{})
@@ -1893,22 +2149,18 @@ func initOptionDelete() *option.Delete {
 
 func initOptionUpdate() *option.Update {
 	return option.NewUpdate().
-		SetComment("comment update golang unit test").
 		SetCollation(&option.Collation{}).
 		SetHint(bson.M{}).
 		SetLet(bson.M{}).
-		SetBypassDocumentValidation(true).
 		SetArrayFilters(&option.ArrayFilters{}).
 		SetUpsert(true)
 }
 
 func initOptionReplace() *option.Replace {
 	return option.NewReplace().
-		SetComment("comment replace golang unit test").
 		SetCollation(&option.Collation{}).
 		SetHint(bson.M{}).
-		SetLet(bson.M{}).
-		SetBypassDocumentValidation(true)
+		SetLet(bson.M{})
 }
 
 func initOptionFindOne() *option.FindOne {
@@ -1946,7 +2198,6 @@ func initOptionFindOneById() *option.FindOneById {
 func initOptionFindOneAndDelete() *option.FindOneAndDelete {
 	return option.NewFindOneAndDelete().
 		SetCollation(nil).
-		SetComment("comment golang unit test").
 		SetHint(bson.M{}).
 		SetMaxTime(5 * time.Second).
 		SetProjection(bson.M{}).
@@ -1957,7 +2208,6 @@ func initOptionFindOneAndDelete() *option.FindOneAndDelete {
 func initOptionFindOneAndReplace() *option.FindOneAndReplace {
 	return option.NewFindOneAndReplace().
 		SetCollation(nil).
-		SetComment("comment golang unit test").
 		SetHint(bson.M{}).
 		SetMaxTime(5 * time.Second).
 		SetProjection(bson.M{}).
@@ -1969,7 +2219,6 @@ func initOptionFindOneAndReplace() *option.FindOneAndReplace {
 func initOptionFindOneAndUpdate() *option.FindOneAndUpdate {
 	return option.NewFindOneAndUpdate().
 		SetCollation(nil).
-		SetComment("comment golang unit test").
 		SetHint(bson.M{}).
 		SetMaxTime(5 * time.Second).
 		SetProjection(bson.M{}).
@@ -2084,4 +2333,14 @@ func initOptionDropIndex() *option.DropIndex {
 func initOptionListIndexes() *option.ListIndexes {
 	return option.NewListIndexes().
 		SetMaxTime(5 * time.Second)
+}
+
+func initGlobalOption() *option.Global {
+	return &option.Global{
+		BypassDocumentValidation:   helper.RandomBool(),
+		Comment:                    "global option comment",
+		DisableAutoRollbackSession: helper.RandomBool(),
+		DisableAutoCloseSession:    helper.RandomBool(),
+		ForceRecreateSession:       helper.RandomBool(),
+	}
 }

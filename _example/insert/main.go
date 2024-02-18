@@ -109,7 +109,7 @@ func insertOneManualCloseSession() {
 		CreatedAt: primitive.NewDateTimeFromTime(time.Now()),
 	}
 	//new document need a pointer
-	err = mongoTemplate.InsertOne(ctx, &testDocument, option.NewInsertOne().
+	err = mongoTemplate.InsertOne(ctx, &testDocument, option.InsertOne().
 		SetForceRecreateSession(false).SetDisableAutoCloseSession(true))
 	if helper.IsNotNil(err) {
 		logger.Error("error insert document:", err)

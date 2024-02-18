@@ -1,7 +1,6 @@
 package mongo
 
 import (
-	"github.com/GabrielHCataldo/go-errors/errors"
 	"github.com/GabrielHCataldo/go-helper/helper"
 	"math"
 	"time"
@@ -32,20 +31,17 @@ type pageItemContent map[string]any
 
 // Decode parse pageResult to dest param
 func (p PageResult) Decode(dest any) error {
-	err := helper.ConvertToDest(p, dest)
-	return errors.NewSkipCaller(2, err)
+	return helper.ConvertToDest(p, dest)
 }
 
 // Decode parse pageResult.Content to dest param
 func (p pageContent) Decode(dest any) error {
-	err := helper.ConvertToDest(p, dest)
-	return errors.NewSkipCaller(2, err)
+	return helper.ConvertToDest(p, dest)
 }
 
 // Decode parse pageResult item to dest param
 func (p pageItemContent) Decode(dest any) error {
-	err := helper.ConvertToDest(p, dest)
-	return errors.NewSkipCaller(2, err)
+	return helper.ConvertToDest(p, dest)
 }
 
 func newPageResult(pageInput PageInput, result any, countTotal int64) *PageResult {

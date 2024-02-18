@@ -2,7 +2,7 @@ package mongo
 
 import (
 	"context"
-	"github.com/GabrielHCataldo/go-errors/errors"
+	"errors"
 	"github.com/GabrielHCataldo/go-helper/helper"
 	"github.com/GabrielHCataldo/go-logger/logger"
 	"github.com/GabrielHCataldo/go-mongo-template/internal/util"
@@ -72,18 +72,29 @@ type Template struct {
 	session mongo.Session
 }
 
+var globalOption = &option.Global{}
+
 func NewTemplate(ctx context.Context, opts ...*options.ClientOptions) (*Template, error) {
 	conn, err := mongo.Connect(ctx, opts...)
 	if helper.IsNotNil(err) {
-		return nil, errors.NewSkipCaller(2, err)
+		return nil, err
 	}
 	err = conn.Ping(ctx, nil)
 	if helper.IsNotNil(err) {
-		return nil, errors.NewSkipCaller(2, err)
+		return nil, err
 	}
 	return &Template{
 		client: conn,
 	}, nil
+}
+
+// SetGlobalOption sets value for the mongo global options.
+func (t *Template) SetGlobalOption(opt *option.Global) {
+	if helper.IsNotNil(opt) {
+		globalOption = opt
+	} else {
+		globalOption = &option.Global{}
+	}
 }
 
 // InsertOne executes an insert command to insert a single document into the collection.
@@ -92,34 +103,34 @@ func NewTemplate(ctx context.Context, opts ...*options.ClientOptions) (*Template
 // field when transformed into BSON, the field value is automatically generated and will be added to the document
 // pointer provided.
 //
-// The opts parameter can be used to specify options for the operation (see the option.InsertOne documentation.)
+// The opts parameter can be used to specify options for the operation (see the option.Change documentation.)
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/insert/.
 func (t *Template) InsertOne(ctx context.Context, document any, opts ...*option.InsertOne) error {
-	opt := option.MergeInsertOneByParams(opts)
-	err := t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeInsertOneByParams(opts, globalOption)
+	err := t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
-			err = t.insertOne(sc, 4, document, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			err = t.insertOne(sc, document, opt)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return err
 }
 
 // InsertMany executes an insert command to insert multiple documents into the collection. If recording errors occur
-// during operation you can configure automatic rollback, see the option.InsertMany documentation.
+// during operation you can configure automatic rollback, see the option.insertMany documentation.
 //
 // The documents parameter must be a structure pointer slice to be inserted. The slice cannot be null or empty.
 // All elements must be non-zero. For any document that does not have the _id field when transformed into BSON,
 // the field value will be automatically generated and added to the slice pointer.
 //
-// The opts parameter can be used to specify options for the operation (see the option.InsertMany documentation.)
+// The opts parameter can be used to specify options for the operation (see the option.Change documentation.)
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/insert/.
 func (t *Template) InsertMany(ctx context.Context, documents any, opts ...*option.InsertMany) error {
-	opt := option.MergeInsertManyByParams(opts)
-	err := t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeInsertManyByParams(opts, globalOption)
+	err := t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			err = t.insertMany(sc, documents, opt)
@@ -144,12 +155,12 @@ func (t *Template) InsertMany(ctx context.Context, documents any, opts ...*optio
 func (t *Template) DeleteOne(ctx context.Context, filter, ref any, opts ...*option.Delete) (*DeleteResult, error) {
 	var result *DeleteResult
 	var err error
-	opt := option.MergeDeleteByParams(opts)
-	err = t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeDeleteByParams(opts, globalOption)
+	err = t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			result, err = t.deleteOne(sc, filter, ref, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return result, err
@@ -169,12 +180,12 @@ func (t *Template) DeleteOne(ctx context.Context, filter, ref any, opts ...*opti
 func (t *Template) DeleteOneById(ctx context.Context, id, ref any, opts ...*option.Delete) (*DeleteResult, error) {
 	var result *DeleteResult
 	var err error
-	opt := option.MergeDeleteByParams(opts)
-	err = t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeDeleteByParams(opts, globalOption)
+	err = t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			result, err = t.deleteOne(sc, bson.D{{"_id", id}}, ref, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return result, err
@@ -195,12 +206,12 @@ func (t *Template) DeleteOneById(ctx context.Context, id, ref any, opts ...*opti
 func (t *Template) DeleteMany(ctx context.Context, filter, ref any, opts ...*option.Delete) (*DeleteResult, error) {
 	var result *DeleteResult
 	var err error
-	opt := option.MergeDeleteByParams(opts)
-	err = t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeDeleteByParams(opts, globalOption)
+	err = t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			result, err = t.deleteMany(sc, filter, ref, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return result, err
@@ -224,12 +235,12 @@ func (t *Template) DeleteMany(ctx context.Context, filter, ref any, opts ...*opt
 func (t *Template) UpdateOneById(ctx context.Context, id, update, ref any, opts ...*option.Update) (*UpdateResult, error) {
 	var result *UpdateResult
 	var err error
-	opt := option.MergeUpdateByParams(opts)
-	err = t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeUpdateByParams(opts, globalOption)
+	err = t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			result, err = t.updateOne(sc, bson.D{{"_id", id}}, update, ref, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return result, err
@@ -255,12 +266,12 @@ func (t *Template) UpdateOne(ctx context.Context, filter any, update, ref any, o
 	error) {
 	var result *UpdateResult
 	var err error
-	opt := option.MergeUpdateByParams(opts)
-	err = t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeUpdateByParams(opts, globalOption)
+	err = t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			result, err = t.updateOne(sc, filter, update, ref, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return result, err
@@ -285,12 +296,12 @@ func (t *Template) UpdateMany(ctx context.Context, filter any, update, ref any, 
 	error) {
 	var result *UpdateResult
 	var err error
-	opt := option.MergeUpdateByParams(opts)
-	err = t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeUpdateByParams(opts, globalOption)
+	err = t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			result, err = t.updateMany(sc, filter, update, ref, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return result, err
@@ -315,12 +326,12 @@ func (t *Template) ReplaceOne(ctx context.Context, filter any, update, ref any, 
 	error) {
 	var result *UpdateResult
 	var err error
-	opt := option.MergeReplaceByParams(opts)
-	err = t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeReplaceByParams(opts, globalOption)
+	err = t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			result, err = t.replaceOne(sc, filter, update, ref, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return result, err
@@ -339,12 +350,12 @@ func (t *Template) ReplaceOneById(ctx context.Context, id, replacement, ref any,
 	error) {
 	var result *UpdateResult
 	var err error
-	opt := option.MergeReplaceByParams(opts)
-	err = t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeReplaceByParams(opts, globalOption)
+	err = t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			result, err = t.replaceOne(sc, bson.D{{"_id", id}}, replacement, ref, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return result, err
@@ -354,7 +365,7 @@ func (t *Template) ReplaceOneById(ctx context.Context, id, replacement, ref any,
 // This is equivalent to running FindOne(ctx, bson.D{{"_id", id}}, dest, opts...).
 //
 // The id parameter must be a document containing query operators and can be used to select the document to be
-// returned. It cannot be null. If the id does not match any document, the dest parameter will not be modified.
+// returned. It cannot be null. If the id does not match any document, the error ErrNoDocuments will be returned.
 //
 // The dest parameter must be a pointer to the return expected by the operation, it is important to have the
 // database and collection tags configured.
@@ -381,8 +392,8 @@ func (t *Template) FindOneById(ctx context.Context, id, dest any, opts ...*optio
 // FindOne executes a find command, if successful it returns the corresponding documents in the collection in the dest
 // parameter with return error nil. Otherwise, it returns corresponding error.
 //
-// The id parameter must be a document id that is used to select the document to be
-// returned. It cannot be null. If the id does not match any document, the dest parameter will not be modified.
+// The id parameter must be a document containing query operators and can be used to select the document to be
+// returned. It cannot be null. If the id does not match any document, the error ErrNoDocuments will be returned.
 //
 // The dest parameter must be a pointer to the return expected by the operation, it is important to have the
 // database and collection tags configured.
@@ -392,6 +403,31 @@ func (t *Template) FindOneById(ctx context.Context, id, dest any, opts ...*optio
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/find/.
 func (t *Template) FindOne(ctx context.Context, filter, dest any, opts ...*option.FindOne) error {
 	return t.findOne(ctx, filter, dest, opts...)
+}
+
+// FindOneAndDeleteById executes a findAndModify command whose _id value matches the ID given in the collection.
+// This is equivalent to running FindOneAndDelete(ctx, bson.D{{"_id", id}}, dest, opts...)
+//
+// The id parameter is the _id of the document to be replaced. It cannot be null. If the filter does not match any
+// documents, an error set to ErrNoDocuments will be returned. If the filter matches multiple documents,
+// one will be selected from the matching set.
+//
+// The dest parameter must be a pointer to the return expected by the operation, it is important to have the
+// database and collection tags configured.
+//
+// The opts parameter can be used to specify options for the operation (see the option.FindOneAndDelete documentation).
+//
+// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/findAndModify/.
+func (t *Template) FindOneAndDeleteById(ctx context.Context, id, dest any, opts ...*option.FindOneAndDelete) error {
+	opt := option.MergeFindOneAndDeleteByParams(opts, globalOption)
+	err := t.startSession(ctx, *opt.ForceRecreateSession)
+	if helper.IsNil(err) {
+		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
+			err = t.findOneAndDelete(sc, bson.D{{"_id", id}}, dest, opt)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
+		})
+	}
+	return err
 }
 
 // FindOneAndDelete executes a findAndModify command to delete at most one document from the collection. and returns the
@@ -408,12 +444,40 @@ func (t *Template) FindOne(ctx context.Context, filter, dest any, opts ...*optio
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/findAndModify/.
 func (t *Template) FindOneAndDelete(ctx context.Context, filter, dest any, opts ...*option.FindOneAndDelete) error {
-	opt := option.MergeFindOneAndDeleteByParams(opts)
-	err := t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeFindOneAndDeleteByParams(opts, globalOption)
+	err := t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			err = t.findOneAndDelete(sc, filter, dest, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
+		})
+	}
+	return err
+}
+
+// FindOneAndReplaceById executes a findAndModify command whose _id value matches the ID given in the collection.
+// This is equivalent to running FindOneAndReplace(ctx, bson.D{{"_id", id}}, dest, opts...).
+//
+// The id parameter is the _id of the document to be replaced. It cannot be null. If the filter does not match any
+// documents, an error set to ErrNoDocuments will be returned. If the filter matches multiple documents,
+// one will be selected from the matching set.
+//
+// The replacement parameter must be a document that will be used to replace the selected document. It cannot be nil
+// and cannot contain any update operators (https://www.mongodb.com/docs/manual/reference/operator/update/).
+//
+// The dest parameter must be a pointer to the return expected by the operation, it is important to have the
+// database and collection tags configured.
+//
+// The opts parameter can be used to specify options for the operation (see the option.FindOneAndReplace documentation).
+//
+// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/findAndModify/.
+func (t *Template) FindOneAndReplaceById(ctx context.Context, id, replacement, dest any, opts ...*option.FindOneAndReplace) error {
+	opt := option.MergeFindOneAndReplaceByParams(opts, globalOption)
+	err := t.startSession(ctx, *opt.ForceRecreateSession)
+	if helper.IsNil(err) {
+		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
+			err = t.findOneAndReplace(sc, bson.D{{"_id", id}}, replacement, dest, opt)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return err
@@ -436,12 +500,39 @@ func (t *Template) FindOneAndDelete(ctx context.Context, filter, dest any, opts 
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/findAndModify/.
 func (t *Template) FindOneAndReplace(ctx context.Context, filter, replacement, dest any, opts ...*option.FindOneAndReplace) error {
-	opt := option.MergeFindOneAndReplaceByParams(opts)
-	err := t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeFindOneAndReplaceByParams(opts, globalOption)
+	err := t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			err = t.findOneAndReplace(sc, filter, replacement, dest, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
+		})
+	}
+	return err
+}
+
+// FindOneAndUpdateById executes a findAndModify command whose _id value matches the ID given in the collection.
+// This is equivalent to running FindOneAndUpdate(ctx, bson.D{{"_id", id}}, dest, opts...).
+//
+// The id parameter is the _id of the document to be updated. It cannot be null. If the filter does not match any
+// documents, an error set to ErrNoDocuments will be returned. If the filter matches multiple documents,
+// one will be selected from the matching set.
+//
+// The update parameter must be a document containing update operators
+// (https://www.mongodb.com/docs/manual/reference/operator/update/) and can be used to specify the modifications to be made
+// to the selected document. It cannot be nil or empty.
+//
+// The opts parameter can be used to specify options for the operation (see the options.FindOneAndUpdateOptions
+// documentation).
+//
+// For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/findAndModify/.
+func (t *Template) FindOneAndUpdateById(ctx context.Context, id, update, dest any, opts ...*option.FindOneAndUpdate) error {
+	opt := option.MergeFindOneAndUpdateByParams(opts, globalOption)
+	err := t.startSession(ctx, *opt.ForceRecreateSession)
+	if helper.IsNil(err) {
+		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
+			err = t.findOneAndUpdate(sc, bson.D{{"_id", id}}, update, dest, opt)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return err
@@ -463,12 +554,12 @@ func (t *Template) FindOneAndReplace(ctx context.Context, filter, replacement, d
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/findAndModify/.
 func (t *Template) FindOneAndUpdate(ctx context.Context, filter, update, dest any, opts ...*option.FindOneAndUpdate) error {
-	opt := option.MergeFindOneAndUpdateByParams(opts)
-	err := t.startSession(ctx, 2, *opt.ForceRecreateSession)
+	opt := option.MergeFindOneAndUpdateByParams(opts, globalOption)
+	err := t.startSession(ctx, *opt.ForceRecreateSession)
 	if helper.IsNil(err) {
 		err = mongo.WithSession(ctx, t.session, func(sc mongo.SessionContext) error {
 			err = t.findOneAndUpdate(sc, filter, update, dest, opt)
-			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, false, err)
+			return t.closeSessionAutomatically(sc, *opt.DisableAutoCloseSession, *opt.DisableAutoRollbackSession, err)
 		})
 	}
 	return err
@@ -516,9 +607,9 @@ func (t *Template) FindAll(ctx context.Context, dest any, opts ...*option.Find) 
 func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput, opts ...*option.FindPageable) (
 	*PageResult, error) {
 	if helper.IsNotStruct(input.Ref) {
-		return nil, errors.NewSkipCaller(2, "mongo: input.Ref need to be structure")
+		return nil, errors.New("mongo: input.Ref need to be structure")
 	}
-	_, collection, err := t.getMongoInfosByAny(2, input.Ref)
+	_, collection, err := t.getMongoInfosByAny(input.Ref)
 	if helper.IsNotNil(err) {
 		return nil, err
 	}
@@ -553,7 +644,7 @@ func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput
 			return newPageResult(input, dest, countTotal), nil
 		}
 	}
-	return nil, errors.NewSkipCaller(2, err)
+	return nil, err
 }
 
 // Exists executes the count command, if the quantity is greater than 0 with a limit of 1, true is returned,
@@ -563,7 +654,7 @@ func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput
 //
 // The opts parameter can be used to specify options for the operation (see the option.Exists documentation).
 func (t *Template) Exists(ctx context.Context, filter, ref any, opts ...*option.Exists) (bool, error) {
-	return t.exists(ctx, 2, filter, ref, opts...)
+	return t.exists(ctx, filter, ref, opts...)
 }
 
 // ExistsById executes a count command whose _id value matches the ID given in the collection.
@@ -573,7 +664,7 @@ func (t *Template) Exists(ctx context.Context, filter, ref any, opts ...*option.
 //
 // The opts parameter can be used to specify options for the operation (see the option.Exists documentation).
 func (t *Template) ExistsById(ctx context.Context, id, ref any, opts ...*option.Exists) (bool, error) {
-	return t.exists(ctx, 2, bson.D{{"_id", id}}, ref, opts...)
+	return t.exists(ctx, bson.D{{"_id", id}}, ref, opts...)
 }
 
 // Aggregate executes a find command, if successful it returns the corresponding documents in the collection in the dest
@@ -593,9 +684,9 @@ func (t *Template) ExistsById(ctx context.Context, id, ref any, opts ...*option.
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/aggregate/.
 func (t *Template) Aggregate(ctx context.Context, pipeline any, dest any, opts ...*option.Aggregate) error {
 	if helper.IsNotPointer(dest) {
-		return errDestIsNotPointer(2)
+		return ErrDestIsNotPointer
 	}
-	_, collection, err := t.getMongoInfosByAny(2, dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if helper.IsNotNil(err) {
 		return err
 	}
@@ -616,7 +707,7 @@ func (t *Template) Aggregate(ctx context.Context, pipeline any, dest any, opts .
 	if helper.IsNil(err) {
 		err = cursor.All(ctx, dest)
 	}
-	return errors.NewSkipCaller(2, err)
+	return err
 }
 
 // CountDocuments returns the number of documents in the collection. For a fast count of the documents in the
@@ -630,7 +721,7 @@ func (t *Template) Aggregate(ctx context.Context, pipeline any, dest any, opts .
 //
 // The opts parameter can be used to specify options for the operation (see the option.Count documentation).
 func (t *Template) CountDocuments(ctx context.Context, filter, ref any, opts ...*option.Count) (int64, error) {
-	return t.countDocuments(ctx, 2, filter, ref, opts...)
+	return t.countDocuments(ctx, filter, ref, opts...)
 }
 
 // EstimatedDocumentCount executes a count command and returns an estimate of the number of documents in the collection
@@ -644,7 +735,7 @@ func (t *Template) CountDocuments(ctx context.Context, filter, ref any, opts ...
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/count/.
 func (t *Template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...*option.EstimatedDocumentCount) (int64,
 	error) {
-	_, collection, err := t.getMongoInfosByAny(2, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return 0, err
 	}
@@ -653,7 +744,7 @@ func (t *Template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...
 		Comment: opt.Comment,
 		MaxTime: opt.MaxTime,
 	})
-	return count, errors.NewSkipCaller(2, err)
+	return count, err
 }
 
 // Distinct executes a distinct command to find the unique values for a specified field in the collection.
@@ -672,10 +763,10 @@ func (t *Template) EstimatedDocumentCount(ctx context.Context, ref any, opts ...
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/distinct/.
 func (t *Template) Distinct(ctx context.Context, fieldName string, filter, dest, ref any, opts ...*option.Distinct) error {
 	if helper.IsNotPointer(dest) {
-		return errDestIsNotPointer(2)
+		return ErrDestIsNotPointer
 	}
 	opt := option.MergeDistinctByParams(opts)
-	_, collection, err := t.getMongoInfosByAny(2, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return err
 	}
@@ -687,7 +778,7 @@ func (t *Template) Distinct(ctx context.Context, fieldName string, filter, dest,
 	if helper.IsNil(err) {
 		err = helper.ConvertToDest(result, dest)
 	}
-	return errors.NewSkipCaller(2, err)
+	return err
 }
 
 // Watch returns a change stream for all changes on the deployment. See
@@ -776,7 +867,7 @@ func (t *Template) WatchWithHandler(ctx context.Context, pipeline any, handler E
 //
 // The ref parameter must be the collection structure with database and collection tags configured.
 func (t *Template) DropCollection(ctx context.Context, ref any) error {
-	_, collection, err := t.getMongoInfosByAny(2, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return err
 	}
@@ -788,7 +879,7 @@ func (t *Template) DropCollection(ctx context.Context, ref any) error {
 //
 // The ref parameter must be the collection structure with database and collection tags configured.
 func (t *Template) DropDatabase(ctx context.Context, ref any) error {
-	database, _, err := t.getMongoInfosByAny(2, ref)
+	database, _, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return err
 	}
@@ -803,7 +894,7 @@ func (t *Template) DropDatabase(ctx context.Context, ref any) error {
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/createIndexes/.
 func (t *Template) CreateOneIndex(ctx context.Context, input IndexInput) (string, error) {
-	return t.createOneIndex(ctx, input, 2)
+	return t.createOneIndex(ctx, input)
 }
 
 // CreateManyIndex executes a createIndexes command to create multiple indexes on the collection and returns the names of
@@ -833,10 +924,9 @@ func (t *Template) CreateManyIndex(ctx context.Context, inputs []IndexInput) ([]
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/dropIndexes/.
 func (t *Template) DropOneIndex(ctx context.Context, name string, ref any, opts ...*option.DropIndex) error {
 	opt := option.MergeDropIndexByParams(opts)
-	_, collection, err := t.getMongoInfosByAny(2, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNil(err) {
-		_, errDrop := collection.Indexes().DropOne(ctx, name, &options.DropIndexesOptions{MaxTime: opt.MaxTime})
-		err = errors.NewSkipCaller(2, errDrop)
+		_, err = collection.Indexes().DropOne(ctx, name, &options.DropIndexesOptions{MaxTime: opt.MaxTime})
 	}
 	return err
 }
@@ -852,10 +942,9 @@ func (t *Template) DropOneIndex(ctx context.Context, name string, ref any, opts 
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/dropIndexes/.
 func (t *Template) DropAllIndexes(ctx context.Context, ref any, opts ...*option.DropIndex) error {
 	opt := option.MergeDropIndexByParams(opts)
-	_, collection, err := t.getMongoInfosByAny(2, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNil(err) {
-		_, errDrop := collection.Indexes().DropAll(ctx, &options.DropIndexesOptions{MaxTime: opt.MaxTime})
-		err = errors.NewSkipCaller(2, errDrop)
+		_, err = collection.Indexes().DropAll(ctx, &options.DropIndexesOptions{MaxTime: opt.MaxTime})
 	}
 	return err
 }
@@ -868,7 +957,7 @@ func (t *Template) DropAllIndexes(ctx context.Context, ref any, opts ...*option.
 //
 // For more information about the command, see https://www.mongodb.com/docs/manual/reference/command/listIndexes/.
 func (t *Template) ListIndexes(ctx context.Context, ref any, opts ...*option.ListIndexes) ([]IndexResult, error) {
-	_, collection, err := t.getMongoInfosByAny(2, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return nil, err
 	}
@@ -882,7 +971,7 @@ func (t *Template) ListIndexes(ctx context.Context, ref any, opts ...*option.Lis
 	if helper.IsNil(err) {
 		err = cursor.All(ctx, &results)
 	}
-	return results, errors.NewSkipCaller(2, err)
+	return results, err
 }
 
 // ListIndexSpecifications executes a List command and returns a slice of returned IndexSpecifications.
@@ -890,7 +979,7 @@ func (t *Template) ListIndexes(ctx context.Context, ref any, opts ...*option.Lis
 // The ref parameter must be the collection structure with database and collection tags configured.
 func (t *Template) ListIndexSpecifications(ctx context.Context, ref any, opts ...*option.ListIndexes) (
 	[]IndexSpecification, error) {
-	_, collection, err := t.getMongoInfosByAny(2, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return nil, err
 	}
@@ -914,33 +1003,33 @@ func (t *Template) ListIndexSpecifications(ctx context.Context, ref any, opts ..
 			})
 		}
 	}
-	return result, errors.NewSkipCaller(2, err)
+	return result, err
 }
 
 // StartSession creates a new session and a new transaction and stores it in the template itself for the next operations.
 func (t *Template) StartSession(ctx context.Context) error {
-	return t.startSession(ctx, 2, true)
+	return t.startSession(ctx, true)
 }
 
 // CloseSession closes session and transaction, if param abort is false it will commit the changes,
 // otherwise it will abort all transactions.
 func (t *Template) CloseSession(ctx context.Context, abort bool) error {
-	return t.closeSession(ctx, 2, abort)
+	return t.closeSession(ctx, abort)
 }
 
 // CommitTransaction commit all transactions on session
 func (t *Template) CommitTransaction(ctx context.Context) error {
-	return t.commitTransaction(ctx, 2)
+	return t.commitTransaction(ctx)
 }
 
 // AbortTransaction abort all transactions on session
 func (t *Template) AbortTransaction(ctx context.Context) error {
-	return t.abortTransaction(ctx, 2)
+	return t.abortTransaction(ctx)
 }
 
 // Disconnect closes the mongodb connection client with return error
 func (t *Template) Disconnect(ctx context.Context) error {
-	return errors.NewSkipCaller(2, t.client.Disconnect(ctx))
+	return t.client.Disconnect(ctx)
 }
 
 // SimpleDisconnect closes the mongodb connection client without return error
@@ -958,16 +1047,15 @@ func (t *Template) GetClient() mongo.Client {
 	return *t.client
 }
 
-func (t *Template) insertOne(sc mongo.SessionContext, skipCaller int, document any, opt *option.InsertOne) error {
-	skipCaller++
+func (t *Template) insertOne(sc mongo.SessionContext, document any, opt *option.InsertOne) error {
 	if helper.IsNotPointer(document) {
-		return errDocumentIsNotPointer(skipCaller)
+		return ErrDocumentIsNotPointer
 	} else if helper.IsNotStruct(document) {
-		return errDocumentIsNotStruct(skipCaller)
+		return ErrDocumentIsNotStruct
 	} else if helper.IsEmpty(document) {
-		return errDocumentIsEmpty(skipCaller)
+		return ErrDocumentIsEmpty
 	}
-	_, collection, err := t.getMongoInfosByAny(skipCaller, document)
+	_, collection, err := t.getMongoInfosByAny(document)
 	if helper.IsNotNil(err) {
 		return err
 	}
@@ -976,7 +1064,7 @@ func (t *Template) insertOne(sc mongo.SessionContext, skipCaller int, document a
 		Comment:                  opt.Comment,
 	})
 	if helper.IsNotNil(err) {
-		return errors.NewSkipCaller(skipCaller, err)
+		return err
 	}
 	util.SetInsertedIdOnDocument(result.InsertedID, document)
 	return nil
@@ -984,9 +1072,9 @@ func (t *Template) insertOne(sc mongo.SessionContext, skipCaller int, document a
 
 func (t *Template) insertMany(sc mongo.SessionContext, a any, opt *option.InsertMany) error {
 	if helper.IsNotSlice(a) {
-		return errors.NewSkipCaller(5, "mongo: document on insert many needs be a slice")
+		return errors.New("mongo: document on insert many needs be a slice")
 	} else if helper.IsEmpty(a) {
-		return errDocumentsIsEmpty(5)
+		return ErrDocumentsIsEmpty
 	}
 	documents := reflect.ValueOf(a)
 	var errs []string
@@ -994,19 +1082,18 @@ func (t *Template) insertMany(sc mongo.SessionContext, a any, opt *option.Insert
 		indexValue := documents.Index(i)
 		document := indexValue.Interface()
 		if helper.IsNotPointer(document) {
-			errs = append(errs, helper.Sprintln(MsgErrDocumentIsNotPointer, "index:", i))
+			errs = append(errs, helper.Sprintln(ErrDocumentIsNotPointer.Error(), "index:", i))
 		} else if helper.IsNotStruct(document) {
-			errs = append(errs, helper.Sprintln(MsgErrDocumentIsNotStruct, "index:", i))
+			errs = append(errs, helper.Sprintln(ErrDocumentIsNotStruct.Error(), "index:", i))
 		} else if helper.IsEmpty(document) {
-			errs = append(errs, helper.Sprintln(MsgErrDocumentIsEmpty, "index:", i))
+			errs = append(errs, helper.Sprintln(ErrDocumentIsEmpty.Error(), "index:", i))
 		} else {
-			err := t.insertOne(sc, 5, document, &option.InsertOne{
+			err := t.insertOne(sc, document, &option.InsertOne{
 				BypassDocumentValidation: opt.BypassDocumentValidation,
 				Comment:                  opt.Comment,
 			})
 			if helper.IsNotNil(err) {
-				errMessage := errors.Details(err).GetMessage()
-				errs = append(errs, helper.Sprintln(errMessage, "index:", i))
+				errs = append(errs, helper.Sprintln(err.Error(), "index:", i))
 			}
 		}
 	}
@@ -1018,13 +1105,13 @@ func (t *Template) insertMany(sc mongo.SessionContext, a any, opt *option.Insert
 			}
 			b.WriteString(err)
 		}
-		return errors.NewSkipCaller(5, b.String())
+		return errors.New(b.String())
 	}
 	return nil
 }
 
 func (t *Template) deleteOne(sc mongo.SessionContext, filter, ref any, opt *option.Delete) (*DeleteResult, error) {
-	_, collection, err := t.getMongoInfosByAny(5, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return nil, err
 	}
@@ -1040,11 +1127,11 @@ func (t *Template) deleteOne(sc mongo.SessionContext, filter, ref any, opt *opti
 			DeletedCount: mongoResult.DeletedCount,
 		}
 	}
-	return result, errors.NewSkipCaller(5, err)
+	return result, err
 }
 
 func (t *Template) deleteMany(sc mongo.SessionContext, filter, ref any, opt *option.Delete) (*DeleteResult, error) {
-	_, collection, err := t.getMongoInfosByAny(5, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return nil, err
 	}
@@ -1060,11 +1147,11 @@ func (t *Template) deleteMany(sc mongo.SessionContext, filter, ref any, opt *opt
 			DeletedCount: mongoResult.DeletedCount,
 		}
 	}
-	return result, errors.NewSkipCaller(5, err)
+	return result, err
 }
 
 func (t *Template) updateOne(sc mongo.SessionContext, filter, update, ref any, opt *option.Update) (*UpdateResult, error) {
-	_, collection, err := t.getMongoInfosByAny(5, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return nil, err
 	}
@@ -1086,11 +1173,11 @@ func (t *Template) updateOne(sc mongo.SessionContext, filter, update, ref any, o
 			UpsertedID:    mongoResult.UpsertedID,
 		}
 	}
-	return result, errors.NewSkipCaller(5, err)
+	return result, err
 }
 
 func (t *Template) updateMany(sc mongo.SessionContext, filter, update, ref any, opt *option.Update) (*UpdateResult, error) {
-	_, collection, err := t.getMongoInfosByAny(5, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return nil, err
 	}
@@ -1112,12 +1199,12 @@ func (t *Template) updateMany(sc mongo.SessionContext, filter, update, ref any, 
 			UpsertedID:    mongoResult.UpsertedID,
 		}
 	}
-	return result, errors.NewSkipCaller(5, err)
+	return result, err
 }
 
 func (t *Template) replaceOne(sc mongo.SessionContext, filter, update, ref any, opt *option.Replace) (*UpdateResult,
 	error) {
-	_, collection, err := t.getMongoInfosByAny(5, ref)
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return nil, err
 	}
@@ -1138,14 +1225,14 @@ func (t *Template) replaceOne(sc mongo.SessionContext, filter, update, ref any, 
 			UpsertedID:    mongoResult.UpsertedID,
 		}
 	}
-	return result, errors.NewSkipCaller(5, err)
+	return result, err
 }
 
 func (t *Template) find(ctx context.Context, filter, dest any, opts ...*option.Find) error {
 	if helper.IsNotPointer(dest) {
-		return errDestIsNotPointer(3)
+		return ErrDestIsNotPointer
 	}
-	_, collection, err := t.getMongoInfosByAny(3, dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if helper.IsNotNil(err) {
 		return err
 	}
@@ -1175,16 +1262,16 @@ func (t *Template) find(ctx context.Context, filter, dest any, opts ...*option.F
 	if helper.IsNil(err) {
 		err = cursor.All(ctx, dest)
 	}
-	return errors.NewSkipCaller(3, err)
+	return err
 }
 
 func (t *Template) findOne(ctx context.Context, filter, dest any, opts ...*option.FindOne) error {
 	if helper.IsNotPointer(dest) {
-		return errDestIsNotPointer(3)
+		return ErrDestIsNotPointer
 	} else if helper.IsNotStruct(dest) {
-		return errDestIsNotStruct(3)
+		return ErrDestIsNotStruct
 	}
-	_, collection, err := t.getMongoInfosByAny(3, dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if helper.IsNotNil(err) {
 		return err
 	}
@@ -1203,19 +1290,19 @@ func (t *Template) findOne(ctx context.Context, filter, dest any, opts ...*optio
 		Skip:                opt.Skip,
 		Sort:                opt.Sort,
 	}).Decode(dest)
-	if helper.IsNotNil(err) && !errors.Is(err, mongo.ErrNoDocuments) {
-		return errors.NewSkipCaller(3, err)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return ErrNoDocuments
 	}
-	return nil
+	return err
 }
 
 func (t *Template) findOneAndDelete(sc mongo.SessionContext, filter, dest any, opt *option.FindOneAndDelete) error {
 	if helper.IsNotPointer(dest) {
-		return errDestIsNotPointer(5)
+		return ErrDestIsNotPointer
 	} else if helper.IsNotStruct(dest) {
-		return errDestIsNotStruct(5)
+		return ErrDestIsNotStruct
 	}
-	_, collection, err := t.getMongoInfosByAny(5, dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if helper.IsNotNil(err) {
 		return err
 	}
@@ -1228,21 +1315,19 @@ func (t *Template) findOneAndDelete(sc mongo.SessionContext, filter, dest any, o
 		Hint:       opt.Hint,
 		Let:        opt.Let,
 	}).Decode(dest)
-	if helper.IsNotNil(err) && errors.Is(err, mongo.ErrNoDocuments) {
-		return errNoDocuments(5)
-	} else if helper.IsNotNil(err) {
-		return errors.NewSkipCaller(5, err)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return ErrNoDocuments
 	}
-	return nil
+	return err
 }
 
 func (t *Template) findOneAndReplace(sc mongo.SessionContext, filter, replacement, dest any, opt *option.FindOneAndReplace) error {
 	if helper.IsNotPointer(dest) {
-		return errDestIsNotPointer(5)
+		return ErrDestIsNotPointer
 	} else if helper.IsNotStruct(dest) {
-		return errDestIsNotStruct(5)
+		return ErrDestIsNotStruct
 	}
-	_, collection, err := t.getMongoInfosByAny(5, dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if helper.IsNotNil(err) {
 		return err
 	}
@@ -1258,21 +1343,19 @@ func (t *Template) findOneAndReplace(sc mongo.SessionContext, filter, replacemen
 		Hint:                     opt.Hint,
 		Let:                      opt.Let,
 	}).Decode(dest)
-	if helper.IsNotNil(err) && errors.Is(err, mongo.ErrNoDocuments) {
-		return errNoDocuments(5)
-	} else if helper.IsNotNil(err) {
-		return errors.NewSkipCaller(5, err)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return ErrNoDocuments
 	}
-	return nil
+	return err
 }
 
 func (t *Template) findOneAndUpdate(sc mongo.SessionContext, filter, update, dest any, opt *option.FindOneAndUpdate) error {
 	if helper.IsNotPointer(dest) {
-		return errDestIsNotPointer(5)
+		return ErrDestIsNotPointer
 	} else if helper.IsNotStruct(dest) {
-		return errDestIsNotStruct(5)
+		return ErrDestIsNotStruct
 	}
-	_, collection, err := t.getMongoInfosByAny(5, dest)
+	_, collection, err := t.getMongoInfosByAny(dest)
 	if helper.IsNotNil(err) {
 		return err
 	}
@@ -1289,22 +1372,19 @@ func (t *Template) findOneAndUpdate(sc mongo.SessionContext, filter, update, des
 		Hint:                     opt.Hint,
 		Let:                      opt.Let,
 	}).Decode(dest)
-	if helper.IsNotNil(err) && errors.Is(err, mongo.ErrNoDocuments) {
-		return errNoDocuments(5)
-	} else if helper.IsNotNil(err) {
-		return errors.NewSkipCaller(5, err)
+	if errors.Is(err, mongo.ErrNoDocuments) {
+		return ErrNoDocuments
 	}
-	return nil
+	return err
 }
 
-func (t *Template) countDocuments(ctx context.Context, skipCaller int, filter, ref any, opts ...*option.Count) (int64, error) {
-	skipCaller++
-	_, collection, err := t.getMongoInfosByAny(skipCaller, ref)
+func (t *Template) countDocuments(ctx context.Context, filter, ref any, opts ...*option.Count) (int64, error) {
+	_, collection, err := t.getMongoInfosByAny(ref)
 	if helper.IsNotNil(err) {
 		return 0, err
 	}
 	opt := option.MergeCountByParams(opts)
-	count, err := collection.CountDocuments(ctx, filter, &options.CountOptions{
+	return collection.CountDocuments(ctx, filter, &options.CountOptions{
 		Collation: option.ParseCollationMongoOptions(opt.Collation),
 		Comment:   opt.Comment,
 		Hint:      opt.Hint,
@@ -1312,13 +1392,11 @@ func (t *Template) countDocuments(ctx context.Context, skipCaller int, filter, r
 		MaxTime:   opt.MaxTime,
 		Skip:      opt.Skip,
 	})
-	return count, errors.NewSkipCaller(skipCaller, err)
 }
 
-func (t *Template) exists(ctx context.Context, skipCaller int, filter, ref any, opts ...*option.Exists) (bool, error) {
-	skipCaller++
+func (t *Template) exists(ctx context.Context, filter, ref any, opts ...*option.Exists) (bool, error) {
 	opt := option.MergeExistsByParams(opts)
-	count, err := t.countDocuments(ctx, skipCaller, filter, ref, &option.Count{
+	count, err := t.countDocuments(ctx, filter, ref, &option.Count{
 		Collation: opt.Collation,
 		Comment:   opt.Comment,
 		Hint:      opt.Hint,
@@ -1329,9 +1407,8 @@ func (t *Template) exists(ctx context.Context, skipCaller int, filter, ref any, 
 	return helper.IsGreaterThan(count, 0), err
 }
 
-func (t *Template) createOneIndex(ctx context.Context, input IndexInput, skipCaller int) (string, error) {
-	skipCaller++
-	_, collection, err := t.getMongoInfosByAny(skipCaller, input.Ref)
+func (t *Template) createOneIndex(ctx context.Context, input IndexInput) (string, error) {
+	_, collection, err := t.getMongoInfosByAny(input.Ref)
 	if helper.IsNotNil(err) {
 		return "", err
 	}
@@ -1339,34 +1416,33 @@ func (t *Template) createOneIndex(ctx context.Context, input IndexInput, skipCal
 }
 
 func (t *Template) createManyIndex(ctx context.Context, inputs []IndexInput) ([]string, error) {
-	var result []string
 	if helper.IsEmpty(inputs) {
-		return result, errDocumentsIsEmpty(3)
+		return nil, ErrDocumentsIsEmpty
 	}
-	var errs []string
+	var result []string
+	var msgErrs []string
 	for i, input := range inputs {
-		r, err := t.createOneIndex(ctx, input, 3)
+		r, err := t.createOneIndex(ctx, input)
 		if helper.IsNotNil(err) {
-			errs = append(errs, helper.Sprintln(err, "index:", i))
+			msgErrs = append(msgErrs, helper.Sprintln(err, "index:", i))
 		} else {
 			result = append(result, r)
 		}
 	}
-	if helper.IsNotEmpty(errs) {
+	if helper.IsNotEmpty(msgErrs) {
 		var b strings.Builder
-		for i, err := range errs {
+		for i, err := range msgErrs {
 			if helper.IsGreaterThan(i, 0) {
 				b.WriteString(", ")
 			}
 			b.WriteString(err)
 		}
-		return result, errors.NewSkipCaller(3, b.String())
+		return nil, errors.New(b.String())
 	}
 	return result, nil
 }
 
-func (t *Template) startSession(ctx context.Context, skipCaller int, forceRecreate bool) error {
-	skipCaller++
+func (t *Template) startSession(ctx context.Context, forceRecreate bool) error {
 	if helper.IsNotNil(t.session) && !forceRecreate {
 		return nil
 	} else if helper.IsNotNil(t.session) {
@@ -1379,16 +1455,15 @@ func (t *Template) startSession(ctx context.Context, skipCaller int, forceRecrea
 			t.session = session
 		}
 	}
-	return errors.NewSkipCaller(skipCaller, err)
+	return err
 }
 
-func (t *Template) closeSession(ctx context.Context, skipCaller int, abort bool) error {
-	skipCaller++
+func (t *Template) closeSession(ctx context.Context, abort bool) error {
 	var err error
 	if abort {
-		err = t.abortTransaction(ctx, skipCaller)
+		err = t.abortTransaction(ctx)
 	} else {
-		err = t.commitTransaction(ctx, skipCaller)
+		err = t.commitTransaction(ctx)
 	}
 	if helper.IsNil(err) {
 		t.endSession(ctx)
@@ -1404,28 +1479,26 @@ func (t *Template) closeSessionAutomatically(
 ) error {
 	if !disableAutoCloseSession {
 		abort := helper.IsNotNil(err) && !disableAutoRollbackSession
-		errClose := t.closeSession(sc, 5, abort)
+		errClose := t.closeSession(sc, abort)
 		if helper.IsNil(err) && helper.IsNotNil(errClose) {
-			err = errors.NewSkipCaller(5, errClose)
+			err = errClose
 		}
 	}
 	return err
 }
 
-func (t *Template) commitTransaction(ctx context.Context, skipCaller int) error {
-	skipCaller++
+func (t *Template) commitTransaction(ctx context.Context) error {
 	if helper.IsNil(t.session) {
-		return errNoOpenSession(skipCaller)
+		return ErrNoOpenSession
 	}
-	return errors.NewSkipCaller(skipCaller, t.session.CommitTransaction(ctx))
+	return t.session.CommitTransaction(ctx)
 }
 
-func (t *Template) abortTransaction(ctx context.Context, skipCaller int) error {
-	skipCaller++
+func (t *Template) abortTransaction(ctx context.Context) error {
 	if helper.IsNil(t.session) {
-		return errNoOpenSession(skipCaller)
+		return ErrNoOpenSession
 	}
-	return errors.NewSkipCaller(skipCaller, t.session.AbortTransaction(ctx))
+	return t.session.AbortTransaction(ctx)
 }
 
 func (t *Template) endSession(ctx context.Context) {
@@ -1441,8 +1514,7 @@ func (t *Template) closeCursor(ctx context.Context, cursor *mongo.Cursor) {
 	}
 }
 
-func (t *Template) getMongoInfosByAny(skipCaller int, a any) (*mongo.Database, *mongo.Collection, error) {
-	skipCaller++
+func (t *Template) getMongoInfosByAny(a any) (*mongo.Database, *mongo.Collection, error) {
 	var databaseName string
 	var collectionName string
 	v := reflect.ValueOf(a)
@@ -1455,7 +1527,7 @@ func (t *Template) getMongoInfosByAny(skipCaller int, a any) (*mongo.Database, *
 			databaseName = util.GetDatabaseNameBySlice(a)
 			collectionName = util.GetCollectionNameBySlice(a)
 		} else {
-			return nil, nil, errRefDocument(skipCaller)
+			return nil, nil, ErrRefDocument
 		}
 		break
 	case reflect.Struct:
@@ -1463,12 +1535,12 @@ func (t *Template) getMongoInfosByAny(skipCaller int, a any) (*mongo.Database, *
 		collectionName = util.GetCollectionNameByStruct(a)
 		break
 	default:
-		return nil, nil, errRefDocument(skipCaller)
+		return nil, nil, ErrRefDocument
 	}
 	if helper.IsEmpty(databaseName) {
-		return nil, nil, errDatabaseNotConfigured(skipCaller)
+		return nil, nil, ErrDatabaseNotConfigured
 	} else if helper.IsEmpty(collectionName) {
-		return nil, nil, errCollectionNotConfigured(skipCaller)
+		return nil, nil, ErrCollectionNotConfigured
 	}
 	database := t.client.Database(databaseName)
 	collection := database.Collection(collectionName)

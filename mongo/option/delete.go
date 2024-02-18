@@ -23,6 +23,8 @@ type Delete struct {
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let any
+	// DisableAutoRollbackSession disable auto rollback if an error occurs.
+	DisableAutoRollbackSession *bool
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
 	// default is false
@@ -62,6 +64,12 @@ func (d *Delete) SetLet(a any) *Delete {
 	return d
 }
 
+// SetDisableAutoRollbackSession sets value for the DisableAutoRollbackSession field.
+func (d *Delete) SetDisableAutoRollbackSession(b bool) *Delete {
+	d.DisableAutoRollbackSession = &b
+	return d
+}
+
 // SetDisableAutoCloseSession sets value for the DisableAutoCloseSession field.
 func (d *Delete) SetDisableAutoCloseSession(b bool) *Delete {
 	d.DisableAutoCloseSession = &b
@@ -75,7 +83,7 @@ func (d *Delete) SetForceRecreateSession(b bool) *Delete {
 }
 
 // MergeDeleteByParams assembles the Delete object from optional parameters.
-func MergeDeleteByParams(opts []*Delete) *Delete {
+func MergeDeleteByParams(opts []*Delete, global *Global) *Delete {
 	result := &Delete{}
 	for _, opt := range opts {
 		if helper.IsNil(opt) {
@@ -93,6 +101,9 @@ func MergeDeleteByParams(opts []*Delete) *Delete {
 		if helper.IsNotNil(opt.Let) {
 			result.Let = opt.Let
 		}
+		if helper.IsNotNil(opt.DisableAutoRollbackSession) {
+			result.DisableAutoRollbackSession = opt.DisableAutoRollbackSession
+		}
 		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
@@ -100,11 +111,17 @@ func MergeDeleteByParams(opts []*Delete) *Delete {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
 	}
+	if helper.IsNil(result.Comment) {
+		result.Comment = global.Comment
+	}
+	if helper.IsNil(result.DisableAutoRollbackSession) {
+		result.DisableAutoRollbackSession = helper.ConvertToPointer(global.DisableAutoRollbackSession)
+	}
 	if helper.IsNil(result.DisableAutoCloseSession) {
-		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+		result.DisableAutoCloseSession = helper.ConvertToPointer(global.DisableAutoCloseSession)
 	}
 	if helper.IsNil(result.ForceRecreateSession) {
-		result.ForceRecreateSession = helper.ConvertToPointer(false)
+		result.ForceRecreateSession = helper.ConvertToPointer(global.ForceRecreateSession)
 	}
 	return result
 }

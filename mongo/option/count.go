@@ -100,8 +100,8 @@ func (e *EstimatedDocumentCount) SetMaxTime(d time.Duration) *EstimatedDocumentC
 }
 
 // SetComment sets value for the Comment field.
-func (e *EstimatedDocumentCount) SetComment(comment any) *EstimatedDocumentCount {
-	e.Comment = comment
+func (e *EstimatedDocumentCount) SetComment(a any) *EstimatedDocumentCount {
+	e.Comment = a
 	return e
 }
 

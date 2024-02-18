@@ -31,6 +31,8 @@ type Replace struct {
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let any
+	// DisableAutoRollbackSession disable auto rollback if an error occurs.
+	DisableAutoRollbackSession *bool
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
 	// default is false
@@ -76,6 +78,12 @@ func (r *Replace) SetLet(a any) *Replace {
 	return r
 }
 
+// SetDisableAutoRollbackSession creates a new DisableAutoRollbackSession instance.
+func (r *Replace) SetDisableAutoRollbackSession(b bool) *Replace {
+	r.DisableAutoRollbackSession = &b
+	return r
+}
+
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
 func (r *Replace) SetDisableAutoCloseSession(b bool) *Replace {
 	r.DisableAutoCloseSession = &b
@@ -89,7 +97,7 @@ func (r *Replace) SetForceRecreateSession(b bool) *Replace {
 }
 
 // MergeReplaceByParams assembles the Replace object from optional parameters.
-func MergeReplaceByParams(opts []*Replace) *Replace {
+func MergeReplaceByParams(opts []*Replace, global *Global) *Replace {
 	result := &Replace{}
 	for _, opt := range opts {
 		if helper.IsNil(opt) {
@@ -107,6 +115,9 @@ func MergeReplaceByParams(opts []*Replace) *Replace {
 		if helper.IsNotNil(opt.Let) {
 			result.Let = opt.Let
 		}
+		if helper.IsNotNil(opt.DisableAutoRollbackSession) {
+			result.DisableAutoRollbackSession = opt.DisableAutoRollbackSession
+		}
 		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
@@ -114,11 +125,20 @@ func MergeReplaceByParams(opts []*Replace) *Replace {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
 	}
+	if helper.IsNil(result.BypassDocumentValidation) {
+		result.BypassDocumentValidation = helper.ConvertToPointer(global.BypassDocumentValidation)
+	}
+	if helper.IsNil(result.Comment) {
+		result.Comment = global.Comment
+	}
+	if helper.IsNil(result.DisableAutoRollbackSession) {
+		result.DisableAutoRollbackSession = helper.ConvertToPointer(global.DisableAutoRollbackSession)
+	}
 	if helper.IsNil(result.DisableAutoCloseSession) {
-		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+		result.DisableAutoCloseSession = helper.ConvertToPointer(global.DisableAutoCloseSession)
 	}
 	if helper.IsNil(result.ForceRecreateSession) {
-		result.ForceRecreateSession = helper.ConvertToPointer(false)
+		result.ForceRecreateSession = helper.ConvertToPointer(global.ForceRecreateSession)
 	}
 	return result
 }

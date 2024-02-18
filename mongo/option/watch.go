@@ -22,35 +22,35 @@ type Watch struct {
 	// Comment A string that will be included in server logs, profiling logs, and currentOp queries to help trace the operation.
 	// The default is nil, which means that no comment will be included in the logs.
 	Comment *string
-	// FullDocument Specifies how the updated document should be returned in change notifications for update operations.
-	// The default is FullDocumentDefault, which means that only partial update deltas will be included in the change
+	// FullDocument Specifies how the updated document should be returned in Change notifications for update operations.
+	// The default is FullDocumentDefault, which means that only partial update deltas will be included in the Change
 	// notification.
 	FullDocument *FullDocument
-	// FullDocumentBeforeChange Specifies how the pre-update document should be returned in change notifications for
+	// FullDocumentBeforeChange Specifies how the pre-update document should be returned in Change notifications for
 	// update operations. The default is FullDocumentOff, which means that the pre-update document will not be included
-	// in the change notification.
+	// in the Change notification.
 	FullDocumentBeforeChange *FullDocument
 	// MaxAwaitTime The maximum amount of time that the server should wait for new documents to satisfy a tailable cursor query.
 	MaxAwaitTime *time.Duration
-	// ResumeAfter A document specifying the logical starting point for the change stream. Only changes corresponding to an oplog
+	// ResumeAfter A document specifying the logical starting point for the Change stream. Only changes corresponding to an oplog
 	// entry immediately after the resume token will be returned. If this is specified, StartAtOperationTime and
 	// StartAfter must not be set.
 	ResumeAfter any
-	// ShowExpandedEvents specifies whether the server will return an expanded list of change stream events. Additional
+	// ShowExpandedEvents specifies whether the server will return an expanded list of Change stream events. Additional
 	// events include: createIndexes, dropIndexes, modify, create, shardCollection, reshardCollection and
 	// refineCollectionShardKey. This option is only valid for MongoDB versions >= 6.0.
 	ShowExpandedEvents *bool
-	// StartAtOperationTime If specified, the change stream will only return changes that occurred at or after the given timestamp. This
+	// StartAtOperationTime If specified, the Change stream will only return changes that occurred at or after the given timestamp. This
 	// option is only valid for MongoDB versions >= 4.0. If this is specified, ResumeAfter and StartAfter must not be
 	// set.
 	StartAtOperationTime *primitive.Timestamp
-	// StartAfter A document specifying the logical starting point for the change stream. This is similar to the ResumeAfter
-	// option, but allows a resume token from an "invalidate" notification to be used. This allows a change stream on a
+	// StartAfter A document specifying the logical starting point for the Change stream. This is similar to the ResumeAfter
+	// option, but allows a resume token from an "invalidate" notification to be used. This allows a Change stream on a
 	// collection to be resumed after the collection has been dropped and recreated or renamed. Only changes
 	// corresponding to an oplog entry immediately after the specified token will be returned. If this is specified,
 	// ResumeAfter and StartAtOperationTime must not be set. This option is only valid for MongoDB versions >= 4.1.1.
 	StartAfter any
-	// Custom options to be added to the initial aggregate for the change stream. Key-value pairs of the BSON map should
+	// Custom options to be added to the initial aggregate for the Change stream. Key-value pairs of the BSON map should
 	// correlate with desired option names and values. Values must be Marshalable. Custom options may conflict with
 	// non-custom options, and custom options bypass client-side validation. Prefer using non-custom options where possible.
 	Custom bson.M
@@ -83,35 +83,35 @@ type WatchWithHandler struct {
 	// Comment A string that will be included in server logs, profiling logs, and currentOp queries to help trace the operation.
 	// The default is nil, which means that no comment will be included in the logs.
 	Comment *string
-	// FullDocument Specifies how the updated document should be returned in change notifications for update operations.
-	// The default is FullDocumentDefault, which means that only partial update deltas will be included in the change
+	// FullDocument Specifies how the updated document should be returned in Change notifications for update operations.
+	// The default is FullDocumentDefault, which means that only partial update deltas will be included in the Change
 	// notification.
 	FullDocument *FullDocument
-	// FullDocumentBeforeChange Specifies how the pre-update document should be returned in change notifications for
+	// FullDocumentBeforeChange Specifies how the pre-update document should be returned in Change notifications for
 	// update operations. The default is FullDocumentOff, which means that the pre-update document will not be included
-	// in the change notification.
+	// in the Change notification.
 	FullDocumentBeforeChange *FullDocument
 	// MaxAwaitTime The maximum amount of time that the server should wait for new documents to satisfy a tailable cursor query.
 	MaxAwaitTime *time.Duration
-	// ResumeAfter A document specifying the logical starting point for the change stream. Only changes corresponding to an oplog
+	// ResumeAfter A document specifying the logical starting point for the Change stream. Only changes corresponding to an oplog
 	// entry immediately after the resume token will be returned. If this is specified, StartAtOperationTime and
 	// StartAfter must not be set.
 	ResumeAfter any
-	// ShowExpandedEvents specifies whether the server will return an expanded list of change stream events. Additional
+	// ShowExpandedEvents specifies whether the server will return an expanded list of Change stream events. Additional
 	// events include: createIndexes, dropIndexes, modify, create, shardCollection, reshardCollection and
 	// refineCollectionShardKey. This option is only valid for MongoDB versions >= 6.0.
 	ShowExpandedEvents *bool
-	// StartAtOperationTime If specified, the change stream will only return changes that occurred at or after the given timestamp. This
+	// StartAtOperationTime If specified, the Change stream will only return changes that occurred at or after the given timestamp. This
 	// option is only valid for MongoDB versions >= 4.0. If this is specified, ResumeAfter and StartAfter must not be
 	// set.
 	StartAtOperationTime *primitive.Timestamp
-	// StartAfter A document specifying the logical starting point for the change stream. This is similar to the ResumeAfter
-	// option, but allows a resume token from an "invalidate" notification to be used. This allows a change stream on a
+	// StartAfter A document specifying the logical starting point for the Change stream. This is similar to the ResumeAfter
+	// option, but allows a resume token from an "invalidate" notification to be used. This allows a Change stream on a
 	// collection to be resumed after the collection has been dropped and recreated or renamed. Only changes
 	// corresponding to an oplog entry immediately after the specified token will be returned. If this is specified,
 	// ResumeAfter and StartAtOperationTime must not be set. This option is only valid for MongoDB versions >= 4.1.1.
 	StartAfter any
-	// Custom options to be added to the initial aggregate for the change stream. Key-value pairs of the BSON map should
+	// Custom options to be added to the initial aggregate for the Change stream. Key-value pairs of the BSON map should
 	// correlate with desired option names and values. Values must be Marshalable. Custom options may conflict with
 	// non-custom options, and custom options bypass client-side validation. Prefer using non-custom options where possible.
 	Custom bson.M

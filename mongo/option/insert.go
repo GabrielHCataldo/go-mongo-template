@@ -12,6 +12,8 @@ type InsertOne struct {
 	// Comment A string or document that will be included in server logs, profiling logs, and currentOp queries to help
 	// trace the operation.  The default value is nil, which means that no comment will be included in the logs.
 	Comment any
+	// DisableAutoRollbackSession disable auto rollback if an error occurs.
+	DisableAutoRollbackSession *bool
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
 	// default is false
@@ -66,6 +68,12 @@ func (i *InsertOne) SetComment(a any) *InsertOne {
 	return i
 }
 
+// SetDisableAutoRollbackSession creates a new DisableAutoRollbackSession instance.
+func (i *InsertOne) SetDisableAutoRollbackSession(b bool) *InsertOne {
+	i.DisableAutoRollbackSession = &b
+	return i
+}
+
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
 func (i *InsertOne) SetDisableAutoCloseSession(b bool) *InsertOne {
 	i.DisableAutoCloseSession = &b
@@ -109,7 +117,7 @@ func (i *InsertMany) SetForceRecreateSession(b bool) *InsertMany {
 }
 
 // MergeInsertOneByParams assembles the InsertOne object from optional parameters.
-func MergeInsertOneByParams(opts []*InsertOne) *InsertOne {
+func MergeInsertOneByParams(opts []*InsertOne, global *Global) *InsertOne {
 	result := &InsertOne{}
 	for _, opt := range opts {
 		if helper.IsNil(opt) {
@@ -128,17 +136,26 @@ func MergeInsertOneByParams(opts []*InsertOne) *InsertOne {
 			result.ForceRecreateSession = opt.ForceRecreateSession
 		}
 	}
+	if helper.IsNil(result.BypassDocumentValidation) {
+		result.BypassDocumentValidation = helper.ConvertToPointer(global.BypassDocumentValidation)
+	}
+	if helper.IsNil(result.Comment) {
+		result.Comment = global.Comment
+	}
+	if helper.IsNil(result.DisableAutoRollbackSession) {
+		result.DisableAutoRollbackSession = helper.ConvertToPointer(global.DisableAutoRollbackSession)
+	}
 	if helper.IsNil(result.DisableAutoCloseSession) {
-		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+		result.DisableAutoCloseSession = helper.ConvertToPointer(global.DisableAutoCloseSession)
 	}
 	if helper.IsNil(result.ForceRecreateSession) {
-		result.ForceRecreateSession = helper.ConvertToPointer(false)
+		result.ForceRecreateSession = helper.ConvertToPointer(global.ForceRecreateSession)
 	}
 	return result
 }
 
 // MergeInsertManyByParams assembles the InsertMany object from optional parameters.
-func MergeInsertManyByParams(opts []*InsertMany) *InsertMany {
+func MergeInsertManyByParams(opts []*InsertMany, global *Global) *InsertMany {
 	result := &InsertMany{}
 	for _, opt := range opts {
 		if helper.IsNil(opt) {
@@ -160,14 +177,20 @@ func MergeInsertManyByParams(opts []*InsertMany) *InsertMany {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
 		}
 	}
-	if helper.IsNil(result.DisableAutoCloseSession) {
-		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+	if helper.IsNil(result.BypassDocumentValidation) {
+		result.BypassDocumentValidation = helper.ConvertToPointer(global.BypassDocumentValidation)
+	}
+	if helper.IsNil(result.Comment) {
+		result.Comment = global.Comment
 	}
 	if helper.IsNil(result.DisableAutoRollbackSession) {
-		result.DisableAutoRollbackSession = helper.ConvertToPointer(false)
+		result.DisableAutoRollbackSession = helper.ConvertToPointer(global.DisableAutoRollbackSession)
+	}
+	if helper.IsNil(result.DisableAutoCloseSession) {
+		result.DisableAutoCloseSession = helper.ConvertToPointer(global.DisableAutoCloseSession)
 	}
 	if helper.IsNil(result.ForceRecreateSession) {
-		result.ForceRecreateSession = helper.ConvertToPointer(false)
+		result.ForceRecreateSession = helper.ConvertToPointer(global.ForceRecreateSession)
 	}
 	return result
 }

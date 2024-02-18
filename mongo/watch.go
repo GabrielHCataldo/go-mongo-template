@@ -2,7 +2,6 @@ package mongo
 
 import (
 	"context"
-	"github.com/GabrielHCataldo/go-errors/errors"
 	"github.com/GabrielHCataldo/go-helper/helper"
 	"github.com/GabrielHCataldo/go-mongo-template/mongo/option"
 	"go.mongodb.org/mongo-driver/bson"
@@ -45,10 +44,9 @@ type EventHandler func(ctx *EventContext)
 // Decode convert Event.FullDocument to struct
 func (f FullDocument) Decode(dest any) error {
 	if helper.IsNotStruct(dest) {
-		return errDestIsNotStruct(2)
+		return ErrDestIsNotStruct
 	}
-	err := helper.ConvertToDest(f, dest)
-	return errors.NewSkipCaller(2, err)
+	return helper.ConvertToDest(f, dest)
 }
 
 func processNextEvent(handler EventHandler, event Event, opt *option.WatchWithHandler) {

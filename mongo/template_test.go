@@ -233,6 +233,23 @@ func TestTemplateFindOne(t *testing.T) {
 	}
 }
 
+func TestTemplateFindOneAndDeleteById(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFindOneAndDeleteById() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.FindOneAndDeleteById(ctx, tt.id, tt.dest, tt.option, nil)
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
+				t.Errorf("FindOneAndDeleteById() error = %v, wantErr %v", err, tt.wantErr)
+			} else if helper.IsNotNil(err) {
+				t.Log("err expected:", err)
+			}
+			_ = mongoTemplate.CloseSession(ctx, helper.IsNotNil(err))
+		})
+	}
+}
+
 func TestTemplateFindOneAndDelete(t *testing.T) {
 	initDocument()
 	for _, tt := range initListTestFindOneAndDelete() {
@@ -250,6 +267,23 @@ func TestTemplateFindOneAndDelete(t *testing.T) {
 	}
 }
 
+func TestTemplateFindOneAndReplaceById(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFindOneAndReplaceById() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.FindOneAndReplaceById(ctx, tt.id, tt.replacement, tt.dest, tt.option, nil)
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
+				t.Errorf("FindOneAndReplaceById() error = %v, wantErr %v", err, tt.wantErr)
+			} else if helper.IsNotNil(err) {
+				t.Log("err expected:", err)
+			}
+			_ = mongoTemplate.CloseSession(ctx, helper.IsNotNil(err))
+		})
+	}
+}
+
 func TestTemplateFindOneAndReplace(t *testing.T) {
 	initDocument()
 	for _, tt := range initListTestFindOneAndReplace() {
@@ -259,6 +293,23 @@ func TestTemplateFindOneAndReplace(t *testing.T) {
 			err := mongoTemplate.FindOneAndReplace(ctx, tt.filter, tt.replacement, tt.dest, tt.option, nil)
 			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
 				t.Errorf("FindOneAndReplace() error = %v, wantErr %v", err, tt.wantErr)
+			} else if helper.IsNotNil(err) {
+				t.Log("err expected:", err)
+			}
+			_ = mongoTemplate.CloseSession(ctx, helper.IsNotNil(err))
+		})
+	}
+}
+
+func TestTemplateFindOneAndUpdateById(t *testing.T) {
+	initDocument()
+	for _, tt := range initListTestFindOneAndUpdateById() {
+		t.Run(tt.name, func(t *testing.T) {
+			ctx, cancel := context.WithTimeout(context.TODO(), tt.durationTimeout)
+			defer cancel()
+			err := mongoTemplate.FindOneAndUpdateById(ctx, tt.id, tt.update, tt.dest, tt.option, nil)
+			if helper.IsNotEqualTo(helper.IsNotNil(err), tt.wantErr) {
+				t.Errorf("FindOneAndUpdateById() error = %v, wantErr %v", err, tt.wantErr)
 			} else if helper.IsNotNil(err) {
 				t.Log("err expected:", err)
 			}

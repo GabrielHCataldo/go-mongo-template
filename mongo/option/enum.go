@@ -8,7 +8,7 @@ type CursorType int8
 // before the update or as it is after the update.
 type ReturnDocument int8
 
-// FullDocument specifies how a change stream should return the modified document.
+// FullDocument specifies how a Change stream should return the modified document.
 type FullDocument string
 
 //goland:noinspection ALL
@@ -22,7 +22,7 @@ const (
 	// FullDocumentUpdateLookup includes a delta describing the changes to the document and a copy of the entire document that
 	// was changed.
 	FullDocumentUpdateLookup FullDocument = "updateLookup"
-	// FullDocumentWhenAvailable includes a post-image of the modified document for replace and update change events
+	// FullDocumentWhenAvailable includes a post-image of the modified document for replace and update Change events
 	// if the post-image for this event is available.
 	FullDocumentWhenAvailable FullDocument = "whenAvailable"
 )

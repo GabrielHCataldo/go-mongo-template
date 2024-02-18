@@ -258,6 +258,8 @@ type FindOneAndDelete struct {
 	// mapping parameter names to values. Values must be constant or closed expressions that do not reference document
 	// fields. Parameters can then be accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let any
+	// DisableAutoRollbackSession disable auto rollback if an error occurs.
+	DisableAutoRollbackSession *bool
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
 	// default is false.
@@ -314,6 +316,8 @@ type FindOneAndReplace struct {
 	// parameter names to values. Values must be constant or closed expressions that do not reference document fields.
 	// Parameters can then be accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let any
+	// DisableAutoRollbackSession disable auto rollback if an error occurs.
+	DisableAutoRollbackSession *bool
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
 	// default is false.
@@ -374,6 +378,8 @@ type FindOneAndUpdate struct {
 	// Values must be constant or closed expressions that do not reference document fields. Parameters can then be
 	// accessed as variables in an aggregate expression context (e.g. "$$var").
 	Let any
+	// DisableAutoRollbackSession disable auto rollback if an error occurs.
+	DisableAutoRollbackSession *bool
 	// DisableAutoCloseSession Disable automatic closing session, if true, we automatically close session according to
 	// the result, if an error occurs, we abort the transaction, otherwise, we commit the transaction.
 	// default is false
@@ -768,8 +774,8 @@ func (f *FindOneAndDelete) SetCollation(c *Collation) *FindOneAndDelete {
 }
 
 // SetComment creates a new Comment instance.
-func (f *FindOneAndDelete) SetComment(s string) *FindOneAndDelete {
-	f.Comment = s
+func (f *FindOneAndDelete) SetComment(a any) *FindOneAndDelete {
+	f.Comment = a
 	return f
 }
 
@@ -803,6 +809,12 @@ func (f *FindOneAndDelete) SetLet(v any) *FindOneAndDelete {
 	return f
 }
 
+// SetDisableAutoRollbackSession creates a new DisableAutoRollbackSession instance.
+func (f *FindOneAndDelete) SetDisableAutoRollbackSession(b bool) *FindOneAndDelete {
+	f.DisableAutoRollbackSession = &b
+	return f
+}
+
 // SetDisableAutoCloseSession creates a new DisableAutoCloseSession instance.
 func (f *FindOneAndDelete) SetDisableAutoCloseSession(b bool) *FindOneAndDelete {
 	f.DisableAutoCloseSession = &b
@@ -812,6 +824,12 @@ func (f *FindOneAndDelete) SetDisableAutoCloseSession(b bool) *FindOneAndDelete 
 // SetForceRecreateSession creates a new ForceRecreateSession instance.
 func (f *FindOneAndDelete) SetForceRecreateSession(b bool) *FindOneAndDelete {
 	f.ForceRecreateSession = &b
+	return f
+}
+
+// SetDisableAutoRollbackSession creates a new DisableAutoCloseSession instance.
+func (f *FindOneAndReplace) SetDisableAutoRollbackSession(b bool) *FindOneAndReplace {
+	f.DisableAutoRollbackSession = &b
 	return f
 }
 
@@ -840,8 +858,8 @@ func (f *FindOneAndReplace) SetCollation(c *Collation) *FindOneAndReplace {
 }
 
 // SetComment sets value for the Comment field.
-func (f *FindOneAndReplace) SetComment(s string) *FindOneAndReplace {
-	f.Comment = s
+func (f *FindOneAndReplace) SetComment(a any) *FindOneAndReplace {
+	f.Comment = a
 	return f
 }
 
@@ -884,6 +902,12 @@ func (f *FindOneAndReplace) SetLet(v any) *FindOneAndReplace {
 // SetSort creates a new Sort instance.
 func (f *FindOneAndReplace) SetSort(a any) *FindOneAndReplace {
 	f.Sort = a
+	return f
+}
+
+// SetDisableAutoRollbackSession creates a new DisableAutoRollbackSession instance.
+func (f *FindOneAndUpdate) SetDisableAutoRollbackSession(b bool) *FindOneAndUpdate {
+	f.DisableAutoRollbackSession = &b
 	return f
 }
 
@@ -1180,11 +1204,14 @@ func MergeFindOneByIdByParams(opts []*FindOneById) *FindOneById {
 }
 
 // MergeFindOneAndDeleteByParams assembles the FindOneAndDelete object from optional parameters.
-func MergeFindOneAndDeleteByParams(opts []*FindOneAndDelete) *FindOneAndDelete {
+func MergeFindOneAndDeleteByParams(opts []*FindOneAndDelete, global *Global) *FindOneAndDelete {
 	result := &FindOneAndDelete{}
 	for _, opt := range opts {
 		if helper.IsNil(opt) {
 			continue
+		}
+		if helper.IsNotNil(opt.DisableAutoRollbackSession) {
+			result.DisableAutoRollbackSession = opt.DisableAutoRollbackSession
 		}
 		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
@@ -1214,17 +1241,23 @@ func MergeFindOneAndDeleteByParams(opts []*FindOneAndDelete) *FindOneAndDelete {
 			result.MaxTime = opt.MaxTime
 		}
 	}
+	if helper.IsNil(result.Comment) {
+		result.Comment = global.Comment
+	}
+	if helper.IsNil(result.DisableAutoRollbackSession) {
+		result.DisableAutoRollbackSession = helper.ConvertToPointer(global.DisableAutoRollbackSession)
+	}
 	if helper.IsNil(result.DisableAutoCloseSession) {
-		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+		result.DisableAutoCloseSession = helper.ConvertToPointer(global.DisableAutoCloseSession)
 	}
 	if helper.IsNil(result.ForceRecreateSession) {
-		result.ForceRecreateSession = helper.ConvertToPointer(false)
+		result.ForceRecreateSession = helper.ConvertToPointer(global.ForceRecreateSession)
 	}
 	return result
 }
 
 // MergeFindOneAndReplaceByParams assembles the FindOneAndReplace object from optional parameters.
-func MergeFindOneAndReplaceByParams(opts []*FindOneAndReplace) *FindOneAndReplace {
+func MergeFindOneAndReplaceByParams(opts []*FindOneAndReplace, global *Global) *FindOneAndReplace {
 	result := &FindOneAndReplace{}
 	for _, opt := range opts {
 		if helper.IsNil(opt) {
@@ -1232,6 +1265,9 @@ func MergeFindOneAndReplaceByParams(opts []*FindOneAndReplace) *FindOneAndReplac
 		}
 		if helper.IsNotNil(opt.BypassDocumentValidation) {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
+		}
+		if helper.IsNotNil(opt.DisableAutoRollbackSession) {
+			result.DisableAutoRollbackSession = opt.DisableAutoRollbackSession
 		}
 		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
@@ -1267,17 +1303,26 @@ func MergeFindOneAndReplaceByParams(opts []*FindOneAndReplace) *FindOneAndReplac
 			result.ReturnDocument = opt.ReturnDocument
 		}
 	}
+	if helper.IsNil(result.BypassDocumentValidation) {
+		result.BypassDocumentValidation = helper.ConvertToPointer(global.BypassDocumentValidation)
+	}
+	if helper.IsNil(result.Comment) {
+		result.Comment = global.Comment
+	}
+	if helper.IsNil(result.DisableAutoRollbackSession) {
+		result.DisableAutoRollbackSession = helper.ConvertToPointer(global.DisableAutoRollbackSession)
+	}
 	if helper.IsNil(result.DisableAutoCloseSession) {
-		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+		result.DisableAutoCloseSession = helper.ConvertToPointer(global.DisableAutoCloseSession)
 	}
 	if helper.IsNil(result.ForceRecreateSession) {
-		result.ForceRecreateSession = helper.ConvertToPointer(false)
+		result.ForceRecreateSession = helper.ConvertToPointer(global.ForceRecreateSession)
 	}
 	return result
 }
 
 // MergeFindOneAndUpdateByParams assembles the FindOneAndUpdate object from optional parameters.
-func MergeFindOneAndUpdateByParams(opts []*FindOneAndUpdate) *FindOneAndUpdate {
+func MergeFindOneAndUpdateByParams(opts []*FindOneAndUpdate, global *Global) *FindOneAndUpdate {
 	result := &FindOneAndUpdate{}
 	for _, opt := range opts {
 		if helper.IsNil(opt) {
@@ -1285,6 +1330,9 @@ func MergeFindOneAndUpdateByParams(opts []*FindOneAndUpdate) *FindOneAndUpdate {
 		}
 		if helper.IsNotNil(opt.BypassDocumentValidation) {
 			result.BypassDocumentValidation = opt.BypassDocumentValidation
+		}
+		if helper.IsNotNil(opt.DisableAutoRollbackSession) {
+			result.DisableAutoRollbackSession = opt.DisableAutoRollbackSession
 		}
 		if helper.IsNotNil(opt.DisableAutoCloseSession) {
 			result.DisableAutoCloseSession = opt.DisableAutoCloseSession
@@ -1323,11 +1371,20 @@ func MergeFindOneAndUpdateByParams(opts []*FindOneAndUpdate) *FindOneAndUpdate {
 			result.ReturnDocument = opt.ReturnDocument
 		}
 	}
+	if helper.IsNil(result.BypassDocumentValidation) {
+		result.BypassDocumentValidation = helper.ConvertToPointer(global.BypassDocumentValidation)
+	}
+	if helper.IsNil(result.Comment) {
+		result.Comment = global.Comment
+	}
+	if helper.IsNil(result.DisableAutoRollbackSession) {
+		result.DisableAutoRollbackSession = helper.ConvertToPointer(global.DisableAutoRollbackSession)
+	}
 	if helper.IsNil(result.DisableAutoCloseSession) {
-		result.DisableAutoCloseSession = helper.ConvertToPointer(false)
+		result.DisableAutoCloseSession = helper.ConvertToPointer(global.DisableAutoCloseSession)
 	}
 	if helper.IsNil(result.ForceRecreateSession) {
-		result.ForceRecreateSession = helper.ConvertToPointer(false)
+		result.ForceRecreateSession = helper.ConvertToPointer(global.ForceRecreateSession)
 	}
 	return result
 }
