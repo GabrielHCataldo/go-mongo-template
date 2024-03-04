@@ -614,6 +614,7 @@ func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput
 		return nil, err
 	}
 	opt := option.MergeFindPageableByParams(opts)
+	skip := input.Page * input.PageSize
 	cursor, err := collection.Find(ctx, filter, &options.FindOptions{
 		AllowDiskUse:        opt.AllowDiskUse,
 		AllowPartialResults: opt.AllowPartialResults,
@@ -631,7 +632,7 @@ func (t *Template) FindPageable(ctx context.Context, filter any, input PageInput
 		Projection:          opt.Projection,
 		ReturnKey:           opt.ReturnKey,
 		ShowRecordID:        opt.ShowRecordID,
-		Skip:                &input.Page,
+		Skip:                &skip,
 		Sort:                input.Sort,
 		Let:                 opt.Let,
 	})
